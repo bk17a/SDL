@@ -32,9 +32,7 @@ bool GameEngine::init()
 		}
 
 		//Create window
-		/*window = SDL_CreateWindow("GAME V0.1", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-		if (window == NULL)*/
-		if(!windowObj.init())
+		if (!windowObj.init())
 		{
 			cout << "Failed to create window! SDL Error: " << SDL_GetError() << endl;
 			running = false;
@@ -42,7 +40,6 @@ bool GameEngine::init()
 		else
 		{
 			//Create renderer
-			//renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 			renderer = windowObj.createRenderer();
 			if (renderer == NULL)
 			{
@@ -92,19 +89,50 @@ bool GameEngine::loadMedia()
 	}
 
 	// Load player1 texture
-	if (!playerTex.loadFromFile("gfx/single.png", renderer))
+	if (!player1Tex.loadFromFile("gfx/player1.png", renderer))
 	{
 		cout << "Failed to load player texture image!\n";
 		success = false;
 	}
 	else
 	{
-		const int playerWidth = 50;
-		const int playerHeight = 50;
 		// Create the player object
-		player1 = Player(renderer, &playerTex);
+		player1 = Player(renderer, &player1Tex);
 	}
 
+	if (!player2Tex.loadFromFile("gfx/player2Idle.png", renderer))
+	{
+		cout << "Fauled to load player 2 idle texture!\n";
+		success = false;
+	}
+	else
+	{
+		// set player 2 rect
+		player2Rect[0].x = 0;
+		player2Rect[0].y = 0;
+		player2Rect[0].w = 127;
+		player2Rect[0].h = 70;
+
+		player2Rect[1].x = 127;
+		player2Rect[1].y = 0;
+		player2Rect[1].w = 127;
+		player2Rect[1].h = 70;
+
+		player2Rect[2].x = 254;
+		player2Rect[2].y = 0;
+		player2Rect[2].w = 127;
+		player2Rect[2].h = 70;
+
+		player2Rect[3].x = 381;
+		player2Rect[3].y = 0;
+		player2Rect[3].w = 127;
+		player2Rect[3].h = 70;
+
+		player2Rect[4].x = 381;
+		player2Rect[4].y = 0;
+		player2Rect[4].w = 127;
+		player2Rect[4].h = 70;
+	}
 	return success;
 }
 
@@ -137,27 +165,23 @@ void GameEngine::update()
 
 void GameEngine::render()
 {
-    // Clear screen
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-    SDL_RenderClear(renderer);
+	// Clear screen
+	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+	SDL_RenderClear(renderer);
 
-    // Render background texture to screen
-    int x1 = 0;
-    int y1 = 0;
-    int screenWidth, screenHeight;
-    SDL_GetWindowSize(windowObj.getWindow(), &screenWidth, &screenHeight);
-    grass.render(x1, y1, screenWidth, screenHeight, renderer, &camera);
+	// Render background texture to screen
+	grass.render(0, 0, renderer, &camera);
 
-    // Render fps
-    fpsTexture.render(screenWidth - fpsTexture.getWidth(), 0, fpsTexture.getWidth(), fpsTexture.getHeight(), renderer);
+	//// Render fps
+	fpsTexture.render(SCREEN_WIDTH - fpsTexture.getWidth(), 0, renderer);
 
-    // Render player
-    player1.render(renderer, camera.x, camera.y);
+	// Render player
+	player1.render(renderer, camera.x, camera.y);
 
-    // Update Screen
-    SDL_RenderPresent(renderer);
+	// Render current frame
+	SDL_Rect* currentClip = &player2Rect[animationFrame / 5];
+	player2Tex.render((SCREEN_WIDTH - currentClip->w) / 2, (SCREEN_HEIGHT - currentClip->h) / 2, renderer, currentClip);
 }
-
 
 bool GameEngine::handleEvents()
 {
@@ -214,7 +238,8 @@ void GameEngine::close()
 	// Free loaded images
 	grass.free();
 	fpsTexture.free();
-	playerTex.free();
+	player1Tex.free();
+	player2Tex.free();
 
 	// Close font
 	TTF_CloseFont(font);
@@ -222,8 +247,6 @@ void GameEngine::close()
 
 	// Destory window
 	windowObj.free();
-	//SDL_DestroyWindow(window);
-	//window = NULL;
 	SDL_DestroyRenderer(renderer);
 	renderer = NULL;
 
@@ -255,9 +278,14 @@ void GameEngine::run()
 			// Variables for frame rate limiting
 			const int displayIndex = 0;  // Index of the display to query
 			SDL_DisplayMode displayMode;
+
 			SDL_GetCurrentDisplayMode(displayIndex, &displayMode);
 			const int SCREEN_TICKS_PER_FRAME = 1000 / displayMode.refresh_rate;
+
 			Uint32 prevFrameTime = 0;
+
+			// current animation frame
+			animationFrame = 0;
 
 			// Game loop
 			while (isRunning())
@@ -279,52 +307,46 @@ void GameEngine::run()
 
 				// Calculate average FPS
 				float avgFPS = countedFrames / (fpsTimer.getTicks() / 1000.0f);
-				if (avgFPS > 0)
-				{
-					//Render text
-					timeText.str("");
-					timeText << "FPS: " << fixed << setprecision(0) << avgFPS;
-					if (!fpsTexture.loadFromRenderedText(timeText.str().c_str(), textColor, renderer, font))
-					{
-						cout << "Unable to render FPS texture!\n";
-					}
-				}
+
 				// update function
 				update();
+
 				if (!windowObj.isMin())
 				{
-					// render function
+					// Render FPS
+					if (avgFPS > 0)
+					{
+						// Render text
+						timeText.str("");
+						timeText << "FPS: " << fixed << setprecision(0) << avgFPS;
+						if (!fpsTexture.loadFromRenderedText(timeText.str().c_str(), textColor, renderer, font))
+						{
+							cout << "Unable to render FPS texture!\n";
+						}
+					}
+
+					// Render function
 					render();
+
+					// Update screen
+					SDL_RenderPresent(renderer);
 				}
+
+				// fps frames
 				++countedFrames;
+
+				// Go to next frame every 5th frame
+				if (countedFrames % 8 == 0)
+				{
+					++animationFrame;
+
+					// Cycle animation
+					if (animationFrame / 5 >= WALKING_ANIMATION_FRAMES)
+					{
+						animationFrame = 0;
+					}
+				}
 			}
 		}
 	}
-}
-
-TextureManager GameEngine::getRedTex() const
-{
-	return redTex;
-}
-
-TextureManager GameEngine::getGreenTex() const
-{
-	return greenTex;
-}
-
-TextureManager GameEngine::getBlueTex() const
-{
-	return blueTex;
-}
-
-TextureManager GameEngine::getShimmerTex() const
-{
-	return shimmerTex;
-}
-
-GameEngine* GameEngine::getGameEngineInstance()
-{
-	static GameEngine gameEngine; // Create a static instance of GameEngine
-
-	return &gameEngine;
 }

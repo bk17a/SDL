@@ -16,6 +16,7 @@ class GameEngine
 {
 public:
 	int countedFrames = 0;
+	int animationFrame = 0;
 
 	// initialization
 	GameEngine();  // default constructor
@@ -23,7 +24,7 @@ public:
 
 	bool init();							// initialize renderer, window, font, image
 	bool loadMedia();						// loads media (image, fonts)
-	void update();							
+	void update();
 	void render();							// render textures, fonts, etc
 	bool handleEvents();					// handle quit event
 	void quit();							// quit out
@@ -31,41 +32,39 @@ public:
 	bool isRunning() const;					// check to see if program is running
 	void run();								// run the program
 
-	TextureManager getRedTex() const;
-	TextureManager getGreenTex() const;
-	TextureManager getBlueTex() const;
-	TextureManager getShimmerTex() const;
-
 	// getters
 	SDL_Window* getWindow() const;
 	SDL_Renderer* getRenderer() const;
 	TTF_Font* getFont() const;
-
-
-	static GameEngine* getGameEngineInstance();
-	TextureManager redTex;
-	TextureManager greenTex;
-	TextureManager blueTex;
-	TextureManager shimmerTex;
 private:
-	bool running;
+	// running flag
+	bool running;															
+	
+	// grass texture
+	TextureManager grass;	
 
-	TextureManager grass;
-
-	TextureManager playerTex;
+	// player texture and object
+	TextureManager player1Tex;
 	Player player1;
 
+	// fps texture and timer object
 	Timer fpsTimer;
 	TextureManager fpsTexture;
 
+	// font
 	TTF_Font* font;
 
+	// window and renderer
 	SDL_Window* window;
 	SDL_Renderer* renderer;
-
-	SDL_Rect camera = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
-
 	Window windowObj;
+
+	// camera rect
+	SDL_Rect camera = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
+	
+	// player animations
+	SDL_Rect player2Rect[WALKING_ANIMATION_FRAMES];
+	TextureManager player2Tex;
 };
 
 #endif

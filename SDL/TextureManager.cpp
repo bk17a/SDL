@@ -80,7 +80,7 @@ bool TextureManager::loadFromRenderedText(const char* textureText, SDL_Color tex
 	}
 	else
 	{
-		// create texture from surface 
+		// create texture from surface
 		texture = SDL_CreateTextureFromSurface(renderer, textSurface);
 		if (texture == NULL)
 		{
@@ -99,18 +99,19 @@ bool TextureManager::loadFromRenderedText(const char* textureText, SDL_Color tex
 	return texture != NULL;
 }
 
-void TextureManager::render(int p_x, int p_y, int p_w, int p_h, SDL_Renderer* renderer, SDL_Rect* clip)
+void TextureManager::render(int x, int y, SDL_Renderer* renderer, SDL_Rect* clip)
 {
-	// set rendering spaces and render to screen
-	SDL_Rect renderQuad = { p_x, p_y, p_w, p_h };
+	//Set rendering space and render to screen
+	SDL_Rect renderQuad = { x, y, width, height };
 
-	// set clip rendering dimensions
+	//Set clip rendering dimensions
 	if (clip != NULL)
 	{
 		renderQuad.w = clip->w;
 		renderQuad.h = clip->h;
 	}
 
+	//Render to screen
 	SDL_RenderCopy(renderer, texture, clip, &renderQuad);
 }
 

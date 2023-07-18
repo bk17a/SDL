@@ -1,6 +1,6 @@
 #include "Player.h"
 
-Player::Player() 
+Player::Player()
 {
 	xPos = 0;
 	yPos = 0;
@@ -66,6 +66,53 @@ void Player::handleEvent(SDL_Event& e)
 	}
 }
 
+void Player::handleEvent2(SDL_Event& e)
+{
+	// if a key is pressed
+	if (e.type == SDL_KEYDOWN && e.key.repeat == 0)
+	{
+		// adjusting the velocity
+		switch (e.key.keysym.sym)
+		{
+		case SDLK_w:
+			yVel = -DOT_VEL;
+			break;
+		case SDLK_s:
+			yVel = DOT_VEL;
+			break;
+		case SDLK_a:
+			xVel = -DOT_VEL;
+			break;
+		case SDLK_d:
+			xVel = DOT_VEL;
+			break;
+		default:
+			break;
+		}
+	}
+	// adjusting velocity when a key is released
+	else if (e.type == SDL_KEYUP && e.key.repeat == 0)
+	{
+		// adjusting the velocity
+		switch (e.key.keysym.sym)
+		{
+		case SDLK_w:
+			yVel = 0;
+			break;
+		case SDLK_s:
+			yVel = 0;
+			break;
+		case SDLK_a:
+			xVel = 0;
+			break;
+		case SDLK_d:
+			xVel = 0;
+			break;
+		default:
+			break;
+		}
+	}
+}
 
 void Player::move()
 {
@@ -86,12 +133,11 @@ void Player::move()
 		// move back
 		yPos -= yVel;
 	}
-
 }
 
 void Player::render(SDL_Renderer* renderer, int camX, int camY)
 {
-	playerTexture->render(xPos - camX, yPos - camY, PLAYER_WIDTH, PLAYER_HEIGHT, renderer);
+	playerTexture->render(xPos - camX, yPos - camY, renderer);
 }
 
 int Player::getXPos() const

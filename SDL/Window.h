@@ -23,14 +23,12 @@ public:
 	bool hasMouseFocus();												// check for mouse focus
 	bool hasKbFocus();													// check for keyboard focus
 	bool isMin();														// check for minimized
-	SDL_Window* getWindow() const; 
+	SDL_Window* getWindow() const;
 
 private:
 	SDL_Window* window;													// window data
 	int width, height;													// window dimensions
 	bool mouseFocus, kbFocus, fullScreen, min;							// window focus
-
-
 };
 
 #endif // WINDOW_H

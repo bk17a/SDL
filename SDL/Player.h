@@ -13,11 +13,11 @@ class Player
 {
 public:
 
-
 	// initialize the variables
 	Player();
-	Player(SDL_Renderer* renderer, TextureManager* playerTexture);								
+	Player(SDL_Renderer* renderer, TextureManager* playerTexture);
 	void handleEvent(SDL_Event& e);										// handle key presses and adjust dot's velocity
+	void handleEvent2(SDL_Event& e);
 	void move();														// moves the player
 	void render(SDL_Renderer* renderer, int camX, int camY);			// render player onto screen relative to camera
 
@@ -29,7 +29,6 @@ private:
 	int xVel, yVel; // velocity of player
 	SDL_Renderer* renderer;
 	TextureManager* playerTexture;
-
 };
 
 #endif //PLAYER_H_

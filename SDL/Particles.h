@@ -5,7 +5,7 @@
 #include "TextureManager.h"
 #include "Constants.h"
 
-class Particles 
+class Particles
 {
 public:
 	Particles();											// default constructor

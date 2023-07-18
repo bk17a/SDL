@@ -1,6 +1,6 @@
 #include "Particles.h"
 
-Particles::Particles() 
+Particles::Particles()
 {
 	xPos = 0;
 	yPos = 0;
@@ -18,7 +18,7 @@ Particles::Particles()
 //	// initialize animation
 //	frame = rand() % 5;
 //
-//	
+//
 //
 //	// set type
 //	switch (rand() % 3)

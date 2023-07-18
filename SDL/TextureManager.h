@@ -14,7 +14,7 @@ public:
 	void free();
 	bool loadFromFile(const char* path, SDL_Renderer* renderer);
 	bool loadFromRenderedText(const char* textureText, SDL_Color textColor, SDL_Renderer* renderer, TTF_Font* font);
-	void render(int p_x, int p_y, int p_w, int p_h, SDL_Renderer* renderer, SDL_Rect* clip = NULL);
+	void render(int x, int y, SDL_Renderer* renderer, SDL_Rect* clip = NULL);
 	void setAlpha(Uint8 alpha);
 
 	int getWidth() const;
@@ -24,7 +24,6 @@ private:
 	SDL_Texture* texture;
 	int width;
 	int height;
-
 };
 
 #endif

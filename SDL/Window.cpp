@@ -2,7 +2,7 @@
 
 using namespace std;
 
-Window::Window() 
+Window::Window()
 {
 	window = NULL;				// initializing all variables
 	width = 0;
@@ -49,41 +49,41 @@ void Window::handleEvent(SDL_Event& e, SDL_Renderer* renderer)
 
 		switch (e.window.event)
 		{
-		// get new dimensions and repain on window size change
+			// get new dimensions and repain on window size change
 		case SDL_WINDOWEVENT_SIZE_CHANGED:
 			width = e.window.data1;
 			height = e.window.data2;
 			SDL_RenderPresent(renderer);
 			break;
-		// repaint on exposure
+			// repaint on exposure
 		case SDL_WINDOWEVENT_EXPOSED:
 			SDL_RenderPresent(renderer);
 			break;
-		// mouse entered window
+			// mouse entered window
 		case SDL_WINDOWEVENT_ENTER:
 			mouseFocus = true;
 			updateCaption = true;
 			break;
-		// mouse left window
+			// mouse left window
 		case SDL_WINDOWEVENT_LEAVE:
 			mouseFocus = false;
 			updateCaption = true;
 			break;
-		// keyboard focus
+			// keyboard focus
 		case SDL_WINDOWEVENT_FOCUS_GAINED:
 			kbFocus = true;
 			updateCaption = true;
 			break;
-		// lost keyboard focus
+			// lost keyboard focus
 		case SDL_WINDOWEVENT_FOCUS_LOST:
 			kbFocus = false;
 			updateCaption = true;
 			break;
-		// window minimized
+			// window minimized
 		case SDL_WINDOWEVENT_MINIMIZED:
 			min = true;
 			break;
-		// window maximeized
+			// window maximeized
 		case SDL_WINDOWEVENT_MAXIMIZED:
 			min = false;
 			break;
