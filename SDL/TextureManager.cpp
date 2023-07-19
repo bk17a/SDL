@@ -4,7 +4,7 @@ using namespace std;
 
 TextureManager::TextureManager()
 {
-	texture = NULL;
+	texture = nullptr;
 	width = 0;
 	height = 0;
 }
@@ -17,10 +17,10 @@ TextureManager::~TextureManager()
 void TextureManager::free()
 {
 	//Free texture if it exists
-	if (texture != NULL)
+	if (texture != nullptr)
 	{
 		SDL_DestroyTexture(texture);
-		texture = NULL;
+		texture = nullptr;
 		width = 0;
 		height = 0;
 	}
@@ -32,11 +32,11 @@ bool TextureManager::loadFromFile(const char* path, SDL_Renderer* renderer)
 	free();
 
 	//The final texture
-	SDL_Texture* newTexture = NULL;
+	SDL_Texture* newTexture = nullptr;
 
 	//Load image at specified path
 	SDL_Surface* loadedSurface = IMG_Load(path);
-	if (loadedSurface == NULL)
+	if (loadedSurface == nullptr)
 	{
 		cout << "Unable to load image! SDL_image Error: " << IMG_GetError() << endl;
 	}
@@ -47,7 +47,7 @@ bool TextureManager::loadFromFile(const char* path, SDL_Renderer* renderer)
 
 		//Create texture from surface pixels
 		newTexture = SDL_CreateTextureFromSurface(renderer, loadedSurface);
-		if (newTexture == NULL)
+		if (newTexture == nullptr)
 		{
 			cout << "Unable to create texture from surface! SDL Error: " << SDL_GetError() << endl;
 		}
@@ -64,7 +64,7 @@ bool TextureManager::loadFromFile(const char* path, SDL_Renderer* renderer)
 
 	//Return success
 	texture = newTexture;
-	return texture != NULL;
+	return texture != nullptr;
 }
 
 bool TextureManager::loadFromRenderedText(const char* textureText, SDL_Color textColor, SDL_Renderer* renderer, TTF_Font* font)
@@ -74,7 +74,7 @@ bool TextureManager::loadFromRenderedText(const char* textureText, SDL_Color tex
 
 	// render text surface
 	SDL_Surface* textSurface = TTF_RenderText_Solid(font, textureText, textColor);
-	if (textSurface == NULL)
+	if (textSurface == nullptr)
 	{
 		cout << "Failed to render text surface! SDL_ttf Error: " << TTF_GetError() << endl;
 	}
@@ -82,7 +82,7 @@ bool TextureManager::loadFromRenderedText(const char* textureText, SDL_Color tex
 	{
 		// create texture from surface
 		texture = SDL_CreateTextureFromSurface(renderer, textSurface);
-		if (texture == NULL)
+		if (texture == nullptr)
 		{
 			cout << "Unable to create texture from surface! SDL Error: " << SDL_GetError() << endl;
 		}
@@ -96,16 +96,16 @@ bool TextureManager::loadFromRenderedText(const char* textureText, SDL_Color tex
 		SDL_FreeSurface(textSurface);
 	}
 
-	return texture != NULL;
+	return texture != nullptr;
 }
 
-void TextureManager::render(int x, int y, SDL_Renderer* renderer, SDL_Rect* clip)
+void TextureManager::render(int x, int y, SDL_Renderer* renderer, const SDL_Rect* clip)
 {
 	//Set rendering space and render to screen
 	SDL_Rect renderQuad = { x, y, width, height };
 
 	//Set clip rendering dimensions
-	if (clip != NULL)
+	if (clip != nullptr)
 	{
 		renderQuad.w = clip->w;
 		renderQuad.h = clip->h;

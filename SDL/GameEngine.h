@@ -2,6 +2,7 @@
 #define GAMEENGINE_H_
 
 #include <SDL.h>
+#include <array>
 #include <iostream>
 #include <iomanip>
 #include <SDL_ttf.h>
@@ -15,8 +16,6 @@
 class GameEngine
 {
 public:
-	int countedFrames = 0;
-	int animationFrame = 0;
 
 	// initialization
 	GameEngine();  // default constructor
@@ -36,7 +35,11 @@ public:
 	SDL_Window* getWindow() const;
 	SDL_Renderer* getRenderer() const;
 	TTF_Font* getFont() const;
+
 private:
+	int countedFrames = 0;
+	int animationFrame = 0;
+
 	// running flag
 	bool running;															
 	
@@ -63,8 +66,9 @@ private:
 	SDL_Rect camera = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
 	
 	// player animations
-	SDL_Rect player2Rect[WALKING_ANIMATION_FRAMES];
+	std::array<SDL_Rect, WALKING_ANIMATION_FRAMES> player2Rect;
 	TextureManager player2Tex;
+	Player player2;
 };
 
 #endif

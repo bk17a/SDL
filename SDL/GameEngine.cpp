@@ -4,10 +4,11 @@ using namespace std;
 
 GameEngine::GameEngine()
 {
-	renderer = NULL;
-	window = NULL;
+	renderer = nullptr;
+	window = nullptr;
 	running = true;
-	font = NULL;
+	font = nullptr;
+	player2Rect = { 0,0,0,0 };
 }
 
 GameEngine::~GameEngine()
@@ -41,7 +42,7 @@ bool GameEngine::init()
 		{
 			//Create renderer
 			renderer = windowObj.createRenderer();
-			if (renderer == NULL)
+			if (renderer == nullptr)
 			{
 				cout << "Renderer could not be created! SDL Error: " << SDL_GetError() << endl;
 				running = false;
@@ -82,7 +83,7 @@ bool GameEngine::loadMedia()
 
 	// load text
 	font = TTF_OpenFont("fonts/press_start.ttf", 18);
-	if (font == NULL)
+	if (font == nullptr)
 	{
 		cout << "Failed to load press_start font! SDL_ttf Error: " << TTF_GetError() << endl;
 		success = false;
@@ -107,6 +108,9 @@ bool GameEngine::loadMedia()
 	}
 	else
 	{
+		// Create the player object
+		player2 = Player(renderer, &player2Tex);
+
 		// set player 2 rect
 		player2Rect[0].x = 0;
 		player2Rect[0].y = 0;
@@ -136,13 +140,35 @@ bool GameEngine::loadMedia()
 	return success;
 }
 
+void GameEngine::render()
+{
+	// Clear screen
+	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+	SDL_RenderClear(renderer);
+
+	// Render background texture to screen
+	grass.render(0, 0, renderer, &camera);
+
+	// Render fps
+	fpsTexture.render(SCREEN_WIDTH - fpsTexture.getWidth(), 0, renderer);
+
+	// Render player
+	//player1.render(renderer, camera.x, camera.y);
+
+	// Render current frame
+	const SDL_Rect* currentClip = &player2Rect[animationFrame / 5];
+	player2.renderAnimated(renderer, currentClip, camera.x, camera.y);
+	//player2.render(renderer, camera.x, camera.y);
+}
+
 void GameEngine::update()
 {
-	player1.move();
+	//player1.move();
+	player2.move();
 
 	//Center the camera over the dot
-	camera.x = (player1.getXPos() + PLAYER_WIDTH / 2) - SCREEN_WIDTH / 2;
-	camera.y = (player1.getYPos() + PLAYER_HEIGHT / 2) - SCREEN_HEIGHT / 2;
+	camera.x = (player2.getXPos() + PLAYER2_WIDTH / 2) - SCREEN_WIDTH / 2;
+	camera.y = (player2.getYPos() + PLAYER2_HEIGHT / 2) - SCREEN_HEIGHT / 2;
 
 	//Keep the camera in bounds
 	if (camera.x < 0)
@@ -163,50 +189,30 @@ void GameEngine::update()
 	}
 }
 
-void GameEngine::render()
-{
-	// Clear screen
-	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-	SDL_RenderClear(renderer);
-
-	// Render background texture to screen
-	grass.render(0, 0, renderer, &camera);
-
-	//// Render fps
-	fpsTexture.render(SCREEN_WIDTH - fpsTexture.getWidth(), 0, renderer);
-
-	// Render player
-	player1.render(renderer, camera.x, camera.y);
-
-	// Render current frame
-	SDL_Rect* currentClip = &player2Rect[animationFrame / 5];
-	player2Tex.render((SCREEN_WIDTH - currentClip->w) / 2, (SCREEN_HEIGHT - currentClip->h) / 2, renderer, currentClip);
-}
-
 bool GameEngine::handleEvents()
 {
 	SDL_Event e;
 
-	// quit out
-	SDL_PollEvent(&e);
-	switch (e.type)
+	// process all events in the queue
+	while (SDL_PollEvent(&e))
 	{
-	case SDL_QUIT:
-		running = false;
-		break;
+		// quit out
+		if (e.type == SDL_QUIT)
+		{
+			running = false;
+		}
 
-	default:
-		break;
+		// player movement
+		//player1.handleEvent(e);
+		player2.handleEvent(e);
+
+		// window events
+		windowObj.handleEvent(e, renderer);
 	}
-
-	// player movement
-	player1.handleEvent(e);
-
-	// window events
-	windowObj.handleEvent(e, renderer);
 
 	return running;
 }
+
 
 SDL_Window* GameEngine::getWindow() const
 {
@@ -243,12 +249,12 @@ void GameEngine::close()
 
 	// Close font
 	TTF_CloseFont(font);
-	font = NULL;
+	font = nullptr;
 
 	// Destory window
 	windowObj.free();
 	SDL_DestroyRenderer(renderer);
-	renderer = NULL;
+	renderer = nullptr;
 
 	// Quit SDL Subsystems
 	IMG_Quit();
@@ -350,3 +356,4 @@ void GameEngine::run()
 		}
 	}
 }
+

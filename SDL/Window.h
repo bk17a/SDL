@@ -26,9 +26,17 @@ public:
 	SDL_Window* getWindow() const;
 
 private:
-	SDL_Window* window;													// window data
-	int width, height;													// window dimensions
-	bool mouseFocus, kbFocus, fullScreen, min;							// window focus
+	SDL_Window* window;
+
+	// window dimensions
+	int width;
+	int height;				
+
+	// window focus
+	bool mouseFocus;
+	bool kbFocus;
+	bool fullScreen;
+	bool min;							
 };
 
 #endif // WINDOW_H

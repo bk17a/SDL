@@ -5,6 +5,7 @@
 #include <SDL.h>
 #include <SDL_ttf.h>
 #include <SDL_image.h>
+#include "Constants.h"
 
 class TextureManager
 {
@@ -14,9 +15,8 @@ public:
 	void free();
 	bool loadFromFile(const char* path, SDL_Renderer* renderer);
 	bool loadFromRenderedText(const char* textureText, SDL_Color textColor, SDL_Renderer* renderer, TTF_Font* font);
-	void render(int x, int y, SDL_Renderer* renderer, SDL_Rect* clip = NULL);
+	void render(int x, int y, SDL_Renderer* renderer, const SDL_Rect* clip = nullptr);
 	void setAlpha(Uint8 alpha);
-
 	int getWidth() const;
 	int getHeight() const;
 

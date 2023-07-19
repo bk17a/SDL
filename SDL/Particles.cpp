@@ -5,12 +5,12 @@ Particles::Particles()
 	xPos = 0;
 	yPos = 0;
 	frame = 0;
-	texture = NULL;
+	texture = nullptr;
 }
 
 //Particles::Particles(int x, int y)
 //{
-//	texture = NULL;
+//	texture = nullptr;
 //	// set offsets
 //	xPos = x - 5 + (rand() % 25);
 //	yPos = y - 5 + (rand() % 25);

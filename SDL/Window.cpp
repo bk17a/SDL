@@ -4,7 +4,7 @@ using namespace std;
 
 Window::Window()
 {
-	window = NULL;				// initializing all variables
+	window = nullptr;				// initializing all variables
 	width = 0;
 	height = 0;
 	mouseFocus = false;
@@ -19,7 +19,7 @@ bool Window::init()
 
 	// create window
 	window = SDL_CreateWindow("GAME V0.1,", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
-	if (window == NULL)
+	if (window == nullptr)
 	{
 		cout << "Failed to create window!\n";
 		success = false;
@@ -119,7 +119,7 @@ void Window::handleEvent(SDL_Event& e, SDL_Renderer* renderer)
 
 void Window::free()
 {
-	if (window != NULL)
+	if (window != nullptr)
 	{
 		SDL_DestroyWindow(window);
 	}

@@ -6,6 +6,12 @@ Player::Player()
 	yPos = 0;
 	xVel = 0;
 	yVel = 0;
+	xPos2 = 0;
+	yPos2 = 0;
+	xVel2 = 0;
+	yVel2 = 0;
+	renderer = nullptr;
+	playerTexture = nullptr;
 }
 
 Player::Player(SDL_Renderer* renderer, TextureManager* playerTexture)
@@ -14,11 +20,15 @@ Player::Player(SDL_Renderer* renderer, TextureManager* playerTexture)
 	yPos = 0;
 	xVel = 0;
 	yVel = 0;
+	xPos2 = 0;
+	yPos2 = 0;
+	xVel2 = 0;
+	yVel2 = 0;
 	this->renderer = renderer;
 	this->playerTexture = playerTexture;
 }
 
-void Player::handleEvent(SDL_Event& e)
+void Player::handleEvent(const SDL_Event& e)
 {
 	// if a key is pressed
 	if (e.type == SDL_KEYDOWN && e.key.repeat == 0)
@@ -58,54 +68,6 @@ void Player::handleEvent(SDL_Event& e)
 			xVel = 0;
 			break;
 		case SDLK_RIGHT:
-			xVel = 0;
-			break;
-		default:
-			break;
-		}
-	}
-}
-
-void Player::handleEvent2(SDL_Event& e)
-{
-	// if a key is pressed
-	if (e.type == SDL_KEYDOWN && e.key.repeat == 0)
-	{
-		// adjusting the velocity
-		switch (e.key.keysym.sym)
-		{
-		case SDLK_w:
-			yVel = -DOT_VEL;
-			break;
-		case SDLK_s:
-			yVel = DOT_VEL;
-			break;
-		case SDLK_a:
-			xVel = -DOT_VEL;
-			break;
-		case SDLK_d:
-			xVel = DOT_VEL;
-			break;
-		default:
-			break;
-		}
-	}
-	// adjusting velocity when a key is released
-	else if (e.type == SDL_KEYUP && e.key.repeat == 0)
-	{
-		// adjusting the velocity
-		switch (e.key.keysym.sym)
-		{
-		case SDLK_w:
-			yVel = 0;
-			break;
-		case SDLK_s:
-			yVel = 0;
-			break;
-		case SDLK_a:
-			xVel = 0;
-			break;
-		case SDLK_d:
 			xVel = 0;
 			break;
 		default:
@@ -135,6 +97,7 @@ void Player::move()
 	}
 }
 
+
 void Player::render(SDL_Renderer* renderer, int camX, int camY)
 {
 	playerTexture->render(xPos - camX, yPos - camY, renderer);
@@ -148,4 +111,9 @@ int Player::getXPos() const
 int Player::getYPos() const
 {
 	return yPos;
+}
+
+void Player::renderAnimated(SDL_Renderer* renderer, const SDL_Rect* clip, int camX, int camY)
+{
+	playerTexture->render(xPos - camX, yPos - camY, renderer, clip);
 }
