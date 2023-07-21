@@ -85,10 +85,11 @@ void Window::handleEvent(SDL_Event& e, SDL_Renderer* renderer)
 			break;
 			// window maximeized
 		case SDL_WINDOWEVENT_MAXIMIZED:
-			min = false;
-			break;
+
 		case SDL_WINDOWEVENT_RESTORED:
 			min = false;
+			break;
+		default: 
 			break;
 		}
 

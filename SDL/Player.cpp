@@ -9,10 +9,9 @@ Player::Player()
 	moving = false;
 	renderer = nullptr;
 	playerTexture = nullptr;
-	angle = 0;
-	center.x = PLAYER2_WIDTH / 2;
-	center.y = PLAYER2_HEIGHT / 2;
 	flipType = SDL_FLIP_NONE;
+	// angle = NULL;
+	// center = nullptr;
 }
 
 Player::Player(SDL_Renderer* renderer, TextureManager* playerTexture)
@@ -24,16 +23,15 @@ Player::Player(SDL_Renderer* renderer, TextureManager* playerTexture)
 	moving = false;
 	this->renderer = renderer;
 	this->playerTexture = playerTexture;
-	angle = 0;
-	center.x = PLAYER2_WIDTH / 2;
-	center.y = PLAYER2_HEIGHT / 2;
 	flipType = SDL_FLIP_NONE;
+	// angle = NULL;
+	// center = nullptr;
 }
 
 void Player::handleEvent(const SDL_Event& e)
 {
 	// Check if any arrow key is pressed
-	bool isArrowKeyPressed = (e.type == SDL_KEYDOWN && e.key.repeat == 0) &&
+	const bool isArrowKeyPressed = (e.type == SDL_KEYDOWN && e.key.repeat == 0) &&
 		(e.key.keysym.sym == SDLK_UP || e.key.keysym.sym == SDLK_DOWN ||
 			e.key.keysym.sym == SDLK_LEFT || e.key.keysym.sym == SDLK_RIGHT);
 
@@ -108,7 +106,7 @@ void Player::move()
 	}
 }
 
-void Player::render(SDL_Renderer* renderer, int camX, int camY)
+void Player::render(SDL_Renderer* renderer, const int camX, const int camY) const  // NOLINT(clang-diagnostic-shadow)
 {
 	playerTexture->render(xPos - camX, yPos - camY, renderer);
 }
@@ -123,9 +121,9 @@ int Player::getYPos() const
 	return yPos;
 }
 
-void Player::renderAnimated(SDL_Renderer* renderer, const SDL_Rect* clip, int camX, int camY, double angle, SDL_Point center, SDL_RendererFlip flipType)
+void Player::renderAnimated(SDL_Renderer* renderer, const SDL_Rect* clip, const int camX, const int camY, const double angle, const SDL_Point* center, const SDL_RendererFlip flipType) const  // NOLINT(clang-diagnostic-shadow)
 {
-	playerTexture->render(xPos - camX, yPos - camY, renderer, clip, angle, &center, flipType);
+	playerTexture->render(xPos - camX, yPos - camY, renderer, clip, angle, center, flipType);
 }
 
 bool Player::isMoving() const
@@ -136,14 +134,4 @@ bool Player::isMoving() const
 SDL_RendererFlip Player::getFlipType() const
 {
 	return flipType;
-}
-
-double Player::getAngle() const
-{
-	return angle;
-}
-
-SDL_Point Player::getCenter() const
-{
-	return center;
 }

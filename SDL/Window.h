@@ -1,11 +1,12 @@
+// ReSharper disable CppUnusedIncludeDirective
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#include <SDL.h>
-#include "Constants.h"
 #include <iostream>
-#include <string>
+#include <SDL.h>
 #include <sstream>
+#include <string>
+#include "Constants.h"
 
 class Window
 {

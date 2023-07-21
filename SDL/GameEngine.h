@@ -1,17 +1,19 @@
-#ifndef GAMEENGINE_H_
-#define GAMEENGINE_H_
+// ReSharper disable CppUnusedIncludeDirective
+#ifndef GAME_ENGINE_H_
+#define GAME_ENGINE_H_
 
-#include <SDL.h>
 #include <array>
-#include <iostream>
 #include <iomanip>
-#include <SDL_ttf.h>
+#include <SDL.h>
 #include <SDL_image.h>
+#include <SDL_ttf.h>
+
+#include "Constants.h"
+#include "Player.h"
 #include "TextureManager.h"
 #include "Timer.h"
-#include "Player.h"
-#include "Constants.h"
 #include "Window.h"
+
 
 class GameEngine
 {
@@ -74,7 +76,7 @@ private:
 	TextureManager player2RunTex;
 	Player player2Run;
 
-	SDL_Point origin = { PLAYER2_WIDTH / 2, PLAYER2_HEIGHT / 2 };
+	SDL_Point center = { PLAYER2_WIDTH / 2, PLAYER2_HEIGHT / 2 };
 };
 
 #endif

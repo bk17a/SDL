@@ -1,11 +1,11 @@
-#ifndef TEXTUREMANAGER_H
-#define TEXTUREMANAGER_H
+// ReSharper disable CppUnusedIncludeDirective
+#ifndef TEXTURE_MANAGER_H
+#define TEXTURE_MANAGER_H
 
-#include <iostream>
 #include <SDL.h>
 #include <SDL_ttf.h>
 #include <SDL_image.h>
-#include "Constants.h"
+#include <iostream>
 
 class TextureManager
 {
@@ -15,8 +15,8 @@ public:
 	void free();
 	bool loadFromFile(const char* path, SDL_Renderer* renderer);
 	bool loadFromRenderedText(const char* textureText, SDL_Color textColor, SDL_Renderer* renderer, TTF_Font* font);
-	void render(int x, int y, SDL_Renderer* renderer, const SDL_Rect* clip = nullptr, double angle = 0, SDL_Point* center = 0, SDL_RendererFlip flip = SDL_FLIP_NONE);
-	void setAlpha(Uint8 alpha);
+	void render(int x, int y, SDL_Renderer* renderer, const SDL_Rect* clip = nullptr, const double angle = NULL, const SDL_Point* center = nullptr, SDL_RendererFlip flip = SDL_FLIP_NONE) const;
+	void setAlpha(Uint8 alpha) const;
 	int getWidth() const;
 	int getHeight() const;
 

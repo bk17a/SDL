@@ -99,7 +99,7 @@ bool TextureManager::loadFromRenderedText(const char* textureText, SDL_Color tex
 	return texture != nullptr;
 }
 
-void TextureManager::render(int x, int y, SDL_Renderer* renderer, const SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip)
+void TextureManager::render(const int x, const int y, SDL_Renderer* renderer, const SDL_Rect* clip, const double angle, const SDL_Point* center, const SDL_RendererFlip flip) const  // NOLINT(clang-diagnostic-shadow)
 {
 	//Set rendering space and render to screen
 	SDL_Rect renderQuad = { x, y, width, height };
@@ -125,7 +125,7 @@ int TextureManager::getWidth() const
 	return width;
 }
 
-void TextureManager::setAlpha(Uint8 alpha)
+void TextureManager::setAlpha(const Uint8 alpha) const
 {
 	//Modulate texture alpha
 	SDL_SetTextureAlphaMod(texture, alpha);

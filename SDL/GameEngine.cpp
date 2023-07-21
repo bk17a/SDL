@@ -2,15 +2,8 @@
 
 using namespace std;
 
-GameEngine::GameEngine()
-{
-	renderer = nullptr;
-	window = nullptr;
-	running = true;
-	font = nullptr;
-	player2Rect = { 0,0,0,0 };
-	player2RunRect = { 0,0,0,0 };
-}
+GameEngine::GameEngine() : running(true), font(nullptr), window(nullptr), renderer(nullptr),
+                           player2Rect({{{0, 0, 0, 0}}}), player2RunRect({{{0, 0, 0, 0}}}) {}
 
 GameEngine::~GameEngine()
 {
@@ -53,7 +46,7 @@ bool GameEngine::init()
 			SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
 			// Initialize SDL_image
-			int imgFlags = IMG_INIT_PNG;
+			const int imgFlags = IMG_INIT_PNG;
 			if (!(IMG_Init(imgFlags) & imgFlags))
 			{
 				cout << "SDL_image could not initialize! SDL_image Error: " << IMG_GetError() << endl;
@@ -142,7 +135,7 @@ bool GameEngine::loadMedia()
 	if (!player2RunTex.loadFromFile("gfx/player2Run.png", renderer))
 	{
 		cout << "Failed to load player 2 run texture!\n";
-		success = false;	
+		success = false;
 	}
 	else
 	{
@@ -190,13 +183,13 @@ void GameEngine::render()
 	fpsTexture.render(SCREEN_WIDTH - fpsTexture.getWidth(), 0, renderer);
 
 	// Check if the player is moving or not
-	bool isMoving = player2.isMoving();
+	const bool isMoving = player2.isMoving();
 
 	// Render player
 	if (isMoving)
 	{
 		const SDL_Rect* currentRunClip = &player2RunRect[runAnimationFrame / RUNNING_ANIMATION_FRAMES];
-		player2Run.renderAnimated(renderer, currentRunClip, camera.x, camera.y, player2.getAngle(), player2.getCenter(), player2.getFlipType());
+		player2Run.renderAnimated(renderer, currentRunClip, camera.x, camera.y, NULL, &center, player2.getFlipType());
 
 		// Increment the animation frame for the running animation
 		++runAnimationFrame;
@@ -210,7 +203,7 @@ void GameEngine::render()
 	else
 	{
 		const SDL_Rect* currentIdleClip = &player2Rect[idleAnimationFrame / IDLE_ANIMATION_FRAMES];
-		player2.renderAnimated(renderer, currentIdleClip, camera.x, camera.y, player2.getAngle(), player2.getCenter(), player2.getFlipType());
+		player2.renderAnimated(renderer, currentIdleClip, camera.x, camera.y, NULL, nullptr, player2.getFlipType());
 
 		// Increment the animation frame for the idle animation
 		++idleAnimationFrame;
@@ -346,24 +339,24 @@ void GameEngine::run()
 			// show fps
 			fpsTimer.start();
 			stringstream timeText;
-			SDL_Color textColor = { 0, 0, 0, 255 };
+			constexpr SDL_Color textColor = {0, 0, 0, 255};
 			Uint32 prevFrameTime = 0;
 
 			// Game loop
 			while (isRunning())
 			{
-				Uint32 currentFrameTime = SDL_GetTicks();
-				Uint32 frameTime = currentFrameTime - prevFrameTime;
+				const Uint32 currentFrameTime = SDL_GetTicks();
+				const Uint32 frameTime = currentFrameTime - prevFrameTime;
 
 				// event handler
 				handleEvents();
 
 				// constants for frame rate limiting
-				const int TARGET_FPS = 165;
-				const int SCREEN_TICKS_PER_FRAME = 1000 / TARGET_FPS;
+				constexpr int TARGET_FPS = 165;
+				constexpr int SCREEN_TICKS_PER_FRAME = 1000 / TARGET_FPS;
 
 				// Calculate the time taken for the frame
-				int delayTime = SCREEN_TICKS_PER_FRAME - frameTime;
+				const int delayTime = SCREEN_TICKS_PER_FRAME - frameTime;  // NOLINT(cppcoreguidelines-narrowing-conversions)
 				if (delayTime > 0)
 				{
 					SDL_Delay(delayTime);
@@ -372,7 +365,7 @@ void GameEngine::run()
 				prevFrameTime = currentFrameTime;
 
 				// Calculate average FPS
-				float avgFPS = countedFrames / (fpsTimer.getTicks() / 1000.0f);
+				const float avgFPS = countedFrames / (fpsTimer.getTicks() / 1000.0f);  // NOLINT(clang-diagnostic-implicit-int-float-conversion, cppcoreguidelines-narrowing-conversions)
 
 				// update function
 				update();
