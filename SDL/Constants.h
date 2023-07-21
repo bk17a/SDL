@@ -9,15 +9,11 @@ static constexpr int SCREEN_HEIGHT = 1050;
 static constexpr int LEVEL_WIDTH = 3840;
 static constexpr int LEVEL_HEIGHT = 2160;
 
-// dimensions of the player sprite
-static constexpr int PLAYER_WIDTH = 50;
-static constexpr int PLAYER_HEIGHT = 50;
+// dimensions of the player1 sprite
+static constexpr int PLAYER1_WIDTH = 127;
+static constexpr int PLAYER1_HEIGHT = 70;
 
-// dimensions of the player2 sprite
-static constexpr int PLAYER2_WIDTH = 127;
-static constexpr int PLAYER2_HEIGHT = 70;
-
-static constexpr int PLAYER2RUN_HEIGHT = 90;
+static constexpr int PLAYER1RUN_HEIGHT = 90;
 
 // maximum axis velocity of player
 static constexpr int DOT_VEL = 1;

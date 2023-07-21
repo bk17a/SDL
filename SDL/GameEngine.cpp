@@ -3,7 +3,7 @@
 using namespace std;
 
 GameEngine::GameEngine() : running(true), font(nullptr), window(nullptr), renderer(nullptr),
-                           player2Rect({{{0, 0, 0, 0}}}), player2RunRect({{{0, 0, 0, 0}}}) {}
+player1Rect({ {{0, 0, 0, 0}} }), player1RunRect({ {{0, 0, 0, 0}} }) {}
 
 GameEngine::~GameEngine()
 {
@@ -83,56 +83,44 @@ bool GameEngine::loadMedia()
 		success = false;
 	}
 
-	// Load player1 texture
-	if (!player1Tex.loadFromFile("gfx/player1.png", renderer))
+	if (!player1Tex.loadFromFile("gfx/player1Idle.png", renderer))
 	{
-		cout << "Failed to load player texture image!\n";
+		cout << "Failed to load player 2 idle texture!\n";
 		success = false;
 	}
 	else
 	{
 		// Create the player object
 		player1 = Player(renderer, &player1Tex);
-	}
-
-	if (!player2Tex.loadFromFile("gfx/player2Idle.png", renderer))
-	{
-		cout << "Fauled to load player 2 idle texture!\n";
-		success = false;
-	}
-	else
-	{
-		// Create the player object
-		player2 = Player(renderer, &player2Tex);
 
 		// set player 2 rect
-		player2Rect[0].x = 0;
-		player2Rect[0].y = 0;
-		player2Rect[0].w = PLAYER2_WIDTH;
-		player2Rect[0].h = PLAYER2_HEIGHT;
+		player1Rect[0].x = 0;
+		player1Rect[0].y = 0;
+		player1Rect[0].w = PLAYER1_WIDTH;
+		player1Rect[0].h = PLAYER1_HEIGHT;
 
-		player2Rect[1].x = PLAYER2_WIDTH;
-		player2Rect[1].y = 0;
-		player2Rect[1].w = PLAYER2_WIDTH;
-		player2Rect[1].h = PLAYER2_HEIGHT;
+		player1Rect[1].x = PLAYER1_WIDTH;
+		player1Rect[1].y = 0;
+		player1Rect[1].w = PLAYER1_WIDTH;
+		player1Rect[1].h = PLAYER1_HEIGHT;
 
-		player2Rect[2].x = PLAYER2_WIDTH * 2;
-		player2Rect[2].y = 0;
-		player2Rect[2].w = PLAYER2_WIDTH;
-		player2Rect[2].h = PLAYER2_HEIGHT;
+		player1Rect[2].x = PLAYER1_WIDTH * 2;
+		player1Rect[2].y = 0;
+		player1Rect[2].w = PLAYER1_WIDTH;
+		player1Rect[2].h = PLAYER1_HEIGHT;
 
-		player2Rect[3].x = PLAYER2_WIDTH * 3;
-		player2Rect[3].y = 0;
-		player2Rect[3].w = PLAYER2_WIDTH;
-		player2Rect[3].h = PLAYER2_HEIGHT;
+		player1Rect[3].x = PLAYER1_WIDTH * 3;
+		player1Rect[3].y = 0;
+		player1Rect[3].w = PLAYER1_WIDTH;
+		player1Rect[3].h = PLAYER1_HEIGHT;
 
-		player2Rect[4].x = PLAYER2_WIDTH * 3;
-		player2Rect[4].y = 0;
-		player2Rect[4].w = PLAYER2_WIDTH;
-		player2Rect[4].h = PLAYER2_HEIGHT;
+		player1Rect[4].x = PLAYER1_WIDTH * 3;
+		player1Rect[4].y = 0;
+		player1Rect[4].w = PLAYER1_WIDTH;
+		player1Rect[4].h = PLAYER1_HEIGHT;
 	}
 
-	if (!player2RunTex.loadFromFile("gfx/player2Run.png", renderer))
+	if (!player1RunTex.loadFromFile("gfx/player1Run.png", renderer))
 	{
 		cout << "Failed to load player 2 run texture!\n";
 		success = false;
@@ -140,32 +128,32 @@ bool GameEngine::loadMedia()
 	else
 	{
 		// set the texture
-		player2Run = Player(renderer, &player2RunTex);
+		player1Run = Player(renderer, &player1RunTex);
 
-		player2RunRect[0].x = 0;
-		player2RunRect[0].y = 0;
-		player2RunRect[0].w = PLAYER2_WIDTH;
-		player2RunRect[0].h = PLAYER2RUN_HEIGHT;
+		player1RunRect[0].x = 0;
+		player1RunRect[0].y = 0;
+		player1RunRect[0].w = PLAYER1_WIDTH;
+		player1RunRect[0].h = PLAYER1RUN_HEIGHT;
 
-		player2RunRect[1].x = PLAYER2_WIDTH;
-		player2RunRect[1].y = 0;
-		player2RunRect[1].w = PLAYER2_WIDTH;
-		player2RunRect[1].h = PLAYER2RUN_HEIGHT;
+		player1RunRect[1].x = PLAYER1_WIDTH;
+		player1RunRect[1].y = 0;
+		player1RunRect[1].w = PLAYER1_WIDTH;
+		player1RunRect[1].h = PLAYER1RUN_HEIGHT;
 
-		player2RunRect[2].x = PLAYER2_WIDTH * 2;
-		player2RunRect[2].y = 0;
-		player2RunRect[2].w = PLAYER2_WIDTH;
-		player2RunRect[2].h = PLAYER2RUN_HEIGHT;
+		player1RunRect[2].x = PLAYER1_WIDTH * 2;
+		player1RunRect[2].y = 0;
+		player1RunRect[2].w = PLAYER1_WIDTH;
+		player1RunRect[2].h = PLAYER1RUN_HEIGHT;
 
-		player2RunRect[3].x = PLAYER2_WIDTH * 3;
-		player2RunRect[3].y = 0;
-		player2RunRect[3].w = PLAYER2_WIDTH;
-		player2RunRect[3].h = PLAYER2RUN_HEIGHT;
+		player1RunRect[3].x = PLAYER1_WIDTH * 3;
+		player1RunRect[3].y = 0;
+		player1RunRect[3].w = PLAYER1_WIDTH;
+		player1RunRect[3].h = PLAYER1RUN_HEIGHT;
 
-		player2RunRect[4].x = PLAYER2_WIDTH * 3;
-		player2RunRect[4].y = 0;
-		player2RunRect[4].w = PLAYER2_WIDTH;
-		player2RunRect[4].h = PLAYER2RUN_HEIGHT;
+		player1RunRect[4].x = PLAYER1_WIDTH * 3;
+		player1RunRect[4].y = 0;
+		player1RunRect[4].w = PLAYER1_WIDTH;
+		player1RunRect[4].h = PLAYER1RUN_HEIGHT;
 	}
 	return success;
 }
@@ -183,13 +171,13 @@ void GameEngine::render()
 	fpsTexture.render(SCREEN_WIDTH - fpsTexture.getWidth(), 0, renderer);
 
 	// Check if the player is moving or not
-	const bool isMoving = player2.isMoving();
+	const bool isMoving = player1.isMoving();
 
 	// Render player
 	if (isMoving)
 	{
-		const SDL_Rect* currentRunClip = &player2RunRect[runAnimationFrame / RUNNING_ANIMATION_FRAMES];
-		player2Run.renderAnimated(renderer, currentRunClip, camera.x, camera.y, NULL, &center, player2.getFlipType());
+		const SDL_Rect* currentRunClip = &player1RunRect[runAnimationFrame / RUNNING_ANIMATION_FRAMES];
+		player1Run.renderAnimated(renderer, currentRunClip, camera.x, camera.y, NULL, &center, player1.getFlipType());
 
 		// Increment the animation frame for the running animation
 		++runAnimationFrame;
@@ -202,8 +190,8 @@ void GameEngine::render()
 	}
 	else
 	{
-		const SDL_Rect* currentIdleClip = &player2Rect[idleAnimationFrame / IDLE_ANIMATION_FRAMES];
-		player2.renderAnimated(renderer, currentIdleClip, camera.x, camera.y, NULL, nullptr, player2.getFlipType());
+		const SDL_Rect* currentIdleClip = &player1Rect[idleAnimationFrame / IDLE_ANIMATION_FRAMES];
+		player1.renderAnimated(renderer, currentIdleClip, camera.x, camera.y, NULL, nullptr, player1.getFlipType());
 
 		// Increment the animation frame for the idle animation
 		++idleAnimationFrame;
@@ -223,12 +211,12 @@ void GameEngine::render()
 void GameEngine::update()
 {
 	//player1.move();
-	player2.move();
-	player2Run.move();
+	player1.move();
+	player1Run.move();
 
 	//Center the camera over the dot
-	camera.x = (player2.getXPos() + PLAYER2_WIDTH / 2) - SCREEN_WIDTH / 2;
-	camera.y = (player2.getYPos() + PLAYER2_HEIGHT / 2) - SCREEN_HEIGHT / 2;
+	camera.x = (player1.getXPos() + PLAYER1_WIDTH / 2) - SCREEN_WIDTH / 2;
+	camera.y = (player1.getYPos() + PLAYER1_HEIGHT / 2) - SCREEN_HEIGHT / 2;
 
 	//Keep the camera in bounds
 	if (camera.x < 0)
@@ -264,8 +252,8 @@ bool GameEngine::handleEvents()
 
 		// player movement
 		//player1.handleEvent(e);
-		player2.handleEvent(e);
-		player2Run.handleEvent(e);
+		player1.handleEvent(e);
+		player1Run.handleEvent(e);
 
 		// window events
 		windowObj.handleEvent(e, renderer);
@@ -305,7 +293,7 @@ void GameEngine::close()
 	grass.free();
 	fpsTexture.free();
 	player1Tex.free();
-	player2Tex.free();
+	player1Tex.free();
 
 	// Close font
 	TTF_CloseFont(font);
@@ -339,7 +327,7 @@ void GameEngine::run()
 			// show fps
 			fpsTimer.start();
 			stringstream timeText;
-			constexpr SDL_Color textColor = {0, 0, 0, 255};
+			constexpr SDL_Color textColor = { 0, 0, 0, 255 };
 			Uint32 prevFrameTime = 0;
 
 			// Game loop

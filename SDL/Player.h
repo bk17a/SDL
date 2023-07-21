@@ -40,8 +40,6 @@ private:
 	TextureManager* playerTexture;
 
 	SDL_RendererFlip flipType;
-	// double angle;
-	// SDL_Point* center;
 };
 
 #endif //PLAYER_H_

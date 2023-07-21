@@ -90,7 +90,7 @@ void Player::move()
 	// player move on x axis
 	xPos += xVel;
 	// if player went out of range
-	if ((xPos < 0) || (xPos > LEVEL_WIDTH + PLAYER_WIDTH - 100))
+	if ((xPos < 0) || (xPos > LEVEL_WIDTH + PLAYER1_WIDTH - 100))
 	{
 		// move back
 		xPos -= xVel;
@@ -99,7 +99,7 @@ void Player::move()
 	// player move on y axis
 	yPos += yVel;
 	// if player out of range
-	if ((yPos < 0) || (yPos + PLAYER_HEIGHT > LEVEL_HEIGHT))
+	if ((yPos < 0) || (yPos + PLAYER1_HEIGHT > LEVEL_HEIGHT))
 	{
 		// move back
 		yPos -= yVel;

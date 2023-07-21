@@ -89,7 +89,7 @@ void Window::handleEvent(SDL_Event& e, SDL_Renderer* renderer)
 		case SDL_WINDOWEVENT_RESTORED:
 			min = false;
 			break;
-		default: 
+		default:
 			break;
 		}
 

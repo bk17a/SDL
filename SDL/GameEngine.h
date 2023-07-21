@@ -47,10 +47,6 @@ private:
 	// grass texture
 	TextureManager grass;
 
-	// player texture and object
-	TextureManager player1Tex;
-	Player player1;
-
 	// fps texture and timer object
 	Timer fpsTimer;
 	TextureManager fpsTexture;
@@ -67,16 +63,16 @@ private:
 	SDL_Rect camera = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
 
 	// player idle animation
-	std::array<SDL_Rect, IDLE_ANIMATION_FRAMES> player2Rect;
-	TextureManager player2Tex;
-	Player player2;
+	std::array<SDL_Rect, IDLE_ANIMATION_FRAMES> player1Rect;
+	TextureManager player1Tex;
+	Player player1;
 
 	// player run animation
-	std::array<SDL_Rect, RUNNING_ANIMATION_FRAMES> player2RunRect;
-	TextureManager player2RunTex;
-	Player player2Run;
+	std::array<SDL_Rect, RUNNING_ANIMATION_FRAMES> player1RunRect;
+	TextureManager player1RunTex;
+	Player player1Run;
 
-	SDL_Point center = { PLAYER2_WIDTH / 2, PLAYER2_HEIGHT / 2 };
+	SDL_Point center = { PLAYER1_WIDTH / 2, PLAYER1_HEIGHT / 2 };
 };
 
 #endif
