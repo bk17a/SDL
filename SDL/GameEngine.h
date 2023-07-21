@@ -38,13 +38,12 @@ public:
 
 private:
 	int countedFrames = 0;
-	int animationFrame = 0;
+	int idleAnimationFrame = 0;
+	int runAnimationFrame = 0;
+	bool running;
 
-	// running flag
-	bool running;															
-	
 	// grass texture
-	TextureManager grass;	
+	TextureManager grass;
 
 	// player texture and object
 	TextureManager player1Tex;
@@ -64,11 +63,18 @@ private:
 
 	// camera rect
 	SDL_Rect camera = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
-	
-	// player animations
-	std::array<SDL_Rect, WALKING_ANIMATION_FRAMES> player2Rect;
+
+	// player idle animation
+	std::array<SDL_Rect, IDLE_ANIMATION_FRAMES> player2Rect;
 	TextureManager player2Tex;
 	Player player2;
+
+	// player run animation
+	std::array<SDL_Rect, RUNNING_ANIMATION_FRAMES> player2RunRect;
+	TextureManager player2RunTex;
+	Player player2Run;
+
+	SDL_Point origin = { PLAYER2_WIDTH / 2, PLAYER2_HEIGHT / 2 };
 };
 
 #endif

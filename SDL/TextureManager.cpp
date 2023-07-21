@@ -99,7 +99,7 @@ bool TextureManager::loadFromRenderedText(const char* textureText, SDL_Color tex
 	return texture != nullptr;
 }
 
-void TextureManager::render(int x, int y, SDL_Renderer* renderer, const SDL_Rect* clip)
+void TextureManager::render(int x, int y, SDL_Renderer* renderer, const SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip)
 {
 	//Set rendering space and render to screen
 	SDL_Rect renderQuad = { x, y, width, height };
@@ -112,7 +112,7 @@ void TextureManager::render(int x, int y, SDL_Renderer* renderer, const SDL_Rect
 	}
 
 	//Render to screen
-	SDL_RenderCopy(renderer, texture, clip, &renderQuad);
+	SDL_RenderCopyEx(renderer, texture, clip, &renderQuad, angle, center, flip);
 }
 
 int TextureManager::getHeight() const

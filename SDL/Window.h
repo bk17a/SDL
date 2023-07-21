@@ -30,13 +30,13 @@ private:
 
 	// window dimensions
 	int width;
-	int height;				
+	int height;
 
 	// window focus
 	bool mouseFocus;
 	bool kbFocus;
 	bool fullScreen;
-	bool min;							
+	bool min;
 };
 
 #endif // WINDOW_H

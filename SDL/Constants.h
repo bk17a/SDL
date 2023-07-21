@@ -17,14 +17,16 @@ static const int PLAYER_HEIGHT = 50;
 static const int PLAYER2_WIDTH = 127;
 static const int PLAYER2_HEIGHT = 70;
 
+static const int PLAYER2RUN_HEIGHT = 90;
+
 // maximum axis velocity of player
-static const int DOT_VEL = 2;
+static const int DOT_VEL = 1;
 
 // amount of particles
 static const int TOTAL_PARTICLES = 20;
 
 // animation frames
-static const int WALKING_ANIMATION_FRAMES = 5;
+static const int IDLE_ANIMATION_FRAMES = 5 * 5;
+static const int RUNNING_ANIMATION_FRAMES = 8 * 3;
 
 #endif
-

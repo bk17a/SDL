@@ -9,6 +9,7 @@ GameEngine::GameEngine()
 	running = true;
 	font = nullptr;
 	player2Rect = { 0,0,0,0 };
+	player2RunRect = { 0,0,0,0 };
 }
 
 GameEngine::~GameEngine()
@@ -114,28 +115,64 @@ bool GameEngine::loadMedia()
 		// set player 2 rect
 		player2Rect[0].x = 0;
 		player2Rect[0].y = 0;
-		player2Rect[0].w = 127;
-		player2Rect[0].h = 70;
+		player2Rect[0].w = PLAYER2_WIDTH;
+		player2Rect[0].h = PLAYER2_HEIGHT;
 
-		player2Rect[1].x = 127;
+		player2Rect[1].x = PLAYER2_WIDTH;
 		player2Rect[1].y = 0;
-		player2Rect[1].w = 127;
-		player2Rect[1].h = 70;
+		player2Rect[1].w = PLAYER2_WIDTH;
+		player2Rect[1].h = PLAYER2_HEIGHT;
 
-		player2Rect[2].x = 254;
+		player2Rect[2].x = PLAYER2_WIDTH * 2;
 		player2Rect[2].y = 0;
-		player2Rect[2].w = 127;
-		player2Rect[2].h = 70;
+		player2Rect[2].w = PLAYER2_WIDTH;
+		player2Rect[2].h = PLAYER2_HEIGHT;
 
-		player2Rect[3].x = 381;
+		player2Rect[3].x = PLAYER2_WIDTH * 3;
 		player2Rect[3].y = 0;
-		player2Rect[3].w = 127;
-		player2Rect[3].h = 70;
+		player2Rect[3].w = PLAYER2_WIDTH;
+		player2Rect[3].h = PLAYER2_HEIGHT;
 
-		player2Rect[4].x = 381;
+		player2Rect[4].x = PLAYER2_WIDTH * 3;
 		player2Rect[4].y = 0;
-		player2Rect[4].w = 127;
-		player2Rect[4].h = 70;
+		player2Rect[4].w = PLAYER2_WIDTH;
+		player2Rect[4].h = PLAYER2_HEIGHT;
+	}
+
+	if (!player2RunTex.loadFromFile("gfx/player2Run.png", renderer))
+	{
+		cout << "Failed to load player 2 run texture!\n";
+		success = false;	
+	}
+	else
+	{
+		// set the texture
+		player2Run = Player(renderer, &player2RunTex);
+
+		player2RunRect[0].x = 0;
+		player2RunRect[0].y = 0;
+		player2RunRect[0].w = PLAYER2_WIDTH;
+		player2RunRect[0].h = PLAYER2RUN_HEIGHT;
+
+		player2RunRect[1].x = PLAYER2_WIDTH;
+		player2RunRect[1].y = 0;
+		player2RunRect[1].w = PLAYER2_WIDTH;
+		player2RunRect[1].h = PLAYER2RUN_HEIGHT;
+
+		player2RunRect[2].x = PLAYER2_WIDTH * 2;
+		player2RunRect[2].y = 0;
+		player2RunRect[2].w = PLAYER2_WIDTH;
+		player2RunRect[2].h = PLAYER2RUN_HEIGHT;
+
+		player2RunRect[3].x = PLAYER2_WIDTH * 3;
+		player2RunRect[3].y = 0;
+		player2RunRect[3].w = PLAYER2_WIDTH;
+		player2RunRect[3].h = PLAYER2RUN_HEIGHT;
+
+		player2RunRect[4].x = PLAYER2_WIDTH * 3;
+		player2RunRect[4].y = 0;
+		player2RunRect[4].w = PLAYER2_WIDTH;
+		player2RunRect[4].h = PLAYER2RUN_HEIGHT;
 	}
 	return success;
 }
@@ -152,19 +189,49 @@ void GameEngine::render()
 	// Render fps
 	fpsTexture.render(SCREEN_WIDTH - fpsTexture.getWidth(), 0, renderer);
 
-	// Render player
-	//player1.render(renderer, camera.x, camera.y);
+	// Check if the player is moving or not
+	bool isMoving = player2.isMoving();
 
-	// Render current frame
-	const SDL_Rect* currentClip = &player2Rect[animationFrame / 5];
-	player2.renderAnimated(renderer, currentClip, camera.x, camera.y);
-	//player2.render(renderer, camera.x, camera.y);
+	// Render player
+	if (isMoving)
+	{
+		const SDL_Rect* currentRunClip = &player2RunRect[runAnimationFrame / RUNNING_ANIMATION_FRAMES];
+		player2Run.renderAnimated(renderer, currentRunClip, camera.x, camera.y, player2.getAngle(), player2.getCenter(), player2.getFlipType());
+
+		// Increment the animation frame for the running animation
+		++runAnimationFrame;
+
+		// Cycle animation
+		if (runAnimationFrame / 5 >= RUNNING_ANIMATION_FRAMES)
+		{
+			runAnimationFrame = 0;
+		}
+	}
+	else
+	{
+		const SDL_Rect* currentIdleClip = &player2Rect[idleAnimationFrame / IDLE_ANIMATION_FRAMES];
+		player2.renderAnimated(renderer, currentIdleClip, camera.x, camera.y, player2.getAngle(), player2.getCenter(), player2.getFlipType());
+
+		// Increment the animation frame for the idle animation
+		++idleAnimationFrame;
+
+		// Cycle animation
+		if (idleAnimationFrame / 5 >= IDLE_ANIMATION_FRAMES)
+		{
+			idleAnimationFrame = 0;
+		}
+	}
+
+	// Update screen
+	SDL_RenderPresent(renderer);
 }
+
 
 void GameEngine::update()
 {
 	//player1.move();
 	player2.move();
+	player2Run.move();
 
 	//Center the camera over the dot
 	camera.x = (player2.getXPos() + PLAYER2_WIDTH / 2) - SCREEN_WIDTH / 2;
@@ -205,6 +272,7 @@ bool GameEngine::handleEvents()
 		// player movement
 		//player1.handleEvent(e);
 		player2.handleEvent(e);
+		player2Run.handleEvent(e);
 
 		// window events
 		windowObj.handleEvent(e, renderer);
@@ -212,7 +280,6 @@ bool GameEngine::handleEvents()
 
 	return running;
 }
-
 
 SDL_Window* GameEngine::getWindow() const
 {
@@ -266,7 +333,7 @@ void GameEngine::run()
 {
 	if (!init())
 	{
-		cout << "Failed to initialize game engine!\n ";
+		cout << "Failed to initialize game engine!\n";
 	}
 	else
 	{
@@ -280,18 +347,7 @@ void GameEngine::run()
 			fpsTimer.start();
 			stringstream timeText;
 			SDL_Color textColor = { 0, 0, 0, 255 };
-
-			// Variables for frame rate limiting
-			const int displayIndex = 0;  // Index of the display to query
-			SDL_DisplayMode displayMode;
-
-			SDL_GetCurrentDisplayMode(displayIndex, &displayMode);
-			const int SCREEN_TICKS_PER_FRAME = 1000 / displayMode.refresh_rate;
-
 			Uint32 prevFrameTime = 0;
-
-			// current animation frame
-			animationFrame = 0;
 
 			// Game loop
 			while (isRunning())
@@ -301,6 +357,10 @@ void GameEngine::run()
 
 				// event handler
 				handleEvents();
+
+				// constants for frame rate limiting
+				const int TARGET_FPS = 165;
+				const int SCREEN_TICKS_PER_FRAME = 1000 / TARGET_FPS;
 
 				// Calculate the time taken for the frame
 				int delayTime = SCREEN_TICKS_PER_FRAME - frameTime;
@@ -333,27 +393,11 @@ void GameEngine::run()
 
 					// Render function
 					render();
-
-					// Update screen
-					SDL_RenderPresent(renderer);
 				}
 
 				// fps frames
 				++countedFrames;
-
-				// Go to next frame every 5th frame
-				if (countedFrames % 8 == 0)
-				{
-					++animationFrame;
-
-					// Cycle animation
-					if (animationFrame / 5 >= WALKING_ANIMATION_FRAMES)
-					{
-						animationFrame = 0;
-					}
-				}
 			}
 		}
 	}
 }
-
