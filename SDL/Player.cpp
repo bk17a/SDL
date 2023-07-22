@@ -10,8 +10,6 @@ Player::Player()
 	renderer = nullptr;
 	playerTexture = nullptr;
 	flipType = SDL_FLIP_NONE;
-	// angle = NULL;
-	// center = nullptr;
 }
 
 Player::Player(SDL_Renderer* renderer, TextureManager* playerTexture)
@@ -24,8 +22,6 @@ Player::Player(SDL_Renderer* renderer, TextureManager* playerTexture)
 	this->renderer = renderer;
 	this->playerTexture = playerTexture;
 	flipType = SDL_FLIP_NONE;
-	// angle = NULL;
-	// center = nullptr;
 }
 
 void Player::handleEvent(const SDL_Event& e)

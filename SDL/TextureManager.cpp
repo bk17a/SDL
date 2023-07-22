@@ -67,7 +67,7 @@ bool TextureManager::loadFromFile(const char* path, SDL_Renderer* renderer)
 	return texture != nullptr;
 }
 
-bool TextureManager::loadFromRenderedText(const char* textureText, SDL_Color textColor, SDL_Renderer* renderer, TTF_Font* font)
+bool TextureManager::loadFromRenderedText(const char* textureText, const SDL_Color textColor, SDL_Renderer* renderer, TTF_Font* font)
 {
 	// get rid of preexisting texture
 	free();
@@ -115,6 +115,13 @@ void TextureManager::render(const int x, const int y, SDL_Renderer* renderer, co
 	SDL_RenderCopyEx(renderer, texture, clip, &renderQuad, angle, center, flip);
 }
 
+void TextureManager::render2(SDL_Renderer* renderer, const int x, const int y, const int width, const int height) const  // NOLINT(clang-diagnostic-shadow)
+{
+	//Render to screen
+	const SDL_Rect dstRect = { x, y, width, height };
+	SDL_RenderCopy(renderer, texture, nullptr, &dstRect);
+}
+
 int TextureManager::getHeight() const
 {
 	return height;
@@ -128,5 +135,5 @@ int TextureManager::getWidth() const
 void TextureManager::setAlpha(const Uint8 alpha) const
 {
 	//Modulate texture alpha
-	SDL_SetTextureAlphaMod(texture, alpha);
+	SDL_SetTextureAlphaMod(texture, ctype_base::alpha);  // NOLINT(clang-diagnostic-constant-conversion)
 }

@@ -25,4 +25,9 @@ static constexpr int TOTAL_PARTICLES = 20;
 static constexpr int IDLE_ANIMATION_FRAMES = 5 * 5;
 static constexpr int RUNNING_ANIMATION_FRAMES = 8 * 3;
 
+// dimensions of enemy
+static constexpr int ENEMY_WIDTH = 50;
+static constexpr int ENEMY_HEIGHT = 50;
+
+
 #endif

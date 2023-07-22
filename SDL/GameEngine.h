@@ -13,6 +13,7 @@
 #include "TextureManager.h"
 #include "Timer.h"
 #include "Window.h"
+#include "Enemy.h"
 
 
 class GameEngine
@@ -73,6 +74,10 @@ private:
 	Player player1Run;
 
 	SDL_Point center = { PLAYER1_WIDTH / 2, PLAYER1_HEIGHT / 2 };
+
+	// enemy members
+	Enemy enemy;
+	TextureManager enemyTex;
 };
 
 #endif

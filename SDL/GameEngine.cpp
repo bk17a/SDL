@@ -46,7 +46,7 @@ bool GameEngine::init()
 			SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
 			// Initialize SDL_image
-			const int imgFlags = IMG_INIT_PNG;
+			constexpr int imgFlags = IMG_INIT_PNG;
 			if (!(IMG_Init(imgFlags) & imgFlags))
 			{
 				cout << "SDL_image could not initialize! SDL_image Error: " << IMG_GetError() << endl;
@@ -155,6 +155,22 @@ bool GameEngine::loadMedia()
 		player1RunRect[4].w = PLAYER1_WIDTH;
 		player1RunRect[4].h = PLAYER1RUN_HEIGHT;
 	}
+
+	if (!enemyTex.loadFromFile("gfx/testEnemy.png", renderer))
+	{
+		cout << "Unable to load test enemy texture!\n";
+		success = false;
+	}
+	else
+	{
+		enemy = Enemy(renderer, &enemyTex);
+
+		if (!enemy.isAlive())
+		{
+			enemy.spawn();
+		}
+	}
+
 	return success;
 }
 
@@ -203,8 +219,11 @@ void GameEngine::render()
 		}
 	}
 
-	// Update screen
-	SDL_RenderPresent(renderer);
+	// Render test enemy
+	if (enemy.isAlive())
+	{
+		enemy.render(renderer);
+	}
 }
 
 
@@ -318,6 +337,9 @@ void GameEngine::run()
 	}
 	else
 	{
+		// Seed the random number generator with a time-based value
+		srand(static_cast<unsigned int>(time(nullptr)));  // NOLINT(cert-msc51-cpp)
+
 		if (!loadMedia())
 		{
 			cout << "Failed to load media!\n";
@@ -374,6 +396,9 @@ void GameEngine::run()
 
 					// Render function
 					render();
+
+					// Update screen
+					SDL_RenderPresent(renderer);
 				}
 
 				// fps frames
