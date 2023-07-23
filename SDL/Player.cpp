@@ -39,17 +39,17 @@ void Player::handleEvent(const SDL_Event& e)
 		switch (e.key.keysym.sym)
 		{
 		case SDLK_UP:
-			yVel = -DOT_VEL;
+			yVel = -PLAYER_VEL;
 			break;
 		case SDLK_DOWN:
-			yVel = DOT_VEL;
+			yVel = PLAYER_VEL;
 			break;
 		case SDLK_LEFT:
-			xVel = -DOT_VEL;
+			xVel = -PLAYER_VEL;
 			flipType = SDL_FLIP_HORIZONTAL;
 			break;
 		case SDLK_RIGHT:
-			xVel = DOT_VEL;
+			xVel = PLAYER_VEL;
 			flipType = SDL_FLIP_NONE;
 			break;
 		default:
@@ -86,7 +86,7 @@ void Player::move()
 	// player move on x axis
 	xPos += xVel;
 	// if player went out of range
-	if ((xPos < 0) || (xPos > LEVEL_WIDTH + PLAYER1_WIDTH - 100))
+	if ((xPos < 0) || (xPos > LEVEL_WIDTH + PLAYER1_WIDTH - 200))
 	{
 		// move back
 		xPos -= xVel;
@@ -95,7 +95,7 @@ void Player::move()
 	// player move on y axis
 	yPos += yVel;
 	// if player out of range
-	if ((yPos < 0) || (yPos + PLAYER1_HEIGHT > LEVEL_HEIGHT))
+	if ((yPos < 0) || (yPos + PLAYER1_HEIGHT > LEVEL_HEIGHT - 30))
 	{
 		// move back
 		yPos -= yVel;
@@ -119,7 +119,13 @@ int Player::getYPos() const
 
 void Player::renderAnimated(SDL_Renderer* renderer, const SDL_Rect* clip, const int camX, const int camY, const double angle, const SDL_Point* center, const SDL_RendererFlip flipType) const  // NOLINT(clang-diagnostic-shadow)
 {
-	playerTexture->render(xPos - camX, yPos - camY, renderer, clip, angle, center, flipType);
+	int renderX = xPos - camX;						
+	const int renderY = yPos - camY;
+	if (flipType == SDL_FLIP_HORIZONTAL)
+	{
+		renderX += PLAYER1_WIDTH - 200;	// flip in place
+	}
+	playerTexture->render(renderX, renderY, renderer, clip, angle, center, flipType);
 }
 
 bool Player::isMoving() const

@@ -21,6 +21,7 @@ public:
 	void setAlpha(Uint8 alpha) const;
 	int getWidth() const;
 	int getHeight() const;
+	SDL_Texture* getTexture() const;
 
 private:
 	SDL_Texture* texture;

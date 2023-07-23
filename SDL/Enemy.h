@@ -4,6 +4,8 @@
 
 #include <SDL.h>
 #include <stdlib.h>
+#include <vector>
+#include <algorithm>
 #include "TextureManager.h"
 #include "Player.h"
 
@@ -13,19 +15,24 @@ public:
 	Enemy();
 	Enemy(SDL_Renderer* renderer, TextureManager* enemyTex);
 
-	void render(SDL_Renderer* renderer) const;
+	void render(SDL_Renderer* renderer, const int camX, const int camY) const;
 	void spawn();
 	bool isAlive() const;
 
-	void takeDamage(int amount);
+	void takeDamage(int damage);
 	void kill();
+
+	int getPosX() const;
+	int getPosY() const;
+	void setPosX(int xPos);
+	void setPosY(int yPos);
 
 private:
 	SDL_Renderer* renderer;
 	TextureManager* enemyTex;
 
 	int xPos, yPos;
-	int xVel, yVel;
+	double xVel, yVel;
 
 	int health;
 	bool alive;

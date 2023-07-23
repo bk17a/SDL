@@ -137,3 +137,8 @@ void TextureManager::setAlpha(const Uint8 alpha) const
 	//Modulate texture alpha
 	SDL_SetTextureAlphaMod(texture, ctype_base::alpha);  // NOLINT(clang-diagnostic-constant-conversion)
 }
+
+SDL_Texture* TextureManager::getTexture() const
+{
+	return texture;
+}

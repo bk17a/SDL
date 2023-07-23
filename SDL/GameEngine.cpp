@@ -163,11 +163,20 @@ bool GameEngine::loadMedia()
 	}
 	else
 	{
-		enemy = Enemy(renderer, &enemyTex);
+		//enemy = Enemy(renderer, &enemyTex);
+
+		for (int i = 0; i < ENEMY_NUM; ++i)
+		{
+			enemy = Enemy(renderer, &enemyTex);
+			enemies.emplace_back(enemy);
+		}
 
 		if (!enemy.isAlive())
 		{
-			enemy.spawn();
+			for (auto& e  : enemies)
+			{
+				e.spawn();
+			}
 		}
 	}
 
@@ -193,7 +202,7 @@ void GameEngine::render()
 	if (isMoving)
 	{
 		const SDL_Rect* currentRunClip = &player1RunRect[runAnimationFrame / RUNNING_ANIMATION_FRAMES];
-		player1Run.renderAnimated(renderer, currentRunClip, camera.x, camera.y, NULL, &center, player1.getFlipType());
+		player1Run.renderAnimated(renderer, currentRunClip, camera.x, camera.y, NULL, nullptr, player1.getFlipType());
 
 		// Increment the animation frame for the running animation
 		++runAnimationFrame;
@@ -220,9 +229,12 @@ void GameEngine::render()
 	}
 
 	// Render test enemy
-	if (enemy.isAlive())
+	for (auto& e : enemies)
 	{
-		enemy.render(renderer);
+		if (e.isAlive())
+		{
+			e.render(renderer, camera.x, camera.y);
+		}
 	}
 }
 
@@ -254,6 +266,15 @@ void GameEngine::update()
 	{
 		camera.y = LEVEL_HEIGHT - camera.h;
 	}
+
+	//enemy.updatePos(player1, ENEMY_VEL, camera);
+	for (auto& e : enemies)
+	{
+		if (e.getPosX() < player1.getXPos()) e.setPosX(e.getPosX() + ENEMY_VEL);
+		if (e.getPosX() > player1.getXPos()) e.setPosX(e.getPosX() - ENEMY_VEL);
+		if (e.getPosY() < player1.getYPos()) e.setPosY(e.getPosY() + ENEMY_VEL);
+		if (e.getPosY() > player1.getYPos()) e.setPosY(e.getPosY() - ENEMY_VEL);
+	}
 }
 
 bool GameEngine::handleEvents()
@@ -270,7 +291,6 @@ bool GameEngine::handleEvents()
 		}
 
 		// player movement
-		//player1.handleEvent(e);
 		player1.handleEvent(e);
 		player1Run.handleEvent(e);
 
@@ -312,7 +332,7 @@ void GameEngine::close()
 	grass.free();
 	fpsTexture.free();
 	player1Tex.free();
-	player1Tex.free();
+	player1RunTex.free();
 
 	// Close font
 	TTF_CloseFont(font);

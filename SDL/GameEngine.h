@@ -3,7 +3,9 @@
 #define GAME_ENGINE_H_
 
 #include <array>
+#include <vector>
 #include <iomanip>
+#include <algorithm>
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_ttf.h>
@@ -73,11 +75,10 @@ private:
 	TextureManager player1RunTex;
 	Player player1Run;
 
-	SDL_Point center = { PLAYER1_WIDTH / 2, PLAYER1_HEIGHT / 2 };
-
 	// enemy members
 	Enemy enemy;
 	TextureManager enemyTex;
+	std::vector<Enemy> enemies;
 };
 
 #endif
