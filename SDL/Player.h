@@ -5,6 +5,7 @@
 #include <SDL.h>
 #include "TextureManager.h"
 #include "Constants.h"
+#include "Enemy.h"
 
 class Player
 {
@@ -24,7 +25,6 @@ public:
 	void renderAnimated(SDL_Renderer* renderer, const SDL_Rect* clip, int camX, int camY, const double angle = NULL, const SDL_Point* center = nullptr, SDL_RendererFlip flipType = SDL_FLIP_NONE) const;
 
 	SDL_RendererFlip getFlipType() const;
-
 private:
 	// x and y offsets
 	int xPos;

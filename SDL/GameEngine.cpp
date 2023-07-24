@@ -270,10 +270,14 @@ void GameEngine::update()
 	//enemy.updatePos(player1, ENEMY_VEL, camera);
 	for (auto& e : enemies)
 	{
+		// enemy movement toward player
 		if (e.getPosX() < player1.getXPos()) e.setPosX(e.getPosX() + ENEMY_VEL);
 		if (e.getPosX() > player1.getXPos()) e.setPosX(e.getPosX() - ENEMY_VEL);
 		if (e.getPosY() < player1.getYPos()) e.setPosY(e.getPosY() + ENEMY_VEL);
 		if (e.getPosY() > player1.getYPos()) e.setPosY(e.getPosY() - ENEMY_VEL);
+
+		// check collision
+
 	}
 }
 

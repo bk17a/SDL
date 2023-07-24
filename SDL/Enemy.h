@@ -36,6 +36,7 @@ private:
 
 	int health;
 	bool alive;
+	std::vector<Enemy> enemies;
 };
 
 #endif

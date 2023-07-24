@@ -81,4 +81,3 @@ void Enemy::setPosY(const int yPos) // NOLINT(clang-diagnostic-shadow)
 	this->yPos = yPos;
 }
 
-
