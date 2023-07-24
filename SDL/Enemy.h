@@ -24,19 +24,28 @@ public:
 
 	int getPosX() const;
 	int getPosY() const;
+	int getWidth() const;
+	int getHeight() const;
 	void setPosX(int xPos);
 	void setPosY(int yPos);
+
+	bool checkCollisionWithEnemy(const Enemy& e) const;
+	//bool checkCollisionWithPlayer(const Player& e) const;
+
 
 private:
 	SDL_Renderer* renderer;
 	TextureManager* enemyTex;
 
 	int xPos, yPos;
+	int width, height;
 	double xVel, yVel;
 
 	int health;
 	bool alive;
 	std::vector<Enemy> enemies;
+
+	SDL_Rect p{};
 };
 
 #endif

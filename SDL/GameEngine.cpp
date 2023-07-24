@@ -274,8 +274,36 @@ void GameEngine::update()
 		if (e.getPosX() > player1.getXPos()) e.setPosX(e.getPosX() - ENEMY_VEL);
 		if (e.getPosY() < player1.getYPos()) e.setPosY(e.getPosY() + ENEMY_VEL);
 		if (e.getPosY() > player1.getYPos()) e.setPosY(e.getPosY() - ENEMY_VEL);
+	}
 
-		// check collision
+	// Check collision between enemies
+	for (size_t i = 0; i < enemies.size(); ++i)
+	{
+		for (size_t j = i + 1; j < enemies.size(); ++j)
+		{
+			if(enemies[i].checkCollisionWithEnemy(enemies[j]))
+			{
+				// Calculate the direction of the collision between enemies
+				int directionX = enemies[i].getPosX() - enemies[j].getPosX();
+				int directionY = enemies[i].getPosY() - enemies[j].getPosY();
+
+				// Normalize the direction vector
+				const int length = static_cast<int>(sqrt(directionX * directionX + directionY * directionY));
+				directionX /= length;
+				directionY /= length;
+
+				// Calculate the maximum distance the enemies can move back
+				constexpr int maxDistance = 2; // Change this value to adjust the maximum distance
+
+				// Move the colliding enemies one step back in the opposite direction, but limit the distance
+				const int distanceX = directionX * maxDistance;
+				const int distanceY = directionY * maxDistance;
+				enemies[i].setPosX(enemies[i].getPosX() + distanceX);
+				enemies[i].setPosY(enemies[i].getPosY() + distanceY);
+				enemies[j].setPosX(enemies[j].getPosX() - distanceX);
+				enemies[j].setPosY(enemies[j].getPosY() - distanceY);
+			}
+		}
 	}
 }
 

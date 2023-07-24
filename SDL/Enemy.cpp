@@ -7,24 +7,40 @@ Enemy::Enemy()
 {
 	xPos = 0;
 	yPos = 0;
+	width = ENEMY_WIDTH;
+	height = ENEMY_HEIGHT;
 	xVel = 0;
 	yVel = 0;
 	renderer = nullptr;
 	enemyTex = nullptr;
 	health = 100;
 	alive = false;
+
+	// Initialize SDL_Rect p 
+	p.x = xPos;
+	p.y = yPos;
+	p.w = width;
+	p.h = height;
 }
 
 Enemy::Enemy(SDL_Renderer* renderer, TextureManager* enemyTex)
 {
 	xPos = 0;
 	yPos = 0;
+	width = ENEMY_WIDTH;
+	height = ENEMY_HEIGHT;
 	xVel = 0;
 	yVel = 0;
 	this->renderer = renderer;
 	this->enemyTex = enemyTex;
 	health = 100;
 	alive = false;
+
+	// Initialize the SDL_Rect p with the correct values
+	p.x = xPos;
+	p.y = yPos;
+	p.w = width;
+	p.h = height;
 }
 
 void Enemy::render(SDL_Renderer* renderer, const int camX, const int camY) const  // NOLINT(clang-diagnostic-shadow)
@@ -73,9 +89,71 @@ int Enemy::getPosY() const
 void Enemy::setPosX(const int xPos)  // NOLINT(clang-diagnostic-shadow)
 {
 	this->xPos = xPos;
+	p.x = xPos;			// update p.x to update new pos
 }
 
 void Enemy::setPosY(const int yPos) // NOLINT(clang-diagnostic-shadow)
 {
 	this->yPos = yPos;
+	p.y = yPos;			// update p.y to update new pos
 }
+
+int Enemy::getHeight() const
+{
+	return height;
+}
+
+int Enemy::getWidth() const
+{
+	return width;
+}
+
+bool Enemy::checkCollisionWithEnemy(const Enemy& e) const
+{
+	// calculate sides of enemy1
+	const int leftA = p.x;
+	const int rightA = p.x + p.w;
+	const int topA = p.y;
+	const int botA = p.y + p.h;
+
+	// calculate sides of enemy2
+	const int leftB = e.p.x;
+	const int rightB = e.p.x + e.p.w;
+	const int topB = e.p.y;
+	const int botB = e.p.y + e.p.h;
+
+	// check if any sides from A is not colliding with B
+	// not colliding if sides of A are outside of B
+	if (botA <= topB || topA >= botB || leftA >= rightB || (rightA <= leftB))
+	{
+		return false;		
+	}
+
+	// if no sides are outside of B
+	return true;
+}
+
+// bool Enemy::checkCollisionWithPlayer(const Player& e) const
+// {
+// 	// calculate sides of enemy
+// 	const int leftA = p.x;
+// 	const int rightA = p.x + p.w;
+// 	const int topA = p.y;
+// 	const int botA = p.y + p.h;
+//
+// 	// calculate sides of player
+// 	const int leftB = e.p.x;
+// 	const int rightB = e.p.x + e.p.w;
+// 	const int topB = e.p.y;
+// 	const int botB = e.p.y + e.p.h;
+//
+// 	// check if any sides from A is not colliding with B
+// 	// not colliding if sides of A are outside of B
+// 	if (botA <= topB || topA >= botB || leftA >= rightB || (rightA <= leftB))
+// 	{
+// 		return false;
+// 	}
+//
+// 	// if no sides are outside of B
+// 	return true;
+// }

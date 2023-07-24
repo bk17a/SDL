@@ -10,7 +10,7 @@
 class Player
 {
 public:
-
+	SDL_Rect p;
 	// initialize the variables
 	Player();
 	Player(SDL_Renderer* renderer, TextureManager* playerTexture);
@@ -30,6 +30,10 @@ private:
 	// x and y offsets
 	int xPos;
 	int yPos;
+
+	// width and height of player
+	int width;
+	int height;
 
 	// velocity of player
 	int xVel;

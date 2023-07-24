@@ -4,6 +4,8 @@ Player::Player()
 {
 	xPos = 0;
 	yPos = 0;
+	width = PLAYER1_WIDTH;
+	height = PLAYER1_HEIGHT;
 	xVel = 0;
 	yVel = 0;
 	moving = false;
@@ -16,6 +18,8 @@ Player::Player(SDL_Renderer* renderer, TextureManager* playerTexture)
 {
 	xPos = 0;
 	yPos = 0;
+	width = PLAYER1_WIDTH;
+	height = PLAYER1_HEIGHT;
 	xVel = 0;
 	yVel = 0;
 	moving = false;
@@ -85,6 +89,7 @@ void Player::move()
 {
 	// player move on x axis
 	xPos += xVel;
+
 	// if player went out of range
 	if ((xPos < 0) || (xPos > LEVEL_WIDTH + PLAYER1_WIDTH - 200))
 	{
@@ -94,6 +99,7 @@ void Player::move()
 
 	// player move on y axis
 	yPos += yVel;
+
 	// if player out of range
 	if ((yPos < 0) || (yPos + PLAYER1_HEIGHT > LEVEL_HEIGHT - 30))
 	{

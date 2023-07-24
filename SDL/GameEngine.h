@@ -25,15 +25,15 @@ public:
 	GameEngine();  // default constructor
 	~GameEngine(); // default destructor
 
-	bool init();							// initialize renderer, window, font, image
-	bool loadMedia();						// loads media (image, fonts)
+	bool init();											// initialize renderer, window, font, image
+	bool loadMedia();										// loads media (image, fonts)
 	void update();
-	void render();							// render textures, fonts, etc
-	bool handleEvents();					// handle quit event
-	void quit();							// quit out
-	void close();							// free and destroy after using
-	bool isRunning() const;					// check to see if program is running
-	void run();								// run the program
+	void render();											// render textures, fonts, etc
+	bool handleEvents();									// handle quit event
+	void quit();											// quit out
+	void close();											// free and destroy after using
+	bool isRunning() const;									// check to see if program is running
+	void run();												// run the program
 
 	// getters
 	SDL_Window* getWindow() const;
