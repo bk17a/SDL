@@ -119,7 +119,7 @@ int Player::getYPos() const
 
 void Player::renderAnimated(SDL_Renderer* renderer, const SDL_Rect* clip, const int camX, const int camY, const double angle, const SDL_Point* center, const SDL_RendererFlip flipType) const  // NOLINT(clang-diagnostic-shadow)
 {
-	int renderX = xPos - camX;						
+	int renderX = xPos - camX;
 	const int renderY = yPos - camY;
 	if (flipType == SDL_FLIP_HORIZONTAL)
 	{

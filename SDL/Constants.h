@@ -35,5 +35,4 @@ static constexpr int ENEMY_VEL = 1;
 // number of enemies
 static constexpr int ENEMY_NUM = 3;
 
-
 #endif

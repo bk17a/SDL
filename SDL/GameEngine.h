@@ -17,7 +17,6 @@
 #include "Window.h"
 #include "Enemy.h"
 
-
 class GameEngine
 {
 public:

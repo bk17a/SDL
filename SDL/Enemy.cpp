@@ -65,7 +65,6 @@ int Enemy::getPosX() const
 	return xPos;
 }
 
-
 int Enemy::getPosY() const
 {
 	return yPos;
@@ -80,4 +79,3 @@ void Enemy::setPosY(const int yPos) // NOLINT(clang-diagnostic-shadow)
 {
 	this->yPos = yPos;
 }
-

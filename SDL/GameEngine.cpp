@@ -173,7 +173,7 @@ bool GameEngine::loadMedia()
 
 		if (!enemy.isAlive())
 		{
-			for (auto& e  : enemies)
+			for (auto& e : enemies)
 			{
 				e.spawn();
 			}
@@ -238,7 +238,6 @@ void GameEngine::render()
 	}
 }
 
-
 void GameEngine::update()
 {
 	//player1.move();
@@ -277,7 +276,6 @@ void GameEngine::update()
 		if (e.getPosY() > player1.getYPos()) e.setPosY(e.getPosY() - ENEMY_VEL);
 
 		// check collision
-
 	}
 }
 
