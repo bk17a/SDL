@@ -2,6 +2,7 @@
 // ReSharper disable CppClangTidyClangDiagnosticDoublePromotion
 // ReSharper disable CppClangTidyClangDiagnosticFloatConversion
 #include "Enemy.h"
+#include "Player.h"
 
 Enemy::Enemy()
 {
@@ -133,27 +134,13 @@ bool Enemy::checkCollisionWithEnemy(const Enemy& e) const
 	return true;
 }
 
-// bool Enemy::checkCollisionWithPlayer(const Player& e) const
-// {
-// 	// calculate sides of enemy
-// 	const int leftA = p.x;
-// 	const int rightA = p.x + p.w;
-// 	const int topA = p.y;
-// 	const int botA = p.y + p.h;
-//
-// 	// calculate sides of player
-// 	const int leftB = e.p.x;
-// 	const int rightB = e.p.x + e.p.w;
-// 	const int topB = e.p.y;
-// 	const int botB = e.p.y + e.p.h;
-//
-// 	// check if any sides from A is not colliding with B
-// 	// not colliding if sides of A are outside of B
-// 	if (botA <= topB || topA >= botB || leftA >= rightB || (rightA <= leftB))
-// 	{
-// 		return false;
-// 	}
-//
-// 	// if no sides are outside of B
-// 	return true;
-// }
+void Enemy::setVelocityX(const int xVel) // NOLINT(clang-diagnostic-shadow)
+{
+	this->xVel = xVel;
+}
+
+void Enemy::setVelocityY(const int yVel)  // NOLINT(clang-diagnostic-shadow)
+{
+	this->yVel = yVel;
+}
+

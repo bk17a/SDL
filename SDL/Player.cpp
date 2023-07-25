@@ -12,6 +12,8 @@ Player::Player()
 	renderer = nullptr;
 	playerTexture = nullptr;
 	flipType = SDL_FLIP_NONE;
+	collider.w = PLAYER1_WIDTH;
+	collider.h = PLAYER1_HEIGHT;
 }
 
 Player::Player(SDL_Renderer* renderer, TextureManager* playerTexture)
@@ -121,6 +123,26 @@ int Player::getXPos() const
 int Player::getYPos() const
 {
 	return yPos;
+}
+
+int Player::getWidth() const
+{
+	return width;
+}
+
+int Player::getHeight() const
+{
+	return height;
+}
+
+void Player::setXPos(const int x)
+{
+	xPos = x;
+}
+
+void Player::setYPos(const int y)
+{
+	yPos = y;
 }
 
 void Player::renderAnimated(SDL_Renderer* renderer, const SDL_Rect* clip, const int camX, const int camY, const double angle, const SDL_Point* center, const SDL_RendererFlip flipType) const  // NOLINT(clang-diagnostic-shadow)

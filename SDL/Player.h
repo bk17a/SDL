@@ -10,7 +10,6 @@
 class Player
 {
 public:
-	SDL_Rect p;
 	// initialize the variables
 	Player();
 	Player(SDL_Renderer* renderer, TextureManager* playerTexture);
@@ -18,12 +17,16 @@ public:
 	void move();														// moves the player
 	void render(SDL_Renderer* renderer, int camX, int camY) const;		// render player onto screen relative to camera
 
+	// getters and setters
 	int getXPos() const;
 	int getYPos() const;
+	int getWidth() const;
+	int getHeight() const;
+	void setXPos(int x);
+	void setYPos(int y);
+
 	bool isMoving() const;
-
 	void renderAnimated(SDL_Renderer* renderer, const SDL_Rect* clip, int camX, int camY, const double angle = NULL, const SDL_Point* center = nullptr, SDL_RendererFlip flipType = SDL_FLIP_NONE) const;
-
 	SDL_RendererFlip getFlipType() const;
 
 private:
@@ -45,6 +48,9 @@ private:
 	TextureManager* playerTexture;
 
 	SDL_RendererFlip flipType;
+
+	// player's collision box
+	SDL_Rect collider{};
 };
 
 #endif //PLAYER_H_

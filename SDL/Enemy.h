@@ -7,11 +7,15 @@
 #include <vector>
 #include <algorithm>
 #include "TextureManager.h"
-#include "Player.h"
+#include "Constants.h"
+
+class Player;
 
 class Enemy
 {
 public:
+	SDL_Rect p{};
+
 	Enemy();
 	Enemy(SDL_Renderer* renderer, TextureManager* enemyTex);
 
@@ -28,10 +32,10 @@ public:
 	int getHeight() const;
 	void setPosX(int xPos);
 	void setPosY(int yPos);
+	void setVelocityX(int xVel);
+	void setVelocityY(int yVel);
 
 	bool checkCollisionWithEnemy(const Enemy& e) const;
-	//bool checkCollisionWithPlayer(const Player& e) const;
-
 
 private:
 	SDL_Renderer* renderer;
@@ -44,8 +48,6 @@ private:
 	int health;
 	bool alive;
 	std::vector<Enemy> enemies;
-
-	SDL_Rect p{};
 };
 
 #endif

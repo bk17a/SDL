@@ -266,7 +266,7 @@ void GameEngine::update()
 		camera.y = LEVEL_HEIGHT - camera.h;
 	}
 
-	//enemy.updatePos(player1, ENEMY_VEL, camera);
+	// looping through all the enemies in the vector
 	for (auto& e : enemies)
 	{
 		// enemy movement toward player
@@ -363,6 +363,9 @@ void GameEngine::close()
 	fpsTexture.free();
 	player1Tex.free();
 	player1RunTex.free();
+
+	// clear enemy vector
+	enemies.clear();
 
 	// Close font
 	TTF_CloseFont(font);
