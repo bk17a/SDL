@@ -163,8 +163,6 @@ bool GameEngine::loadMedia()
 	}
 	else
 	{
-		//enemy = Enemy(renderer, &enemyTex);
-
 		for (int i = 0; i < ENEMY_NUM; ++i)
 		{
 			enemy = Enemy(renderer, &enemyTex);
@@ -178,6 +176,16 @@ bool GameEngine::loadMedia()
 				e.spawn();
 			}
 		}
+	}
+
+	if (!bulletTex.loadFromFile("gfx/laser.png", renderer))
+	{
+		cout << "Unable to load bullet texture!\n";
+		success = false;
+	}
+	else
+	{
+		bullets = Bullet(renderer, &bulletTex);
 	}
 
 	return success;
@@ -228,12 +236,13 @@ void GameEngine::render()
 		}
 	}
 
-	// Render test enemy
+	// Render test enemy and bullet
 	for (auto& e : enemies)
 	{
 		if (e.isAlive())
 		{
 			e.render(renderer, camera.x, camera.y);
+			bullets.render(renderer, camera.x, camera.y);		// render bullets if enemies are alive
 		}
 	}
 }
@@ -281,7 +290,7 @@ void GameEngine::update()
 	{
 		for (size_t j = i + 1; j < enemies.size(); ++j)
 		{
-			if(enemies[i].checkCollisionWithEnemy(enemies[j]))
+			if (enemies[i].checkCollisionWithEnemy(enemies[j]))
 			{
 				// Calculate the direction of the collision between enemies
 				int directionX = enemies[i].getPosX() - enemies[j].getPosX();

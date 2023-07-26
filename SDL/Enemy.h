@@ -8,6 +8,7 @@
 #include <algorithm>
 #include "TextureManager.h"
 #include "Constants.h"
+#include "Vector2.h"
 
 class Player;
 
@@ -41,9 +42,9 @@ private:
 	SDL_Renderer* renderer;
 	TextureManager* enemyTex;
 
-	int xPos, yPos;
-	int width, height;
-	double xVel, yVel;
+	Vector2 position;
+	Vector2 size;
+	Vector2 velocity;
 
 	int health;
 	bool alive;

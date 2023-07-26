@@ -12,9 +12,9 @@ public:
 	void stop();
 	void pause();
 	void unpause();
-	Uint32 getTicks();
-	bool isStarted();
-	bool isPaused();
+	Uint32 getTicks() const;
+	bool isStarted() const;
+	bool isPaused() const;
 
 private:
 	Uint32 startTicks; // clock when timer started

@@ -6,6 +6,7 @@
 #include "TextureManager.h"
 #include "Constants.h"
 #include "Enemy.h"
+#include "Vector2.h"
 
 class Player
 {
@@ -31,16 +32,11 @@ public:
 
 private:
 	// x and y offsets
-	int xPos;
-	int yPos;
-
+	Vector2 position;
 	// width and height of player
-	int width;
-	int height;
-
-	// velocity of player
-	int xVel;
-	int yVel;
+	Vector2 size;
+	// speed of player
+	Vector2 velocity;
 
 	bool moving;
 

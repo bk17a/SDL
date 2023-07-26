@@ -6,54 +6,48 @@
 
 Enemy::Enemy()
 {
-	xPos = 0;
-	yPos = 0;
-	width = ENEMY_WIDTH;
-	height = ENEMY_HEIGHT;
-	xVel = 0;
-	yVel = 0;
+	position = Vector2(0, 0);
+	size = Vector2(ENEMY_WIDTH, ENEMY_HEIGHT);
+	velocity = Vector2(0, 0);
 	renderer = nullptr;
 	enemyTex = nullptr;
 	health = 100;
 	alive = false;
 
-	// Initialize SDL_Rect p 
-	p.x = xPos;
-	p.y = yPos;
-	p.w = width;
-	p.h = height;
+	// Initialize SDL_Rect p
+	p.x = position.x;
+	p.y = position.y;
+	p.w = size.x;
+	p.h = size.y;
 }
 
 Enemy::Enemy(SDL_Renderer* renderer, TextureManager* enemyTex)
 {
-	xPos = 0;
-	yPos = 0;
-	width = ENEMY_WIDTH;
-	height = ENEMY_HEIGHT;
-	xVel = 0;
-	yVel = 0;
+	position = Vector2(0, 0);
+	size = Vector2(ENEMY_WIDTH, ENEMY_HEIGHT);
+	velocity = Vector2(0, 0);
 	this->renderer = renderer;
 	this->enemyTex = enemyTex;
 	health = 100;
 	alive = false;
 
 	// Initialize the SDL_Rect p with the correct values
-	p.x = xPos;
-	p.y = yPos;
-	p.w = width;
-	p.h = height;
+	p.x = position.x;
+	p.y = position.y;
+	p.w = size.x;
+	p.h = size.y;
 }
 
 void Enemy::render(SDL_Renderer* renderer, const int camX, const int camY) const  // NOLINT(clang-diagnostic-shadow)
 {
-	enemyTex->render2(renderer, xPos - camX, yPos - camY, ENEMY_WIDTH, ENEMY_HEIGHT);
+	enemyTex->render2(renderer, position.x - camX, position.y - camY, ENEMY_WIDTH, ENEMY_HEIGHT);
 }
 
 void Enemy::spawn()
 {
 	// Set random initial position within the screen boundaries
-	xPos = rand() % (SCREEN_WIDTH - ENEMY_WIDTH);	 // NOLINT(concurrency-mt-unsafe)
-	yPos = rand() % (SCREEN_HEIGHT - ENEMY_HEIGHT);  // NOLINT(concurrency-mt-unsafe)
+	position.x = rand() % (SCREEN_WIDTH - ENEMY_WIDTH);	 // NOLINT(concurrency-mt-unsafe)
+	position.y = rand() % (SCREEN_HEIGHT - ENEMY_HEIGHT);  // NOLINT(concurrency-mt-unsafe)
 
 	alive = true;
 }
@@ -79,34 +73,34 @@ void Enemy::kill()
 
 int Enemy::getPosX() const
 {
-	return xPos;
+	return position.x;
 }
 
 int Enemy::getPosY() const
 {
-	return yPos;
+	return position.y;
 }
 
 void Enemy::setPosX(const int xPos)  // NOLINT(clang-diagnostic-shadow)
 {
-	this->xPos = xPos;
+	position.x = xPos;
 	p.x = xPos;			// update p.x to update new pos
 }
 
 void Enemy::setPosY(const int yPos) // NOLINT(clang-diagnostic-shadow)
 {
-	this->yPos = yPos;
+	position.y = yPos;
 	p.y = yPos;			// update p.y to update new pos
 }
 
 int Enemy::getHeight() const
 {
-	return height;
+	return  size.y;
 }
 
 int Enemy::getWidth() const
 {
-	return width;
+	return  size.x;
 }
 
 bool Enemy::checkCollisionWithEnemy(const Enemy& e) const
@@ -127,7 +121,7 @@ bool Enemy::checkCollisionWithEnemy(const Enemy& e) const
 	// not colliding if sides of A are outside of B
 	if (botA <= topB || topA >= botB || leftA >= rightB || (rightA <= leftB))
 	{
-		return false;		
+		return false;
 	}
 
 	// if no sides are outside of B
@@ -136,11 +130,10 @@ bool Enemy::checkCollisionWithEnemy(const Enemy& e) const
 
 void Enemy::setVelocityX(const int xVel) // NOLINT(clang-diagnostic-shadow)
 {
-	this->xVel = xVel;
+	velocity.x = xVel;
 }
 
 void Enemy::setVelocityY(const int yVel)  // NOLINT(clang-diagnostic-shadow)
 {
-	this->yVel = yVel;
+	velocity.y = yVel;
 }
-

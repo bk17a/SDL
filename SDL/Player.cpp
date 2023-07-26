@@ -2,12 +2,9 @@
 
 Player::Player()
 {
-	xPos = 0;
-	yPos = 0;
-	width = PLAYER1_WIDTH;
-	height = PLAYER1_HEIGHT;
-	xVel = 0;
-	yVel = 0;
+	position = Vector2(0, 0);
+	size = Vector2(PLAYER1_WIDTH, PLAYER1_HEIGHT);
+	velocity = Vector2(0, 0);
 	moving = false;
 	renderer = nullptr;
 	playerTexture = nullptr;
@@ -18,12 +15,9 @@ Player::Player()
 
 Player::Player(SDL_Renderer* renderer, TextureManager* playerTexture)
 {
-	xPos = 0;
-	yPos = 0;
-	width = PLAYER1_WIDTH;
-	height = PLAYER1_HEIGHT;
-	xVel = 0;
-	yVel = 0;
+	position = Vector2(0, 0);
+	size = Vector2(PLAYER1_WIDTH, PLAYER1_HEIGHT);
+	velocity = Vector2(0, 0);
 	moving = false;
 	this->renderer = renderer;
 	this->playerTexture = playerTexture;
@@ -45,17 +39,17 @@ void Player::handleEvent(const SDL_Event& e)
 		switch (e.key.keysym.sym)
 		{
 		case SDLK_UP:
-			yVel = -PLAYER_VEL;
+			velocity.y = -PLAYER_VEL;
 			break;
 		case SDLK_DOWN:
-			yVel = PLAYER_VEL;
+			velocity.y = PLAYER_VEL;
 			break;
 		case SDLK_LEFT:
-			xVel = -PLAYER_VEL;
+			velocity.x = -PLAYER_VEL;
 			flipType = SDL_FLIP_HORIZONTAL;
 			break;
 		case SDLK_RIGHT:
-			xVel = PLAYER_VEL;
+			velocity.x = PLAYER_VEL;
 			flipType = SDL_FLIP_NONE;
 			break;
 		default:
@@ -69,11 +63,11 @@ void Player::handleEvent(const SDL_Event& e)
 		{
 		case SDLK_UP:
 		case SDLK_DOWN:
-			yVel = 0;
+			velocity.y = 0;
 			break;
 		case SDLK_LEFT:
 		case SDLK_RIGHT:
-			xVel = 0;
+			velocity.x = 0;
 			break;
 		default:
 			break;
@@ -90,65 +84,65 @@ void Player::handleEvent(const SDL_Event& e)
 void Player::move()
 {
 	// player move on x axis
-	xPos += xVel;
+	position.x += velocity.x;
 
 	// if player went out of range
-	if ((xPos < 0) || (xPos > LEVEL_WIDTH + PLAYER1_WIDTH - 200))
+	if ((position.x < 0) || (position.x > LEVEL_WIDTH + PLAYER1_WIDTH - 200))
 	{
 		// move back
-		xPos -= xVel;
+		position.x -= velocity.x;
 	}
 
 	// player move on y axis
-	yPos += yVel;
+	position.y += velocity.y;
 
 	// if player out of range
-	if ((yPos < 0) || (yPos + PLAYER1_HEIGHT > LEVEL_HEIGHT - 30))
+	if ((position.y < 0) || (position.y + PLAYER1_HEIGHT > LEVEL_HEIGHT - 30))
 	{
 		// move back
-		yPos -= yVel;
+		position.y -= velocity.y;
 	}
 }
 
 void Player::render(SDL_Renderer* renderer, const int camX, const int camY) const  // NOLINT(clang-diagnostic-shadow)
 {
-	playerTexture->render(xPos - camX, yPos - camY, renderer);
+	playerTexture->render(position.x - camX, position.y - camY, renderer);
 }
 
 int Player::getXPos() const
 {
-	return xPos;
+	return position.x;
 }
 
 int Player::getYPos() const
 {
-	return yPos;
+	return position.y;
 }
 
 int Player::getWidth() const
 {
-	return width;
+	return size.x;
 }
 
 int Player::getHeight() const
 {
-	return height;
+	return size.y;
 }
 
 void Player::setXPos(const int x)
 {
-	xPos = x;
+	position.x = x;
 }
 
 void Player::setYPos(const int y)
 {
-	yPos = y;
+	position.y = y;
 }
 
 void Player::renderAnimated(SDL_Renderer* renderer, const SDL_Rect* clip, const int camX, const int camY, const double angle, const SDL_Point* center, const SDL_RendererFlip flipType) const  // NOLINT(clang-diagnostic-shadow)
 {
-	int renderX = xPos - camX;
-	const int renderY = yPos - camY;
+	int renderX = position.x - camX;
+	const int renderY = position.y - camY;
 	if (flipType == SDL_FLIP_HORIZONTAL)
 	{
 		renderX += PLAYER1_WIDTH - 200;	// flip in place

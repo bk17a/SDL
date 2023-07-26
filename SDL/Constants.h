@@ -35,4 +35,10 @@ static constexpr int ENEMY_VEL = 1;
 // number of enemies
 static constexpr int ENEMY_NUM = 3;
 
+// speed of bullet
+static constexpr int BULLET_SPEED = 5;		// 5 pixeles
+
+// size of bullet
+static constexpr int BULLET_SIZE = 50;
+
 #endif

@@ -60,7 +60,7 @@ void Timer::unpause()
 	}
 }
 
-Uint32 Timer::getTicks()
+Uint32 Timer::getTicks() const
 {
 	// the actua ltimer time
 	Uint32 time = 0;
@@ -83,12 +83,12 @@ Uint32 Timer::getTicks()
 	return time;
 }
 
-bool Timer::isPaused()
+bool Timer::isPaused() const
 {
 	return paused && started;
 }
 
-bool Timer::isStarted()
+bool Timer::isStarted() const
 {
 	return started;
 }

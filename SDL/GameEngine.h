@@ -16,6 +16,7 @@
 #include "Timer.h"
 #include "Window.h"
 #include "Enemy.h"
+#include "Weapon.h"
 
 class GameEngine
 {
@@ -78,6 +79,10 @@ private:
 	Enemy enemy;
 	TextureManager enemyTex;
 	std::vector<Enemy> enemies;
+
+	// weapon members
+	Bullet bullets;
+	TextureManager bulletTex;
 };
 
 #endif
