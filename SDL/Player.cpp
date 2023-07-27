@@ -129,6 +129,12 @@ int Player::getHeight() const
 	return size.y;
 }
 
+Vector2 Player::getPlayerPos() const
+{
+	return position;
+}
+
+
 void Player::setXPos(const int x)
 {
 	position.x = x;
@@ -158,4 +164,10 @@ bool Player::isMoving() const
 SDL_RendererFlip Player::getFlipType() const
 {
 	return flipType;
+}
+
+void Player::spawn()
+{
+	position.x = (SCREEN_WIDTH - size.x) / 2;
+	position.y = (SCREEN_HEIGHT - size.y) / 2;
 }

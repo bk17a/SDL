@@ -23,8 +23,10 @@ public:
 	int getYPos() const;
 	int getWidth() const;
 	int getHeight() const;
+	Vector2 getPlayerPos() const;
 	void setXPos(int x);
 	void setYPos(int y);
+	void spawn();
 
 	bool isMoving() const;
 	void renderAnimated(SDL_Renderer* renderer, const SDL_Rect* clip, int camX, int camY, const double angle = NULL, const SDL_Point* center = nullptr, SDL_RendererFlip flipType = SDL_FLIP_NONE) const;

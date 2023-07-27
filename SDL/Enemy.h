@@ -31,6 +31,7 @@ public:
 	int getPosY() const;
 	int getWidth() const;
 	int getHeight() const;
+	Vector2 getEnemyPos() const;
 	void setPosX(int xPos);
 	void setPosY(int yPos);
 	void setVelocityX(int xVel);

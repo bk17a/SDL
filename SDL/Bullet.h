@@ -7,25 +7,25 @@
 #include "Vector2.h"
 
 class Bullet
-{		
+{
 public:
 	Bullet();
 	Bullet(SDL_Renderer* renderer, TextureManager* bulletTex);
 	void render(SDL_Renderer* renderer, const int camX, const int camY) const;
-	void shoot(int enemyX, int enemyY);		// shoot at direction of the enemy
+	bool canShoot() const;
+	void shoot(const Vector2& playerPos, const Vector2& enemyPos);		// shoot at direction of the enemy
+	void reload();
 	void update();
 	bool isActive() const;
 
-	void setPosX(int x);
-	void setPosY(int y);
-	int getPosX() const;
-	int getPosY() const;
+	unsigned int getLastShotTime() const;
+	void setLastShotTime(unsigned int time);
 
 private:
 	Vector2 velocity;		// speed of the bullet
 	Vector2 position;		// inital position where the bullet starts from
 	Vector2 size;			// size of bullet
-		
+
 	SDL_Renderer* renderer;
 	TextureManager* bulletTex;
 	std::vector<Bullet> bullets;

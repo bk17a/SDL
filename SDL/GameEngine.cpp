@@ -85,15 +85,16 @@ bool GameEngine::loadMedia()
 
 	if (!player1Tex.loadFromFile("gfx/player1Idle.png", renderer))
 	{
-		cout << "Failed to load player 2 idle texture!\n";
+		cout << "Failed to load player1 idle texture!\n";
 		success = false;
 	}
 	else
 	{
 		// Create the player object
 		player1 = Player(renderer, &player1Tex);
+		player1.spawn();
 
-		// set player 2 rect
+		// set player 1 rect
 		player1Rect[0].x = 0;
 		player1Rect[0].y = 0;
 		player1Rect[0].w = PLAYER1_WIDTH;
@@ -122,13 +123,14 @@ bool GameEngine::loadMedia()
 
 	if (!player1RunTex.loadFromFile("gfx/player1Run.png", renderer))
 	{
-		cout << "Failed to load player 2 run texture!\n";
+		cout << "Failed to load player1 run texture!\n";
 		success = false;
 	}
 	else
 	{
 		// set the texture
 		player1Run = Player(renderer, &player1RunTex);
+		player1Run.spawn();
 
 		player1RunRect[0].x = 0;
 		player1RunRect[0].y = 0;
@@ -185,7 +187,10 @@ bool GameEngine::loadMedia()
 	}
 	else
 	{
+		bulletVec.clear();
 		bullets = Bullet(renderer, &bulletTex);
+		bullets.shoot(player1.getPlayerPos(), enemy.getEnemyPos());
+		bulletVec.emplace_back(bullets);			// initial bullet
 	}
 
 	return success;
@@ -253,7 +258,7 @@ void GameEngine::update()
 	player1.move();
 	player1Run.move();
 
-	//Center the camera over the dot
+	//Center the camera over the player
 	camera.x = (player1.getXPos() + PLAYER1_WIDTH / 2) - SCREEN_WIDTH / 2;
 	camera.y = (player1.getYPos() + PLAYER1_HEIGHT / 2) - SCREEN_HEIGHT / 2;
 
@@ -314,6 +319,7 @@ void GameEngine::update()
 			}
 		}
 	}
+	bullets.update();
 }
 
 bool GameEngine::handleEvents()
@@ -375,6 +381,7 @@ void GameEngine::close()
 
 	// clear enemy vector
 	enemies.clear();
+	bulletVec.clear();
 
 	// Close font
 	TTF_CloseFont(font);
@@ -441,7 +448,6 @@ void GameEngine::run()
 
 				// update function
 				update();
-
 				if (!windowObj.isMin())
 				{
 					// Render FPS

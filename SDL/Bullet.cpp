@@ -1,4 +1,4 @@
-#include "Weapon.h"
+#include "Bullet.h"
 #include "Constants.h"
 
 Bullet::Bullet()
@@ -10,7 +10,7 @@ Bullet::Bullet()
 	size = Vector2(BULLET_SIZE, BULLET_SIZE);
 	lastShotTime = 0;
 	shootDelay = 2000; // 2 seconds
-	active = false;
+	active = true;
 }
 
 Bullet::Bullet(SDL_Renderer* renderer, TextureManager* bulletTex)
@@ -22,34 +22,31 @@ Bullet::Bullet(SDL_Renderer* renderer, TextureManager* bulletTex)
 	size = Vector2(BULLET_SIZE, BULLET_SIZE);
 	lastShotTime = 0;
 	shootDelay = 2000; // 2 seconds
-	active = false;
+	active = true;
 }
 
 void Bullet::render(SDL_Renderer* renderer, const int camX, const int camY) const  // NOLINT(clang-diagnostic-shadow)
 {
-	bulletTex->render2(renderer, position.x - camX, position.y, size.x, size.y);
+	bulletTex->render2(renderer, position.x - camX, position.y - camY, size.x, size.y);
+}
+
+bool Bullet::canShoot() const
+{
+	const unsigned int currentTime = SDL_GetTicks();
+	return (currentTime - lastShotTime >= shootDelay);
 }
 
 
-void Bullet::shoot(const int enemyX, const int enemyY)
+void Bullet::shoot(const Vector2& playerPos, const Vector2& enemyPos)
 {
-	// const Uint32 currentTime = SDL_GetTicks();
-	// if (currentTime - lastShotTime >= shootDelay)
-	// {
-	// 	// create new bullet at player pos
-	// 	Bullet toShoot(renderer, bulletTex);
-	// 	toShoot.initPosX = enemyX;
-	// 	toShoot.initPosY = enemyY;
-	// 	// set bullet speed
-	// 	toShoot.xVel = BULLET_SPEED;
-	// 	toShoot.yVel = BULLET_SPEED;
-	// 	active = true;
-	// 	bullets.emplace_back(toShoot);
-	//
-	// 	// update last shot time
-	// 	lastShotTime = currentTime;
-	// }
+	position = playerPos;		// starting position at player
+	active = true;
+	lastShotTime = SDL_GetTicks();
+}
 
+void Bullet::reload()
+{
+	active = false;
 }
 
 void Bullet::update()
@@ -62,33 +59,22 @@ void Bullet::update()
 
 		if (position.x < -OFFSCREEN_BUFFER || position.x > SCREEN_WIDTH + OFFSCREEN_BUFFER || position.y < -OFFSCREEN_BUFFER || position.y > SCREEN_HEIGHT + OFFSCREEN_BUFFER)
 		{
-			active = false;
+			reload();
 		}
 	}
-}
-
-void Bullet::setPosX(const int x)
-{
-	position.x = x;
-}
-
-void Bullet::setPosY(const int y)
-{
-	position.y = y;
-}
-
-
-int Bullet::getPosX() const
-{
-	return position.x;
-}
-
-int Bullet::getPosY() const
-{
-	return position.y;
 }
 
 bool Bullet::isActive() const
 {
 	return active;
+}
+
+unsigned int Bullet::getLastShotTime() const
+{
+	return lastShotTime;
+}
+
+void Bullet::setLastShotTime(const unsigned time)
+{
+	lastShotTime = time;
 }

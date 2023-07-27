@@ -16,7 +16,7 @@
 #include "Timer.h"
 #include "Window.h"
 #include "Enemy.h"
-#include "Weapon.h"
+#include "Bullet.h"
 
 class GameEngine
 {
@@ -83,6 +83,7 @@ private:
 	// weapon members
 	Bullet bullets;
 	TextureManager bulletTex;
+	std::vector<Bullet> bulletVec;
 };
 
 #endif
