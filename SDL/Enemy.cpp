@@ -108,7 +108,6 @@ Vector2 Enemy::getEnemyPos() const
 	return position;
 }
 
-
 bool Enemy::checkCollisionWithEnemy(const Enemy& e) const
 {
 	// calculate sides of enemy1

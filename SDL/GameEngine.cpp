@@ -3,7 +3,7 @@
 using namespace std;
 
 GameEngine::GameEngine() : running(true), font(nullptr), window(nullptr), renderer(nullptr),
-player1Rect({ {{0, 0, 0, 0}} }), player1RunRect({ {{0, 0, 0, 0}} }) {}
+player1Rect({ {{0, 0, 0, 0}} }), player1RunRect({ {{0, 0, 0, 0}} }){}
 
 GameEngine::~GameEngine()
 {
@@ -180,19 +180,6 @@ bool GameEngine::loadMedia()
 		}
 	}
 
-	if (!bulletTex.loadFromFile("gfx/laser.png", renderer))
-	{
-		cout << "Unable to load bullet texture!\n";
-		success = false;
-	}
-	else
-	{
-		bulletVec.clear();
-		bullets = Bullet(renderer, &bulletTex);
-		bullets.shoot(player1.getPlayerPos(), enemy.getEnemyPos());
-		bulletVec.emplace_back(bullets);			// initial bullet
-	}
-
 	return success;
 }
 
@@ -247,7 +234,6 @@ void GameEngine::render()
 		if (e.isAlive())
 		{
 			e.render(renderer, camera.x, camera.y);
-			bullets.render(renderer, camera.x, camera.y);		// render bullets if enemies are alive
 		}
 	}
 }
@@ -319,7 +305,6 @@ void GameEngine::update()
 			}
 		}
 	}
-	bullets.update();
 }
 
 bool GameEngine::handleEvents()
@@ -381,7 +366,6 @@ void GameEngine::close()
 
 	// clear enemy vector
 	enemies.clear();
-	bulletVec.clear();
 
 	// Close font
 	TTF_CloseFont(font);

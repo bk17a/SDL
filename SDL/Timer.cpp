@@ -10,6 +10,8 @@ Timer::Timer()
 	pausedTicks = 0;
 	paused = false;
 	started = false;
+	deltaTime = 0;
+	elapsedTicks = 0;
 }
 
 void Timer::start()
@@ -91,4 +93,15 @@ bool Timer::isPaused() const
 bool Timer::isStarted() const
 {
 	return started;
+}
+
+float Timer::getDeltaTime() const
+{
+	return deltaTime;
+}
+
+void Timer::update()
+{
+	elapsedTicks = SDL_GetTicks() - startTicks;
+	deltaTime = static_cast<float>(elapsedTicks) / 1000.f;
 }

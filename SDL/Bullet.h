@@ -1,40 +1,27 @@
-#ifndef WEAPON_H
-#define WEAPON_H
+#ifndef BULLET_H_
+#define BULLET_H_
 
 #include <SDL.h>
-#include <vector>
-#include "TextureManager.h"
 #include "Vector2.h"
+#include "TextureManager.h"
 
 class Bullet
 {
 public:
-	Bullet();
-	Bullet(SDL_Renderer* renderer, TextureManager* bulletTex);
-	void render(SDL_Renderer* renderer, const int camX, const int camY) const;
-	bool canShoot() const;
-	void shoot(const Vector2& playerPos, const Vector2& enemyPos);		// shoot at direction of the enemy
+	Bullet(Vector2 position, Vector2 velocity, Vector2 size, SDL_Renderer* renderer, TextureManager* texture);
 	void reload();
-	void update();
-	bool isActive() const;
-
-	unsigned int getLastShotTime() const;
-	void setLastShotTime(unsigned int time);
+	void shoot(Vector2 playerPos);
+	void render(SDL_Renderer* renderer, const int camX, const int camY) const;
 
 private:
-	Vector2 velocity;		// speed of the bullet
-	Vector2 position;		// inital position where the bullet starts from
-	Vector2 size;			// size of bullet
+	Vector2 pos;
+	Vector2 vel;
+	Vector2 size;
 
 	SDL_Renderer* renderer;
-	TextureManager* bulletTex;
-	std::vector<Bullet> bullets;
-
-	Uint32 lastShotTime;	// time of last shot
-	Uint32 shootDelay;		// time between shots in ms
+	TextureManager* texture;
 
 	bool active;
-	int OFFSCREEN_BUFFER = 10; // pixels outside screen to delete bullet
 };
 
-#endif // WEAPON_H
+#endif 

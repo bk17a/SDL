@@ -134,7 +134,6 @@ Vector2 Player::getPlayerPos() const
 	return position;
 }
 
-
 void Player::setXPos(const int x)
 {
 	position.x = x;

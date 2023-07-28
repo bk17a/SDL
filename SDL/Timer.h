@@ -16,9 +16,14 @@ public:
 	bool isStarted() const;
 	bool isPaused() const;
 
+	float getDeltaTime() const;
+	void update();
 private:
 	Uint32 startTicks; // clock when timer started
 	Uint32 pausedTicks; // clock when timer was paused
+
+	float deltaTime;
+	Uint32 elapsedTicks;
 
 	// timer status
 	bool paused;

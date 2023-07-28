@@ -21,7 +21,7 @@
 class GameEngine
 {
 public:
-
+	Uint32 lastShotTime = 0;
 	// initialization
 	GameEngine();  // default constructor
 	~GameEngine(); // default destructor
@@ -40,7 +40,6 @@ public:
 	SDL_Window* getWindow() const;
 	SDL_Renderer* getRenderer() const;
 	TTF_Font* getFont() const;
-
 private:
 	int countedFrames = 0;
 	int idleAnimationFrame = 0;
@@ -79,11 +78,6 @@ private:
 	Enemy enemy;
 	TextureManager enemyTex;
 	std::vector<Enemy> enemies;
-
-	// weapon members
-	Bullet bullets;
-	TextureManager bulletTex;
-	std::vector<Bullet> bulletVec;
 };
 
 #endif

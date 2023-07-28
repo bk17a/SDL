@@ -6,7 +6,7 @@ public:
 	int x;
 	int y;
 
-	Vector2() : x(0.0f), y(0.0f) {}
+	Vector2() : x(0), y(0) {}
 	Vector2(const int x, const int y) : x(x), y(y) {}
 
 	// Add member functions for vector operations
@@ -30,14 +30,31 @@ public:
 		return { x / scalar, y / scalar };
 	}
 
+	static Vector2 ZERO_VEC()
+	{
+		return { 0, 0 };
+	}
+
 	void normalize()
 	{
-		const int magnitude = static_cast<int>(sqrt(x * x + y * y));
-		if (magnitude != 0)
+		const int length = static_cast<int>(sqrt(x * x + y * y));
+		if (length != 0)
 		{
-			x /= magnitude;
-			y /= magnitude;
+			x /= length;
+			y /= length;
 		}
+	}
+
+	// Overload the >> operator (input stream extraction)
+	friend std::istream& operator>>(std::istream& input, Vector2& vec) {
+		input >> vec.x >> vec.y;
+		return input;
+	}
+
+	// Overload the << operator (output stream insertion)
+	friend std::ostream& operator<<(std::ostream& output, const Vector2& vec) {
+		output << "(" << vec.x << ", " << vec.y << ")";
+		return output;
 	}
 };
 
