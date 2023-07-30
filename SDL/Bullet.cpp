@@ -23,9 +23,11 @@ void Bullet::shoot(const Vector2 playerPos)
 	active = true;
 }
 
-void Bullet::render(SDL_Renderer* renderer, const int camX, const int camY) const  // NOLINT(clang-diagnostic-shadow)
+void Bullet::render(SDL_Renderer* renderer, const float camX, const float camY) const  // NOLINT(clang-diagnostic-shadow)
 {
-	texture->render2(renderer, pos.x - camX, pos.y - camY, size.x, size.y);
+	const int renderX = static_cast<int>(pos.x - camX);
+	const int renderY = static_cast<int>(pos.y - camY);
+	texture->render2(renderer, renderX, renderY, static_cast<int>(size.x), static_cast<int>(size.y));
 }
 
 void Bullet::handleEvent(const SDL_Event& e, const Vector2 playerPos)
@@ -50,10 +52,12 @@ void Bullet::update()
 	pos += vel;
 
 	// check if bullet went out of screen
-	if (pos.x > LEVEL_WIDTH + OFFSCREEN_BUFFER || pos.x < 0 - OFFSCREEN_BUFFER || pos.y > LEVEL_HEIGHT + OFFSCREEN_BUFFER || pos.y < 0 - OFFSCREEN_BUFFER)
+	if (pos.x > static_cast<float>(LEVEL_WIDTH) + OFFSCREEN_BUFFER || pos.x < 0.0f - OFFSCREEN_BUFFER || 
+		pos.y > static_cast<float>(LEVEL_HEIGHT) + OFFSCREEN_BUFFER || pos.y < 0.0f - OFFSCREEN_BUFFER)
 	{
 		reload();
 	}
+
 }
 
 bool Bullet::isActive() const

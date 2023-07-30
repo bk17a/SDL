@@ -4,11 +4,11 @@
 
 class Vector2 {
 public:
-	int x;
-	int y;
+	float x;
+	float y;
 
 	Vector2() : x(0), y(0) {}
-	Vector2(const int x, const int y) : x(x), y(y) {}
+	Vector2(const float x, const float y) : x(x), y(y) {}
 
 	// Add member functions for vector operations
 	Vector2 operator+(const Vector2& other) const
@@ -21,12 +21,12 @@ public:
 		return { x - other.x, y - other.y };
 	}
 
-	Vector2 operator*(const int scalar) const
+	Vector2 operator*(const float scalar) const
 	{
 		return { x * scalar, y * scalar };
 	}
 
-	Vector2 operator/(const int scalar) const
+	Vector2 operator/(const float scalar) const
 	{
 		return { x / scalar, y / scalar };
 	}
@@ -44,15 +44,15 @@ public:
 	}
 
 	// Calculate the squared length of the vector
-	int calcVecLength() const
+	float calcVecLength() const
 	{
 		return x * x + y * y;
 	}
 
 	void normalize()
 	{
-		const int length = static_cast<int>(sqrt(x * x + y * y));
-		if (length != 0)
+		const auto length = static_cast<float>(sqrt(x * x + y * y));
+		if (length != 0.0f)
 		{
 			x /= length;
 			y /= length;

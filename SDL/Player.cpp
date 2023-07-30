@@ -104,27 +104,30 @@ void Player::move()
 	}
 }
 
-void Player::render(SDL_Renderer* renderer, const int camX, const int camY) const  // NOLINT(clang-diagnostic-shadow)
+void Player::render(SDL_Renderer* renderer, const float camX, const float camY) const  // NOLINT(clang-diagnostic-shadow)
 {
-	playerTexture->render(position.x - camX, position.y - camY, renderer);
+	const int renderX = static_cast<int>(position.x - camX);
+	const int renderY = static_cast<int>(position.y - camY);
+
+	playerTexture->render(renderX, renderY, renderer);
 }
 
-int Player::getXPos() const
+float Player::getXPos() const
 {
 	return position.x;
 }
 
-int Player::getYPos() const
+float Player::getYPos() const
 {
 	return position.y;
 }
 
-int Player::getWidth() const
+float Player::getWidth() const
 {
 	return size.x;
 }
 
-int Player::getHeight() const
+float Player::getHeight() const
 {
 	return size.y;
 }
@@ -134,20 +137,20 @@ Vector2 Player::getPlayerPos() const
 	return position;
 }
 
-void Player::setXPos(const int x)
+void Player::setXPos(const float x)
 {
 	position.x = x;
 }
 
-void Player::setYPos(const int y)
+void Player::setYPos(const float y)
 {
 	position.y = y;
 }
 
-void Player::renderAnimated(SDL_Renderer* renderer, const SDL_Rect* clip, const int camX, const int camY, const double angle, const SDL_Point* center, const SDL_RendererFlip flipType) const  // NOLINT(clang-diagnostic-shadow)
+void Player::renderAnimated(SDL_Renderer* renderer, const SDL_Rect* clip, const float camX, const float camY, const double angle, const SDL_Point* center, const SDL_RendererFlip flipType) const  // NOLINT(clang-diagnostic-shadow)
 {
-	int renderX = position.x - camX;
-	const int renderY = position.y - camY;
+	int renderX = static_cast<int>(position.x - camX);
+	const int renderY = static_cast<int>(position.y - camY);
 	if (flipType == SDL_FLIP_HORIZONTAL)
 	{
 		renderX += PLAYER1_WIDTH - 200;	// flip in place

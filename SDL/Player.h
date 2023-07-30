@@ -16,20 +16,20 @@ public:
 	Player(SDL_Renderer* renderer, TextureManager* playerTexture);
 	void handleEvent(const SDL_Event& e);								// handle key presses and adjust dot's velocity
 	void move();														// moves the player
-	void render(SDL_Renderer* renderer, int camX, int camY) const;		// render player onto screen relative to camera
+	void render(SDL_Renderer* renderer, float camX, float camY) const;		// render player onto screen relative to camera
 
 	// getters and setters
-	int getXPos() const;
-	int getYPos() const;
-	int getWidth() const;
-	int getHeight() const;
+	float getXPos() const;
+	float getYPos() const;
+	float getWidth() const;
+	float getHeight() const;
 	Vector2 getPlayerPos() const;
-	void setXPos(int x);
-	void setYPos(int y);
+	void setXPos(const float x);
+	void setYPos(const float y);
 	void spawn();
 
 	bool isMoving() const;
-	void renderAnimated(SDL_Renderer* renderer, const SDL_Rect* clip, int camX, int camY, const double angle = NULL, const SDL_Point* center = nullptr, SDL_RendererFlip flipType = SDL_FLIP_NONE) const;
+	void renderAnimated(SDL_Renderer* renderer, const SDL_Rect* clip, float camX, float camY, const double angle = NULL, const SDL_Point* center = nullptr, SDL_RendererFlip flipType = SDL_FLIP_NONE) const;
 	SDL_RendererFlip getFlipType() const;
 
 private:

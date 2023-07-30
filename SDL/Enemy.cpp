@@ -3,42 +3,45 @@
 
 Enemy::Enemy()
 {
-	position = Vector2(0, 0);
+	position = Vector2(0.f, 0.f);
 	size = Vector2(ENEMY_WIDTH, ENEMY_HEIGHT);
-	velocity = Vector2(0, 0);
+	velocity = Vector2(0.f, 0.f);
 	renderer = nullptr;
 	enemyTex = nullptr;
 	health = 100;
 	alive = false;
 
 	// Initialize SDL_Rect p
-	p.x = position.x;
-	p.y = position.y;
-	p.w = size.x;
-	p.h = size.y;
+	p.x = static_cast<float>(position.x);
+	p.y = static_cast<float>(position.y);
+	p.w = static_cast<float>(size.x);
+	p.h = static_cast<float>(size.y);
 }
 
 Enemy::Enemy(SDL_Renderer* renderer, TextureManager* enemyTex)
 {
-	position = Vector2(0, 0);
+	position = Vector2(0.f, 0.f);
 	size = Vector2(ENEMY_WIDTH, ENEMY_HEIGHT);
-	velocity = Vector2(0, 0);
+	velocity = Vector2(0.f, 0.f);
 	this->renderer = renderer;
 	this->enemyTex = enemyTex;
 	health = 100;
 	alive = false;
 
 	// Initialize the SDL_Rect p with the correct values
-	p.x = position.x;
-	p.y = position.y;
-	p.w = size.x;
-	p.h = size.y;
+	p.x = static_cast<float>(position.x);
+	p.y = static_cast<float>(position.y);
+	p.w = static_cast<float>(size.x);
+	p.h = static_cast<float>(size.y);
 }
 
-void Enemy::render(SDL_Renderer* renderer, const int camX, const int camY) const  // NOLINT(clang-diagnostic-shadow)
+void Enemy::render(SDL_Renderer* renderer, const float camX, const float camY) const  // NOLINT(clang-diagnostic-shadow)
 {
-	enemyTex->render2(renderer, position.x - camX, position.y - camY, ENEMY_WIDTH, ENEMY_HEIGHT);
+	const int renderX = static_cast<int>(position.x - camX);
+	const int renderY = static_cast<int>(position.y - camY);
+	enemyTex->render2(renderer, renderX, renderY, ENEMY_WIDTH, ENEMY_HEIGHT);
 }
+
 
 void Enemy::spawn()
 {
@@ -68,34 +71,34 @@ void Enemy::kill()
 	alive = false;
 }
 
-int Enemy::getPosX() const
+float Enemy::getPosX() const
 {
 	return position.x;
 }
 
-int Enemy::getPosY() const
+float Enemy::getPosY() const
 {
 	return position.y;
 }
 
-void Enemy::setPosX(const int xPos)  // NOLINT(clang-diagnostic-shadow)
+void Enemy::setPosX(const float xPos)  // NOLINT(clang-diagnostic-shadow)
 {
 	position.x = xPos;
-	p.x = xPos;			// update p.x to update new pos
+	p.x = static_cast<int>(xPos);			// update p.x to update new pos
 }
 
-void Enemy::setPosY(const int yPos) // NOLINT(clang-diagnostic-shadow)
+void Enemy::setPosY(const float yPos) // NOLINT(clang-diagnostic-shadow)
 {
 	position.y = yPos;
-	p.y = yPos;			// update p.y to update new pos
+	p.y = static_cast<int>(yPos);			// update p.y to update new pos
 }
 
-int Enemy::getHeight() const
+float Enemy::getHeight() const
 {
 	return  size.y;
 }
 
-int Enemy::getWidth() const
+float Enemy::getWidth() const
 {
 	return  size.x;
 }
@@ -130,12 +133,12 @@ bool Enemy::checkCollisionWithEnemy(const Enemy& e) const
 	return true;
 }
 
-void Enemy::setVelocityX(const int xVel) // NOLINT(clang-diagnostic-shadow)
+void Enemy::setVelocityX(const float xVel) // NOLINT(clang-diagnostic-shadow)
 {
 	velocity.x = xVel;
 }
 
-void Enemy::setVelocityY(const int yVel)  // NOLINT(clang-diagnostic-shadow)
+void Enemy::setVelocityY(const float yVel)  // NOLINT(clang-diagnostic-shadow)
 {
 	velocity.y = yVel;
 }

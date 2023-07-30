@@ -3,7 +3,7 @@
 using namespace std;
 
 GameEngine::GameEngine() : running(true), font(nullptr), window(nullptr), renderer(nullptr),
-player1Rect({ {{0, 0, 0, 0}} }), player1RunRect({ {{0, 0, 0, 0}} }){}
+player1Rect({ {{0, 0, 0, 0}} }), player1RunRect({ {{0, 0, 0, 0}} }) {}
 
 GameEngine::~GameEngine()
 {
@@ -214,7 +214,7 @@ void GameEngine::render()
 	if (isMoving)
 	{
 		const SDL_Rect* currentRunClip = &player1RunRect[runAnimationFrame / RUNNING_ANIMATION_FRAMES];
-		player1Run.renderAnimated(renderer, currentRunClip, camera.x, camera.y, NULL, nullptr, player1.getFlipType());
+		player1Run.renderAnimated(renderer, currentRunClip, static_cast<float>(camera.x), static_cast<float>(camera.y), NULL, nullptr, player1.getFlipType());
 
 		// Increment the animation frame for the running animation
 		++runAnimationFrame;
@@ -228,7 +228,7 @@ void GameEngine::render()
 	else
 	{
 		const SDL_Rect* currentIdleClip = &player1Rect[idleAnimationFrame / IDLE_ANIMATION_FRAMES];
-		player1.renderAnimated(renderer, currentIdleClip, camera.x, camera.y, NULL, nullptr, player1.getFlipType());
+		player1.renderAnimated(renderer, currentIdleClip, static_cast<float>(camera.x), static_cast<float>(camera.y), NULL, nullptr, player1.getFlipType());
 
 		// Increment the animation frame for the idle animation
 		++idleAnimationFrame;
@@ -245,12 +245,12 @@ void GameEngine::render()
 	{
 		if (e.isAlive())
 		{
-			e.render(renderer, camera.x, camera.y);
+			e.render(renderer, static_cast<float>(camera.x), static_cast<float>(camera.y));
 		}
 	}
 	if (bullet.isActive())
 	{
-		bullet.render(renderer, camera.x, camera.y);
+		bullet.render(renderer, static_cast<float>(camera.x), static_cast<float>(camera.y));
 	}
 }
 
@@ -261,8 +261,9 @@ void GameEngine::update()
 	player1Run.move();
 
 	//Center the camera over the player
-	camera.x = (player1.getXPos() + PLAYER1_WIDTH / 2) - SCREEN_WIDTH / 2;
-	camera.y = (player1.getYPos() + PLAYER1_HEIGHT / 2) - SCREEN_HEIGHT / 2;
+	camera.x = static_cast<int>(player1.getXPos() + static_cast<float>(PLAYER1_WIDTH) / 2 - static_cast<float>(SCREEN_WIDTH) / 2);
+	camera.y = static_cast<int>(player1.getYPos() + static_cast<float>(PLAYER1_HEIGHT) / 2 - static_cast<float>(SCREEN_HEIGHT) / 2);
+
 
 	//Keep the camera in bounds
 	if (camera.x < 0)
@@ -300,20 +301,20 @@ void GameEngine::update()
 			if (enemies[i].checkCollisionWithEnemy(enemies[j]))
 			{
 				// Calculate the direction of the collision between enemies
-				int directionX = enemies[i].getPosX() - enemies[j].getPosX();
-				int directionY = enemies[i].getPosY() - enemies[j].getPosY();
+				float directionX = enemies[i].getPosX() - enemies[j].getPosX();
+				float directionY = enemies[i].getPosY() - enemies[j].getPosY();
 
 				// Normalize the direction vector
-				const int length = static_cast<int>(sqrt(directionX * directionX + directionY * directionY));
+				const auto length = static_cast<float>(sqrt(directionX * directionX + directionY * directionY));
 				directionX /= length;
 				directionY /= length;
 
 				// Calculate the maximum distance the enemies can move back
-				constexpr int maxDistance = 2; // Change this value to adjust the maximum distance
+				constexpr float maxDistance = 2; // Change this value to adjust the maximum distance
 
 				// Move the colliding enemies one step back in the opposite direction, but limit the distance
-				const int distanceX = directionX * maxDistance;
-				const int distanceY = directionY * maxDistance;
+				const float distanceX = directionX * maxDistance;
+				const float distanceY = directionY * maxDistance;
 				enemies[i].setPosX(enemies[i].getPosX() + distanceX);
 				enemies[i].setPosY(enemies[i].getPosY() + distanceY);
 				enemies[j].setPosX(enemies[j].getPosX() - distanceX);
@@ -480,6 +481,7 @@ void GameEngine::run()
 
 				// update function
 				update();
+
 				if (!windowObj.isMin())
 				{
 					// Render FPS
