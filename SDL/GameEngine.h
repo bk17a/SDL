@@ -78,6 +78,10 @@ private:
 	Enemy enemy;
 	TextureManager enemyTex;
 	std::vector<Enemy> enemies;
+
+	// bullet members
+	TextureManager bulletTex;
+	Bullet bullet;
 };
 
 #endif

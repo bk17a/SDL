@@ -1,5 +1,6 @@
 #ifndef VECTOR2_H
 #define VECTOR2_H
+#include <istream>
 
 class Vector2 {
 public:
@@ -30,9 +31,22 @@ public:
 		return { x / scalar, y / scalar };
 	}
 
+	Vector2& operator+=(const Vector2& other)
+	{
+		x += other.x;
+		y += other.y;
+		return *this;
+	}
+
 	static Vector2 ZERO_VEC()
 	{
 		return { 0, 0 };
+	}
+
+	// Calculate the squared length of the vector
+	int calcVecLength() const
+	{
+		return x * x + y * y;
 	}
 
 	void normalize()

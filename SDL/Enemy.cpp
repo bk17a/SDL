@@ -1,6 +1,3 @@
-// ReSharper disable CppClangTidyClangDiagnosticImplicitIntFloatConversion
-// ReSharper disable CppClangTidyClangDiagnosticDoublePromotion
-// ReSharper disable CppClangTidyClangDiagnosticFloatConversion
 #include "Enemy.h"
 #include "Player.h"
 

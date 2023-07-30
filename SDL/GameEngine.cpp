@@ -180,6 +180,18 @@ bool GameEngine::loadMedia()
 		}
 	}
 
+	if (!bulletTex.loadFromFile("gfx/laser.png", renderer))
+	{
+		cout << "Unable to load bullet texture!\n";
+		success = false;
+	}
+	else
+	{
+		const auto bulletSpeed = Vector2(10, 10);
+		const auto bulletSize = Vector2(50, 50);
+		bullet = Bullet(player1.getPlayerPos(), bulletSpeed, bulletSize, renderer, &bulletTex);
+	}
+
 	return success;
 }
 
@@ -228,13 +240,17 @@ void GameEngine::render()
 		}
 	}
 
-	// Render test enemy and bullet
+	// Render test enemy
 	for (auto& e : enemies)
 	{
 		if (e.isAlive())
 		{
 			e.render(renderer, camera.x, camera.y);
 		}
+	}
+	if (bullet.isActive())
+	{
+		bullet.render(renderer, camera.x, camera.y);
 	}
 }
 
@@ -305,6 +321,35 @@ void GameEngine::update()
 			}
 		}
 	}
+
+	// updating bullet
+	// Find the nearest enemy to the player's position
+	const Vector2 playerPosition = player1.getPlayerPos();
+	Vector2 nearestEnemyPosition;
+
+	float nearestDistance = std::numeric_limits<float>::max();
+
+	for (const auto& e : enemies)
+	{
+		if (e.isAlive())
+		{
+			Vector2 enemyPosition(e.getPosX(), e.getPosY());
+			const float distance = static_cast<float>((enemyPosition - playerPosition).calcVecLength());
+
+			if (distance < nearestDistance)
+			{
+				nearestDistance = distance;
+				nearestEnemyPosition = enemyPosition;
+			}
+		}
+	}
+
+	// Update active bullets with the nearest enemy's position as the target
+	if (bullet.isActive())
+	{
+		bullet.setTargetPos(nearestEnemyPosition);
+		bullet.update();
+	}
 }
 
 bool GameEngine::handleEvents()
@@ -326,6 +371,8 @@ bool GameEngine::handleEvents()
 
 		// window events
 		windowObj.handleEvent(e, renderer);
+
+		bullet.handleEvent(e, player1.getPlayerPos());
 	}
 
 	return running;
@@ -363,6 +410,7 @@ void GameEngine::close()
 	fpsTexture.free();
 	player1Tex.free();
 	player1RunTex.free();
+	bulletTex.free();
 
 	// clear enemy vector
 	enemies.clear();

@@ -1,5 +1,6 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
+#include "Vector2.h"
 
 // dimension of screen/window
 static constexpr int SCREEN_WIDTH = 1920;
@@ -35,10 +36,7 @@ static constexpr int ENEMY_VEL = 1;
 // number of enemies
 static constexpr int ENEMY_NUM = 3;
 
-// speed of bullet
-static constexpr int BULLET_SPEED = 500;
-
-// size of bullet
-static constexpr int BULLET_SIZE = 50;
+// bullet vel
+static constexpr int BULLET_SPEED = 10;
 
 #endif
