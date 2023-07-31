@@ -264,7 +264,6 @@ void GameEngine::update()
 	camera.x = static_cast<int>(player1.getXPos() + static_cast<float>(PLAYER1_WIDTH) / 2 - static_cast<float>(SCREEN_WIDTH) / 2);
 	camera.y = static_cast<int>(player1.getYPos() + static_cast<float>(PLAYER1_HEIGHT) / 2 - static_cast<float>(SCREEN_HEIGHT) / 2);
 
-
 	//Keep the camera in bounds
 	if (camera.x < 0)
 	{

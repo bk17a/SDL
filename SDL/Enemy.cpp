@@ -42,7 +42,6 @@ void Enemy::render(SDL_Renderer* renderer, const float camX, const float camY) c
 	enemyTex->render2(renderer, renderX, renderY, ENEMY_WIDTH, ENEMY_HEIGHT);
 }
 
-
 void Enemy::spawn()
 {
 	// Set random initial position within the screen boundaries
@@ -151,7 +150,7 @@ bool Enemy::checkCollisionWith(const SDL_Rect& rect) const
 	const int topA = p.y;
 	const int botA = p.y + p.h;
 
-	// Calculate sides of the other SDL_Rect 
+	// Calculate sides of the other SDL_Rect
 	const int leftB = rect.x;
 	const int rightB = rect.x + rect.w;
 	const int topB = rect.y;

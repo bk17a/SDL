@@ -60,7 +60,7 @@ void Bullet::update()
 	pos += vel;
 
 	// check if bullet went out of screen
-	if (pos.x > static_cast<float>(LEVEL_WIDTH) + OFFSCREEN_BUFFER || pos.x < 0.0f - OFFSCREEN_BUFFER || 
+	if (pos.x > static_cast<float>(LEVEL_WIDTH) + OFFSCREEN_BUFFER || pos.x < 0.0f - OFFSCREEN_BUFFER ||
 		pos.y > static_cast<float>(LEVEL_HEIGHT) + OFFSCREEN_BUFFER || pos.y < 0.0f - OFFSCREEN_BUFFER)
 	{
 		reload();
@@ -90,7 +90,6 @@ Vector2 Bullet::getPos() const
 {
 	return pos;
 }
-
 
 void Bullet::setPos(const Vector2 pos)  // NOLINT(clang-diagnostic-shadow)
 {
