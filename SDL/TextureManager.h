@@ -22,6 +22,7 @@ public:
 	int getWidth() const;
 	int getHeight() const;
 	SDL_Texture* getTexture() const;
+	void changeTextureColor(SDL_Renderer* renderer, Uint8 r, Uint8 g, Uint8 b) const;
 
 private:
 	SDL_Texture* texture;

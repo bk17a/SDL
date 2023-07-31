@@ -9,6 +9,7 @@
 #include "TextureManager.h"
 #include "Constants.h"
 #include "Vector2.h"
+#include "Bullet.h"
 
 class Player;
 
@@ -37,7 +38,8 @@ public:
 	void setVelocityX(float xVel);
 	void setVelocityY(float yVel);
 
-	bool checkCollisionWithEnemy(const Enemy& e) const;
+	//bool checkCollisionWithEnemy(const Enemy& e) const;
+	bool checkCollisionWith(const SDL_Rect& rect) const;
 
 private:
 	SDL_Renderer* renderer;
@@ -50,6 +52,8 @@ private:
 	int health;
 	bool alive;
 	std::vector<Enemy> enemies;
+
+	Bullet bullet;
 };
 
 #endif

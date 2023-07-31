@@ -142,3 +142,8 @@ SDL_Texture* TextureManager::getTexture() const
 {
 	return texture;
 }
+
+void TextureManager::changeTextureColor(SDL_Renderer* renderer, const Uint8 r, const Uint8 g, const Uint8 b) const
+{
+	SDL_SetTextureColorMod(texture, r, g, b);
+}

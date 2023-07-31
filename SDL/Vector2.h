@@ -38,6 +38,11 @@ public:
 		return *this;
 	}
 
+	bool operator==(const Vector2& other) const
+	{
+		return (x == other.x) && (y == other.y);
+	}
+
 	static Vector2 ZERO_VEC()
 	{
 		return { 0, 0 };

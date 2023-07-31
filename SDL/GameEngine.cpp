@@ -298,14 +298,14 @@ void GameEngine::update()
 	{
 		for (size_t j = i + 1; j < enemies.size(); ++j)
 		{
-			if (enemies[i].checkCollisionWithEnemy(enemies[j]))
+			if (enemies[i].checkCollisionWith(enemies[j].p))
 			{
 				// Calculate the direction of the collision between enemies
 				float directionX = enemies[i].getPosX() - enemies[j].getPosX();
 				float directionY = enemies[i].getPosY() - enemies[j].getPosY();
 
 				// Normalize the direction vector
-				const auto length = static_cast<float>(sqrt(directionX * directionX + directionY * directionY));
+				const float length = sqrt(directionX * directionX + directionY * directionY);
 				directionX /= length;
 				directionY /= length;
 
@@ -323,7 +323,7 @@ void GameEngine::update()
 		}
 	}
 
-	// updating bullet
+	// Updating bullet
 	// Find the nearest enemy to the player's position
 	const Vector2 playerPosition = player1.getPlayerPos();
 	Vector2 nearestEnemyPosition;
@@ -335,7 +335,7 @@ void GameEngine::update()
 		if (e.isAlive())
 		{
 			Vector2 enemyPosition(e.getPosX(), e.getPosY());
-			const float distance = static_cast<float>((enemyPosition - playerPosition).calcVecLength());
+			const float distance = (enemyPosition - playerPosition).calcVecLength();
 
 			if (distance < nearestDistance)
 			{
@@ -350,6 +350,19 @@ void GameEngine::update()
 	{
 		bullet.setTargetPos(nearestEnemyPosition);
 		bullet.update();
+	}
+
+	// check if bullet hit enemy
+	for (auto& e : enemies)
+	{
+		if (bullet.isActive() && e.checkCollisionWith(bullet.p))
+		{
+			cout << "enemy hit\n";
+		}
+		else
+		{
+			cout << "no shot\n";
+		}
 	}
 }
 
@@ -373,6 +386,7 @@ bool GameEngine::handleEvents()
 		// window events
 		windowObj.handleEvent(e, renderer);
 
+		// bullet events
 		bullet.handleEvent(e, player1.getPlayerPos());
 	}
 

@@ -12,10 +12,10 @@ Enemy::Enemy()
 	alive = false;
 
 	// Initialize SDL_Rect p
-	p.x = static_cast<float>(position.x);
-	p.y = static_cast<float>(position.y);
-	p.w = static_cast<float>(size.x);
-	p.h = static_cast<float>(size.y);
+	p.x = static_cast<int>(position.x);
+	p.y = static_cast<int>(position.y);
+	p.w = static_cast<int>(size.x);
+	p.h = static_cast<int>(size.y);
 }
 
 Enemy::Enemy(SDL_Renderer* renderer, TextureManager* enemyTex)
@@ -29,10 +29,10 @@ Enemy::Enemy(SDL_Renderer* renderer, TextureManager* enemyTex)
 	alive = false;
 
 	// Initialize the SDL_Rect p with the correct values
-	p.x = static_cast<float>(position.x);
-	p.y = static_cast<float>(position.y);
-	p.w = static_cast<float>(size.x);
-	p.h = static_cast<float>(size.y);
+	p.x = static_cast<int>(position.x);
+	p.y = static_cast<int>(position.y);
+	p.w = static_cast<int>(size.x);
+	p.h = static_cast<int>(size.y);
 }
 
 void Enemy::render(SDL_Renderer* renderer, const float camX, const float camY) const  // NOLINT(clang-diagnostic-shadow)
@@ -46,8 +46,8 @@ void Enemy::render(SDL_Renderer* renderer, const float camX, const float camY) c
 void Enemy::spawn()
 {
 	// Set random initial position within the screen boundaries
-	position.x = rand() % (SCREEN_WIDTH - ENEMY_WIDTH);	 // NOLINT(concurrency-mt-unsafe)
-	position.y = rand() % (SCREEN_HEIGHT - ENEMY_HEIGHT);  // NOLINT(concurrency-mt-unsafe)
+	position.x = static_cast<float>(rand() % (SCREEN_WIDTH - ENEMY_WIDTH));	 // NOLINT(concurrency-mt-unsafe)
+	position.y = static_cast<float>(rand() % (SCREEN_HEIGHT - ENEMY_HEIGHT));  // NOLINT(concurrency-mt-unsafe)
 
 	alive = true;
 }
@@ -108,31 +108,6 @@ Vector2 Enemy::getEnemyPos() const
 	return position;
 }
 
-bool Enemy::checkCollisionWithEnemy(const Enemy& e) const
-{
-	// calculate sides of enemy1
-	const int leftA = p.x;
-	const int rightA = p.x + p.w;
-	const int topA = p.y;
-	const int botA = p.y + p.h;
-
-	// calculate sides of enemy2
-	const int leftB = e.p.x;
-	const int rightB = e.p.x + e.p.w;
-	const int topB = e.p.y;
-	const int botB = e.p.y + e.p.h;
-
-	// check if any sides from A is not colliding with B
-	// not colliding if sides of A are outside of B
-	if (botA <= topB || topA >= botB || leftA >= rightB || (rightA <= leftB))
-	{
-		return false;
-	}
-
-	// if no sides are outside of B
-	return true;
-}
-
 void Enemy::setVelocityX(const float xVel) // NOLINT(clang-diagnostic-shadow)
 {
 	velocity.x = xVel;
@@ -141,4 +116,54 @@ void Enemy::setVelocityX(const float xVel) // NOLINT(clang-diagnostic-shadow)
 void Enemy::setVelocityY(const float yVel)  // NOLINT(clang-diagnostic-shadow)
 {
 	velocity.y = yVel;
+}
+
+// bool Enemy::checkCollisionWithEnemy(const Enemy& e) const
+// {
+// 	// calculate sides of enemy1
+// 	const int leftA = p.x;
+// 	const int rightA = p.x + p.w;
+// 	const int topA = p.y;
+// 	const int botA = p.y + p.h;
+//
+// 	// calculate sides of enemy2
+// 	const int leftB = e.p.x;
+// 	const int rightB = e.p.x + e.p.w;
+// 	const int topB = e.p.y;
+// 	const int botB = e.p.y + e.p.h;
+//
+// 	// check if any sides from A is not colliding with B
+// 	// not colliding if sides of A are outside of B
+// 	if (botA <= topB || topA >= botB || leftA >= rightB || (rightA <= leftB))
+// 	{
+// 		return false;
+// 	}
+//
+// 	// if no sides are outside of B
+// 	return true;
+// }
+
+bool Enemy::checkCollisionWith(const SDL_Rect& rect) const
+{
+	// Calculate sides of the enemy (current enemy)
+	const int leftA = p.x;
+	const int rightA = p.x + p.w;
+	const int topA = p.y;
+	const int botA = p.y + p.h;
+
+	// Calculate sides of the other SDL_Rect 
+	const int leftB = rect.x;
+	const int rightB = rect.x + rect.w;
+	const int topB = rect.y;
+	const int botB = rect.y + rect.h;
+
+	// Check if any sides from enemy1 are not colliding with the other SDL_Rect
+	// Not colliding if sides of enemy1 are outside of the other SDL_Rect
+	if (botA <= topB || topA >= botB || leftA >= rightB || rightA <= leftB)
+	{
+		return false;
+	}
+
+	// If no sides are outside of the other SDL_Rect, the two objects are colliding
+	return true;
 }

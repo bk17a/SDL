@@ -8,6 +8,7 @@
 class Bullet
 {
 public:
+	SDL_Rect p{};
 	Bullet();
 	Bullet(Vector2 position, Vector2 velocity, Vector2 size, SDL_Renderer* renderer, TextureManager* texture);
 	void reload();
@@ -18,6 +19,9 @@ public:
 	void setTargetPos(const Vector2& targetPos);
 
 	bool isActive() const;
+	void setActive(bool active);
+	Vector2 getPos() const;
+	void setPos(Vector2 pos);
 
 private:
 	Vector2 pos;

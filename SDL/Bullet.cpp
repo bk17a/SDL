@@ -9,6 +9,10 @@ Bullet::Bullet(const Vector2 position, const Vector2 velocity, const Vector2 siz
 	this->renderer = renderer;
 	this->texture = texture;
 	active = false;
+	p.x = static_cast<int>(pos.x);
+	p.y = static_cast<int>(pos.y);
+	p.w = static_cast<int>(this->size.x);
+	p.h = static_cast<int>(this->size.y);
 };
 
 void Bullet::reload()
@@ -44,7 +48,11 @@ void Bullet::handleEvent(const SDL_Event& e, const Vector2 playerPos)
 
 void Bullet::update()
 {
-	Vector2 dir = targetPos - pos;
+	if (!active)
+	{
+		return;
+	}
+	Vector2 dir = targetPos - pos;		// we get targetPos from calling setTargetPos in the GameEngine class
 	dir.normalize();
 
 	vel = dir * BULLET_SPEED;	// multiply for bullet speed
@@ -58,6 +66,9 @@ void Bullet::update()
 		reload();
 	}
 
+	// update SDL_Rect p to match the current position of bullet
+	p.x = static_cast<int>(pos.x);
+	p.y = static_cast<int>(pos.y);
 }
 
 bool Bullet::isActive() const
@@ -68,4 +79,20 @@ bool Bullet::isActive() const
 void Bullet::setTargetPos(const Vector2& targetPos)  // NOLINT(clang-diagnostic-shadow)
 {
 	this->targetPos = targetPos;
+}
+
+void Bullet::setActive(const bool active)	// NOLINT(clang-diagnostic-shadow)
+{
+	this->active = active;
+}
+
+Vector2 Bullet::getPos() const
+{
+	return pos;
+}
+
+
+void Bullet::setPos(const Vector2 pos)  // NOLINT(clang-diagnostic-shadow)
+{
+	this->pos = pos;
 }
