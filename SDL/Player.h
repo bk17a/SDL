@@ -26,12 +26,16 @@ public:
 	Vector2 getPlayerPos() const;
 	void setXPos(const float x);
 	void setYPos(const float y);
-	void spawn();
+
+	void renderAnimated(SDL_Renderer* renderer, const SDL_Rect* clip, float camX, float camY, const double angle = NULL, const SDL_Point* center = nullptr, SDL_RendererFlip flipType = SDL_FLIP_NONE) const;
 
 	bool isMoving() const;
-	void renderAnimated(SDL_Renderer* renderer, const SDL_Rect* clip, float camX, float camY, const double angle = NULL, const SDL_Point* center = nullptr, SDL_RendererFlip flipType = SDL_FLIP_NONE) const;
 	SDL_RendererFlip getFlipType() const;
-
+	void spawn();
+	void takeDamage(int damage);
+	void kill();
+	bool isAlive() const;
+	void setAlive(bool alive);
 private:
 	// x and y offsets
 	Vector2 position;
@@ -39,6 +43,9 @@ private:
 	Vector2 size;
 	// speed of player
 	Vector2 velocity;
+
+	int health;
+	bool alive;
 
 	bool moving;
 

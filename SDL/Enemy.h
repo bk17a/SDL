@@ -24,7 +24,6 @@ public:
 	void render(SDL_Renderer* renderer, const float camX, const float camY) const;
 	void spawn();
 	bool isAlive() const;
-
 	void takeDamage(int damage);
 	void kill();
 
@@ -38,7 +37,6 @@ public:
 	void setVelocityX(float xVel);
 	void setVelocityY(float yVel);
 
-	//bool checkCollisionWithEnemy(const Enemy& e) const;
 	bool checkCollisionWith(const SDL_Rect& rect) const;
 
 private:

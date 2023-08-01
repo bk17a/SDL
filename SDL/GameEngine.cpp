@@ -209,34 +209,36 @@ void GameEngine::render()
 
 	// Check if the player is moving or not
 	const bool isMoving = player1.isMoving();
-
-	// Render player
-	if (isMoving)
+	if (player1.isAlive())
 	{
-		const SDL_Rect* currentRunClip = &player1RunRect[runAnimationFrame / RUNNING_ANIMATION_FRAMES];
-		player1Run.renderAnimated(renderer, currentRunClip, static_cast<float>(camera.x), static_cast<float>(camera.y), NULL, nullptr, player1.getFlipType());
-
-		// Increment the animation frame for the running animation
-		++runAnimationFrame;
-
-		// Cycle animation
-		if (runAnimationFrame / 5 >= RUNNING_ANIMATION_FRAMES)
+		// Render player
+		if (isMoving)
 		{
-			runAnimationFrame = 0;
+			const SDL_Rect* currentRunClip = &player1RunRect[runAnimationFrame / RUNNING_ANIMATION_FRAMES];
+			player1Run.renderAnimated(renderer, currentRunClip, static_cast<float>(camera.x), static_cast<float>(camera.y), NULL, nullptr, player1.getFlipType());
+
+			// Increment the animation frame for the running animation
+			++runAnimationFrame;
+
+			// Cycle animation
+			if (runAnimationFrame / 5 >= RUNNING_ANIMATION_FRAMES)
+			{
+				runAnimationFrame = 0;
+			}
 		}
-	}
-	else
-	{
-		const SDL_Rect* currentIdleClip = &player1Rect[idleAnimationFrame / IDLE_ANIMATION_FRAMES];
-		player1.renderAnimated(renderer, currentIdleClip, static_cast<float>(camera.x), static_cast<float>(camera.y), NULL, nullptr, player1.getFlipType());
-
-		// Increment the animation frame for the idle animation
-		++idleAnimationFrame;
-
-		// Cycle animation
-		if (idleAnimationFrame / 5 >= IDLE_ANIMATION_FRAMES)
+		else
 		{
-			idleAnimationFrame = 0;
+			const SDL_Rect* currentIdleClip = &player1Rect[idleAnimationFrame / IDLE_ANIMATION_FRAMES];
+			player1.renderAnimated(renderer, currentIdleClip, static_cast<float>(camera.x), static_cast<float>(camera.y), NULL, nullptr, player1.getFlipType());
+
+			// Increment the animation frame for the idle animation
+			++idleAnimationFrame;
+
+			// Cycle animation
+			if (idleAnimationFrame / 5 >= IDLE_ANIMATION_FRAMES)
+			{
+				idleAnimationFrame = 0;
+			}
 		}
 	}
 
@@ -351,18 +353,31 @@ void GameEngine::update()
 		bullet.update();
 	}
 
-	// check if bullet hit enemy
-	for (auto& e : enemies)
+	std::vector<size_t> enemiesKilled;
+
+	for (size_t i = 0; i < enemies.size(); ++i)
 	{
-		if (bullet.isActive() && e.checkCollisionWith(bullet.p))
+		if (bullet.isActive() && enemies[i].checkCollisionWith(bullet.p))
 		{
-			cout << "enemy hit\n";
-		}
-		else
-		{
-			cout << "no shot\n";
+			enemies[i].takeDamage(25);
+			bullet.reload();
+
+			// if enemy is dead, add it to enemiesKilled vector to remove it
+			if (!enemies[i].isAlive())
+			{
+				enemiesKilled.emplace_back(i);
+			}
 		}
 	}
+
+	// Remove the marked enemies using the erase-remove idiom
+	for (auto it = enemiesKilled.rbegin(); it != enemiesKilled.rend(); ++it)
+	{
+		enemies.erase(enemies.begin() + *it);
+	}
+
+	// clear the vector
+	enemiesKilled.clear();
 }
 
 bool GameEngine::handleEvents()
@@ -386,7 +401,10 @@ bool GameEngine::handleEvents()
 		windowObj.handleEvent(e, renderer);
 
 		// bullet events
-		bullet.handleEvent(e, player1.getPlayerPos());
+		if (!enemies.empty())	// disable bullet shoot if all enemies are dead
+		{
+			bullet.handleEvent(e, player1.getPlayerPos());
+		}
 	}
 
 	return running;

@@ -11,6 +11,8 @@ Player::Player()
 	flipType = SDL_FLIP_NONE;
 	collider.w = PLAYER1_WIDTH;
 	collider.h = PLAYER1_HEIGHT;
+	health = 100;
+	alive = false;
 }
 
 Player::Player(SDL_Renderer* renderer, TextureManager* playerTexture)
@@ -22,6 +24,8 @@ Player::Player(SDL_Renderer* renderer, TextureManager* playerTexture)
 	this->renderer = renderer;
 	this->playerTexture = playerTexture;
 	flipType = SDL_FLIP_NONE;
+	health = 100;
+	alive = false;
 }
 
 void Player::handleEvent(const SDL_Event& e)
@@ -172,4 +176,29 @@ void Player::spawn()
 {
 	position.x = (SCREEN_WIDTH - size.x) / 2;
 	position.y = (SCREEN_HEIGHT - size.y) / 2;
+	alive = true;
+}
+
+void Player::takeDamage(const int damage)
+{
+	health -= damage;
+	if (health == 0)
+	{
+		kill();
+	}
+}
+
+void Player::kill()
+{
+	alive = false;
+}
+
+bool Player::isAlive() const
+{
+	return alive;
+}
+
+void Player::setAlive(const bool alive)  // NOLINT(clang-diagnostic-shadow)
+{
+	this->alive = alive;
 }
