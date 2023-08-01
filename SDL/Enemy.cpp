@@ -1,22 +1,7 @@
 #include "Enemy.h"
 #include "Player.h"
 
-Enemy::Enemy()
-{
-	position = Vector2(0.f, 0.f);
-	size = Vector2(ENEMY_WIDTH, ENEMY_HEIGHT);
-	velocity = Vector2(0.f, 0.f);
-	renderer = nullptr;
-	enemyTex = nullptr;
-	health = 100;
-	alive = false;
-
-	// Initialize SDL_Rect p
-	p.x = static_cast<int>(position.x);
-	p.y = static_cast<int>(position.y);
-	p.w = static_cast<int>(size.x);
-	p.h = static_cast<int>(size.y);
-}
+Enemy::Enemy() = default; // NOLINT(cppcoreguidelines-pro-type-member-init)
 
 Enemy::Enemy(SDL_Renderer* renderer, TextureManager* enemyTex)
 {

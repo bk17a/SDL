@@ -24,18 +24,21 @@ public:
 	float getWidth() const;
 	float getHeight() const;
 	Vector2 getPlayerPos() const;
+	void renderAnimated(SDL_Renderer* renderer, const SDL_Rect* clip, float camX, float camY, const double angle = NULL, const SDL_Point* center = nullptr, SDL_RendererFlip flipType = SDL_FLIP_NONE) const;
 	void setXPos(const float x);
 	void setYPos(const float y);
-
-	void renderAnimated(SDL_Renderer* renderer, const SDL_Rect* clip, float camX, float camY, const double angle = NULL, const SDL_Point* center = nullptr, SDL_RendererFlip flipType = SDL_FLIP_NONE) const;
 
 	bool isMoving() const;
 	SDL_RendererFlip getFlipType() const;
 	void spawn();
+	void setHp(int hp);
 	void takeDamage(int damage);
 	void kill();
 	bool isAlive() const;
 	void setAlive(bool alive);
+
+	int getHp() const;
+	int getHpMax() const;
 private:
 	// x and y offsets
 	Vector2 position;
@@ -44,7 +47,7 @@ private:
 	// speed of player
 	Vector2 velocity;
 
-	int health;
+	int hp, hpMax;
 	bool alive;
 
 	bool moving;
@@ -53,9 +56,6 @@ private:
 	TextureManager* playerTexture;
 
 	SDL_RendererFlip flipType;
-
-	// player's collision box
-	SDL_Rect collider{};
 };
 
 #endif //PLAYER_H_

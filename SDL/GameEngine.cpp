@@ -3,7 +3,7 @@
 using namespace std;
 
 GameEngine::GameEngine() : running(true), font(nullptr), window(nullptr), renderer(nullptr),
-player1Rect({ {{0, 0, 0, 0}} }), player1RunRect({ {{0, 0, 0, 0}} }) {}
+player1Rect({ {{0, 0, 0, 0}} }), player1RunRect({ {{0, 0, 0, 0}} }), playerHpBar({ 0, 0, 0, 0 }), playerHpBarBack({ 0, 0, 0, 0 }) {}
 
 GameEngine::~GameEngine()
 {
@@ -58,6 +58,10 @@ bool GameEngine::init()
 			{
 				cout << "SDL_ttf could not initialize! SDL_ttf Error: " << TTF_GetError() << endl;
 				running = false;
+			}
+			else
+			{
+				initGUI();
 			}
 		}
 	}
@@ -207,177 +211,27 @@ void GameEngine::render()
 	// Render fps
 	fpsTexture.render(SCREEN_WIDTH - fpsTexture.getWidth(), 0, renderer);
 
-	// Check if the player is moving or not
-	const bool isMoving = player1.isMoving();
-	if (player1.isAlive())
-	{
-		// Render player
-		if (isMoving)
-		{
-			const SDL_Rect* currentRunClip = &player1RunRect[runAnimationFrame / RUNNING_ANIMATION_FRAMES];
-			player1Run.renderAnimated(renderer, currentRunClip, static_cast<float>(camera.x), static_cast<float>(camera.y), NULL, nullptr, player1.getFlipType());
+	// render game elements
+	renderPlayer();
+	renderEnemies();
+	renderBullets();
 
-			// Increment the animation frame for the running animation
-			++runAnimationFrame;
-
-			// Cycle animation
-			if (runAnimationFrame / 5 >= RUNNING_ANIMATION_FRAMES)
-			{
-				runAnimationFrame = 0;
-			}
-		}
-		else
-		{
-			const SDL_Rect* currentIdleClip = &player1Rect[idleAnimationFrame / IDLE_ANIMATION_FRAMES];
-			player1.renderAnimated(renderer, currentIdleClip, static_cast<float>(camera.x), static_cast<float>(camera.y), NULL, nullptr, player1.getFlipType());
-
-			// Increment the animation frame for the idle animation
-			++idleAnimationFrame;
-
-			// Cycle animation
-			if (idleAnimationFrame / 5 >= IDLE_ANIMATION_FRAMES)
-			{
-				idleAnimationFrame = 0;
-			}
-		}
-	}
-
-	// Render test enemy
-	for (auto& e : enemies)
-	{
-		if (e.isAlive())
-		{
-			e.render(renderer, static_cast<float>(camera.x), static_cast<float>(camera.y));
-		}
-	}
-	if (bullet.isActive())
-	{
-		bullet.render(renderer, static_cast<float>(camera.x), static_cast<float>(camera.y));
-	}
+	SDL_SetRenderDrawColor(renderer, 25, 25, 25, 200); // Grey color with less opacity
+	SDL_RenderFillRect(renderer, &playerHpBarBack);
+	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); // Grey color with less opacity
+	SDL_RenderFillRect(renderer, &playerHpBar);
 }
 
 void GameEngine::update()
 {
-	//player1.move();
 	player1.move();
 	player1Run.move();
 
-	//Center the camera over the player
-	camera.x = static_cast<int>(player1.getXPos() + static_cast<float>(PLAYER1_WIDTH) / 2 - static_cast<float>(SCREEN_WIDTH) / 2);
-	camera.y = static_cast<int>(player1.getYPos() + static_cast<float>(PLAYER1_HEIGHT) / 2 - static_cast<float>(SCREEN_HEIGHT) / 2);
-
-	//Keep the camera in bounds
-	if (camera.x < 0)
-	{
-		camera.x = 0;
-	}
-	if (camera.y < 0)
-	{
-		camera.y = 0;
-	}
-	if (camera.x > LEVEL_WIDTH - camera.w)
-	{
-		camera.x = LEVEL_WIDTH - camera.w;
-	}
-	if (camera.y > LEVEL_HEIGHT - camera.h)
-	{
-		camera.y = LEVEL_HEIGHT - camera.h;
-	}
-
-	// looping through all the enemies in the vector
-	for (auto& e : enemies)
-	{
-		// enemy movement toward player
-		if (e.getPosX() < player1.getXPos()) e.setPosX(e.getPosX() + ENEMY_VEL);
-		if (e.getPosX() > player1.getXPos()) e.setPosX(e.getPosX() - ENEMY_VEL);
-		if (e.getPosY() < player1.getYPos()) e.setPosY(e.getPosY() + ENEMY_VEL);
-		if (e.getPosY() > player1.getYPos()) e.setPosY(e.getPosY() - ENEMY_VEL);
-	}
-
-	// Check collision between enemies
-	for (size_t i = 0; i < enemies.size(); ++i)
-	{
-		for (size_t j = i + 1; j < enemies.size(); ++j)
-		{
-			if (enemies[i].checkCollisionWith(enemies[j].p))
-			{
-				// Calculate the direction of the collision between enemies
-				float directionX = enemies[i].getPosX() - enemies[j].getPosX();
-				float directionY = enemies[i].getPosY() - enemies[j].getPosY();
-
-				// Normalize the direction vector
-				const float length = sqrt(directionX * directionX + directionY * directionY);
-				directionX /= length;
-				directionY /= length;
-
-				// Calculate the maximum distance the enemies can move back
-				constexpr float maxDistance = 2; // Change this value to adjust the maximum distance
-
-				// Move the colliding enemies one step back in the opposite direction, but limit the distance
-				const float distanceX = directionX * maxDistance;
-				const float distanceY = directionY * maxDistance;
-				enemies[i].setPosX(enemies[i].getPosX() + distanceX);
-				enemies[i].setPosY(enemies[i].getPosY() + distanceY);
-				enemies[j].setPosX(enemies[j].getPosX() - distanceX);
-				enemies[j].setPosY(enemies[j].getPosY() - distanceY);
-			}
-		}
-	}
-
-	// Updating bullet
-	// Find the nearest enemy to the player's position
-	const Vector2 playerPosition = player1.getPlayerPos();
-	Vector2 nearestEnemyPosition;
-
-	float nearestDistance = std::numeric_limits<float>::max();
-
-	for (const auto& e : enemies)
-	{
-		if (e.isAlive())
-		{
-			Vector2 enemyPosition(e.getPosX(), e.getPosY());
-			const float distance = (enemyPosition - playerPosition).calcVecLength();
-
-			if (distance < nearestDistance)
-			{
-				nearestDistance = distance;
-				nearestEnemyPosition = enemyPosition;
-			}
-		}
-	}
-
-	// Update active bullets with the nearest enemy's position as the target
-	if (bullet.isActive())
-	{
-		bullet.setTargetPos(nearestEnemyPosition);
-		bullet.update();
-	}
-
-	std::vector<size_t> enemiesKilled;
-
-	for (size_t i = 0; i < enemies.size(); ++i)
-	{
-		if (bullet.isActive() && enemies[i].checkCollisionWith(bullet.p))
-		{
-			enemies[i].takeDamage(25);
-			bullet.reload();
-
-			// if enemy is dead, add it to enemiesKilled vector to remove it
-			if (!enemies[i].isAlive())
-			{
-				enemiesKilled.emplace_back(i);
-			}
-		}
-	}
-
-	// Remove the marked enemies using the erase-remove idiom
-	for (auto it = enemiesKilled.rbegin(); it != enemiesKilled.rend(); ++it)
-	{
-		enemies.erase(enemies.begin() + *it);
-	}
-
-	// clear the vector
-	enemiesKilled.clear();
+	updateGUI();
+	updateCamera();
+	updateEnemies();
+	updateBullets();
+	updateEnemiesKilled();
 }
 
 bool GameEngine::handleEvents()
@@ -394,8 +248,11 @@ bool GameEngine::handleEvents()
 		}
 
 		// player movement
-		player1.handleEvent(e);
-		player1Run.handleEvent(e);
+		if (player1.isAlive())
+		{
+			player1.handleEvent(e);
+			player1Run.handleEvent(e);
+		}
 
 		// window events
 		windowObj.handleEvent(e, renderer);
@@ -460,6 +317,209 @@ void GameEngine::close()
 	IMG_Quit();
 	TTF_Quit();
 	SDL_Quit();
+}
+
+void GameEngine::updateGUI()
+{
+	// Render the HP bar based on the updated player's health
+	const float hpPercent = static_cast<float>(player1.getHp()) / static_cast<float>(player1.getHpMax());
+	const int hpBarWidth = static_cast<int>(PLAYER_HP_BAR_WIDTH * hpPercent);
+	playerHpBar = { PLAYER_HP_BAR_X, PLAYER_HP_BAR_Y, hpBarWidth, PLAYER_HP_BAR_HEIGHT };
+}
+
+void GameEngine::initGUI()
+{
+	// Init player GUI
+	playerHpBar = { PLAYER_HP_BAR_X, PLAYER_HP_BAR_Y, PLAYER_HP_BAR_WIDTH, PLAYER_HP_BAR_HEIGHT };
+
+	playerHpBarBack = { PLAYER_HP_BAR_X, PLAYER_HP_BAR_Y, PLAYER_HP_BAR_WIDTH, PLAYER_HP_BAR_HEIGHT };
+}
+
+void GameEngine::updateCamera()
+{
+	//Center the camera over the player
+	camera.x = static_cast<int>(player1.getXPos() + static_cast<float>(PLAYER1_WIDTH) / 2 - static_cast<float>(SCREEN_WIDTH) / 2);
+	camera.y = static_cast<int>(player1.getYPos() + static_cast<float>(PLAYER1_HEIGHT) / 2 - static_cast<float>(SCREEN_HEIGHT) / 2);
+
+	//Keep the camera in bounds
+	if (camera.x < 0)
+	{
+		camera.x = 0;
+	}
+	if (camera.y < 0)
+	{
+		camera.y = 0;
+	}
+	if (camera.x > LEVEL_WIDTH - camera.w)
+	{
+		camera.x = LEVEL_WIDTH - camera.w;
+	}
+	if (camera.y > LEVEL_HEIGHT - camera.h)
+	{
+		camera.y = LEVEL_HEIGHT - camera.h;
+	}
+}
+
+void GameEngine::updateEnemies()
+{
+	// looping through all the enemies in the vector
+	for (auto& e : enemies)
+	{
+		// enemy movement toward player
+		if (e.getPosX() < player1.getXPos()) e.setPosX(e.getPosX() + ENEMY_VEL);
+		if (e.getPosX() > player1.getXPos()) e.setPosX(e.getPosX() - ENEMY_VEL);
+		if (e.getPosY() < player1.getYPos()) e.setPosY(e.getPosY() + ENEMY_VEL);
+		if (e.getPosY() > player1.getYPos()) e.setPosY(e.getPosY() - ENEMY_VEL);
+	}
+
+	// Check collision between enemies
+	for (size_t i = 0; i < enemies.size(); ++i)
+	{
+		for (size_t j = i + 1; j < enemies.size(); ++j)
+		{
+			if (enemies[i].checkCollisionWith(enemies[j].p))
+			{
+				// Calculate the direction of the collision between enemies
+				float directionX = enemies[i].getPosX() - enemies[j].getPosX();
+				float directionY = enemies[i].getPosY() - enemies[j].getPosY();
+
+				// Normalize the direction vector
+				const float length = sqrt(directionX * directionX + directionY * directionY);
+				directionX /= length;
+				directionY /= length;
+
+				// Calculate the maximum distance the enemies can move back
+				constexpr float maxDistance = 2; // Change this value to adjust the maximum distance
+
+				// Move the colliding enemies one step back in the opposite direction, but limit the distance
+				const float distanceX = directionX * maxDistance;
+				const float distanceY = directionY * maxDistance;
+				enemies[i].setPosX(enemies[i].getPosX() + distanceX);
+				enemies[i].setPosY(enemies[i].getPosY() + distanceY);
+				enemies[j].setPosX(enemies[j].getPosX() - distanceX);
+				enemies[j].setPosY(enemies[j].getPosY() - distanceY);
+			}
+		}
+	}
+}
+
+void GameEngine::updateBullets()
+{
+	// Updating bullet
+	// Find the nearest enemy to the player's position
+	const Vector2 playerPosition = player1.getPlayerPos();
+	Vector2 nearestEnemyPosition;
+
+	float nearestDistance = std::numeric_limits<float>::max();
+
+	for (const auto& e : enemies)
+	{
+		if (e.isAlive())
+		{
+			Vector2 enemyPosition(e.getPosX(), e.getPosY());
+			const float distance = (enemyPosition - playerPosition).calcVecLength();
+
+			if (distance < nearestDistance)
+			{
+				nearestDistance = distance;
+				nearestEnemyPosition = enemyPosition;
+			}
+		}
+	}
+
+	// Update active bullets with the nearest enemy's position as the target
+	if (bullet.isActive())
+	{
+		bullet.setTargetPos(nearestEnemyPosition);
+		bullet.update();
+	}
+}
+
+void GameEngine::updateEnemiesKilled()
+{
+	std::vector<size_t> enemiesKilled;
+
+	for (size_t i = 0; i < enemies.size(); ++i)
+	{
+		if (bullet.isActive() && enemies[i].checkCollisionWith(bullet.p))
+		{
+			enemies[i].takeDamage(25);
+			bullet.reload();
+
+			// if enemy is dead, add it to enemiesKilled vector to remove it
+			if (!enemies[i].isAlive())
+			{
+				enemiesKilled.emplace_back(i);
+			}
+		}
+	}
+
+	// Remove the marked enemies using the erase-remove idiom
+	for (auto it = enemiesKilled.rbegin(); it != enemiesKilled.rend(); ++it)
+	{
+		enemies.erase(enemies.begin() + *it);
+	}
+
+	// clear the vector
+	enemiesKilled.clear();
+}
+
+void GameEngine::renderPlayer()
+{
+	// Check if the player is moving or not
+	const bool isMoving = player1.isMoving();
+	if (player1.isAlive())
+	{
+		// Render player
+		if (isMoving)
+		{
+			const SDL_Rect* currentRunClip = &player1RunRect[runAnimationFrame / RUNNING_ANIMATION_FRAMES];
+			player1Run.renderAnimated(renderer, currentRunClip, static_cast<float>(camera.x), static_cast<float>(camera.y), NULL, nullptr, player1.getFlipType());
+
+			// Increment the animation frame for the running animation
+			++runAnimationFrame;
+
+			// Cycle animation
+			if (runAnimationFrame / 5 >= RUNNING_ANIMATION_FRAMES)
+			{
+				runAnimationFrame = 0;
+			}
+		}
+		else
+		{
+			const SDL_Rect* currentIdleClip = &player1Rect[idleAnimationFrame / IDLE_ANIMATION_FRAMES];
+			player1.renderAnimated(renderer, currentIdleClip, static_cast<float>(camera.x), static_cast<float>(camera.y), NULL, nullptr, player1.getFlipType());
+
+			// Increment the animation frame for the idle animation
+			++idleAnimationFrame;
+
+			// Cycle animation
+			if (idleAnimationFrame / 5 >= IDLE_ANIMATION_FRAMES)
+			{
+				idleAnimationFrame = 0;
+			}
+		}
+	}
+}
+
+void GameEngine::renderEnemies() const
+{
+	// Render test enemy
+	for (auto& e : enemies)
+	{
+		if (e.isAlive())
+		{
+			e.render(renderer, static_cast<float>(camera.x), static_cast<float>(camera.y));
+		}
+	}
+}
+
+void GameEngine::renderBullets() const
+{
+	if (bullet.isActive())
+	{
+		bullet.render(renderer, static_cast<float>(camera.x), static_cast<float>(camera.y));
+	}
 }
 
 void GameEngine::run()

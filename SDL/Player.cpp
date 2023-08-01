@@ -1,19 +1,6 @@
 #include "Player.h"
 
-Player::Player()
-{
-	position = Vector2(0, 0);
-	size = Vector2(PLAYER1_WIDTH, PLAYER1_HEIGHT);
-	velocity = Vector2(0, 0);
-	moving = false;
-	renderer = nullptr;
-	playerTexture = nullptr;
-	flipType = SDL_FLIP_NONE;
-	collider.w = PLAYER1_WIDTH;
-	collider.h = PLAYER1_HEIGHT;
-	health = 100;
-	alive = false;
-}
+Player::Player() = default; // NOLINT(cppcoreguidelines-pro-type-member-init)
 
 Player::Player(SDL_Renderer* renderer, TextureManager* playerTexture)
 {
@@ -24,8 +11,9 @@ Player::Player(SDL_Renderer* renderer, TextureManager* playerTexture)
 	this->renderer = renderer;
 	this->playerTexture = playerTexture;
 	flipType = SDL_FLIP_NONE;
-	health = 100;
 	alive = false;
+	hpMax = 100;
+	hp = hpMax;
 }
 
 void Player::handleEvent(const SDL_Event& e)
@@ -179,10 +167,19 @@ void Player::spawn()
 	alive = true;
 }
 
+void Player::setHp(const int hp)  // NOLINT(clang-diagnostic-shadow)
+{
+	this->hp = hp;
+	if (hp <= 0)
+	{
+		kill();
+	}
+}
+
 void Player::takeDamage(const int damage)
 {
-	health -= damage;
-	if (health == 0)
+	hp -= damage;
+	if (hp <= 0)
 	{
 		kill();
 	}
@@ -201,4 +198,14 @@ bool Player::isAlive() const
 void Player::setAlive(const bool alive)  // NOLINT(clang-diagnostic-shadow)
 {
 	this->alive = alive;
+}
+
+int Player::getHp() const
+{
+	return hp;
+}
+
+int Player::getHpMax() const
+{
+	return hpMax;
 }

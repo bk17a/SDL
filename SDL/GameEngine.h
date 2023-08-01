@@ -31,15 +31,28 @@ public:
 	void update();
 	void render();											// render textures, fonts, etc
 	bool handleEvents();									// handle quit event
-	void quit();											// quit out
-	void close();											// free and destroy after using
-	bool isRunning() const;									// check to see if program is running
-	void run();												// run the program
 
 	// getters
 	SDL_Window* getWindow() const;
 	SDL_Renderer* getRenderer() const;
 	TTF_Font* getFont() const;
+
+	bool isRunning() const;									// check to see if program is running
+	void quit();											// quit out
+	void close();											// free and destroy after using
+
+	void updateGUI();
+	void initGUI();
+	void updateCamera();
+	void updateEnemies();
+	void updateBullets();
+	void updateEnemiesKilled();
+	void renderPlayer();
+	void renderEnemies() const;
+	void renderBullets() const;
+
+	void run();												// run the program
+
 private:
 	int countedFrames = 0;
 	int idleAnimationFrame = 0;
@@ -82,6 +95,10 @@ private:
 	// bullet members
 	TextureManager bulletTex;
 	Bullet bullet;
+
+	// PlayerGUI
+	SDL_Rect playerHpBar;
+	SDL_Rect playerHpBarBack;
 };
 
 #endif
