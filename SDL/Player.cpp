@@ -14,6 +14,11 @@ Player::Player(SDL_Renderer* renderer, TextureManager* playerTexture)
 	alive = false;
 	hpMax = 100;
 	hp = hpMax;
+	p.x = static_cast<int>(position.x);
+	p.y = static_cast<int>(position.y);
+	p.w = static_cast<int>(size.x);
+	p.h = static_cast<int>(size.y);
+	collisionCooldown = 0;
 }
 
 void Player::handleEvent(const SDL_Event& e)
@@ -178,10 +183,14 @@ void Player::setHp(const int hp)  // NOLINT(clang-diagnostic-shadow)
 
 void Player::takeDamage(const int damage)
 {
-	hp -= damage;
-	if (hp <= 0)
+	if (collisionCooldown <= 0)
 	{
-		kill();
+		hp -= damage;
+		collisionCooldown = 60; // set collision cooldown to 60 frames
+		if (hp <= 0)
+		{
+			kill();
+		}
 	}
 }
 
@@ -208,4 +217,10 @@ int Player::getHp() const
 int Player::getHpMax() const
 {
 	return hpMax;
+}
+
+void Player::update()
+{
+	if (collisionCooldown > 0)
+		collisionCooldown--;
 }

@@ -41,8 +41,8 @@ public:
 	void quit();											// quit out
 	void close();											// free and destroy after using
 
+	void checkCollision();
 	void updateGUI();
-	void initGUI();
 	void updateCamera();
 	void updateEnemies();
 	void updateBullets();
@@ -53,6 +53,10 @@ public:
 
 	void run();												// run the program
 
+	// Helper function to convert SDL_Rect to a string
+	std::string rectToString(const SDL_Rect& rect) const;
+
+	void checkPlayerEnemyCollision(const Enemy& enemy);
 private:
 	int countedFrames = 0;
 	int idleAnimationFrame = 0;

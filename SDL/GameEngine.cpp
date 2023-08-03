@@ -3,7 +3,9 @@
 using namespace std;
 
 GameEngine::GameEngine() : running(true), font(nullptr), window(nullptr), renderer(nullptr),
-player1Rect({ {{0, 0, 0, 0}} }), player1RunRect({ {{0, 0, 0, 0}} }), playerHpBar({ 0, 0, 0, 0 }), playerHpBarBack({ 0, 0, 0, 0 }) {}
+player1Rect({ {{0, 0, 0, 0}} }), player1RunRect({ {{0, 0, 0, 0}} }),
+playerHpBar({ PLAYER_HP_BAR_X, PLAYER_HP_BAR_Y, PLAYER_HP_BAR_WIDTH, PLAYER_HP_BAR_HEIGHT }),
+playerHpBarBack({ PLAYER_HP_BAR_X, PLAYER_HP_BAR_Y, PLAYER_HP_BAR_WIDTH, PLAYER_HP_BAR_HEIGHT }) {}
 
 GameEngine::~GameEngine()
 {
@@ -58,10 +60,6 @@ bool GameEngine::init()
 			{
 				cout << "SDL_ttf could not initialize! SDL_ttf Error: " << TTF_GetError() << endl;
 				running = false;
-			}
-			else
-			{
-				initGUI();
 			}
 		}
 	}
@@ -216,17 +214,27 @@ void GameEngine::render()
 	renderEnemies();
 	renderBullets();
 
+	// render background of hp bar
 	SDL_SetRenderDrawColor(renderer, 25, 25, 25, 200); // Grey color with less opacity
 	SDL_RenderFillRect(renderer, &playerHpBarBack);
-	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); // Grey color with less opacity
+
+	// render red hp bar
+	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
 	SDL_RenderFillRect(renderer, &playerHpBar);
 }
 
 void GameEngine::update()
 {
+	player1.update();
 	player1.move();
 	player1Run.move();
 
+	for (auto& e : enemies)
+	{
+		checkPlayerEnemyCollision(e);
+	}
+
+	checkCollision();
 	updateGUI();
 	updateCamera();
 	updateEnemies();
@@ -319,20 +327,55 @@ void GameEngine::close()
 	SDL_Quit();
 }
 
-void GameEngine::updateGUI()
+void GameEngine::checkCollision()
 {
-	// Render the HP bar based on the updated player's health
-	const float hpPercent = static_cast<float>(player1.getHp()) / static_cast<float>(player1.getHpMax());
-	const int hpBarWidth = static_cast<int>(PLAYER_HP_BAR_WIDTH * hpPercent);
-	playerHpBar = { PLAYER_HP_BAR_X, PLAYER_HP_BAR_Y, hpBarWidth, PLAYER_HP_BAR_HEIGHT };
+	// Check collision between enemies
+	for (size_t i = 0; i < enemies.size(); ++i)
+	{
+		for (size_t j = i + 1; j < enemies.size(); ++j)
+		{
+			if (enemies[i].checkCollisionWith(enemies[j].p))
+			{
+				// Calculate the direction of the collision between enemies
+				float directionX = enemies[i].getPosX() - enemies[j].getPosX();
+				float directionY = enemies[i].getPosY() - enemies[j].getPosY();
+
+				// Normalize the direction vector
+				const float length = sqrt(directionX * directionX + directionY * directionY);
+				directionX /= length;
+				directionY /= length;
+
+				// Calculate the maximum distance the enemies can move back
+				constexpr float maxDistance = 2; // Change this value to adjust the maximum distance
+
+				// Move the colliding enemies one step back in the opposite direction, but limit the distance
+				const float distanceX = directionX * maxDistance;
+				const float distanceY = directionY * maxDistance;
+				enemies[i].setPosX(enemies[i].getPosX() + distanceX);
+				enemies[i].setPosY(enemies[i].getPosY() + distanceY);
+				enemies[j].setPosX(enemies[j].getPosX() - distanceX);
+				enemies[j].setPosY(enemies[j].getPosY() - distanceY);
+			}
+		}
+	}
 }
 
-void GameEngine::initGUI()
+void GameEngine::updateGUI()
 {
-	// Init player GUI
-	playerHpBar = { PLAYER_HP_BAR_X, PLAYER_HP_BAR_Y, PLAYER_HP_BAR_WIDTH, PLAYER_HP_BAR_HEIGHT };
+	// Calculate the percentage of HP remaining
+	float hpPercent = static_cast<float>(player1.getHp()) / static_cast<float>(player1.getHpMax());
 
-	playerHpBarBack = { PLAYER_HP_BAR_X, PLAYER_HP_BAR_Y, PLAYER_HP_BAR_WIDTH, PLAYER_HP_BAR_HEIGHT };
+	// Ensure the percentage is between 0 and 1
+	hpPercent = std::max(0.0f, std::min(hpPercent, 1.0f));
+
+	// Calculate the HP bar width based on the percentage of HP remaining
+	int hpBarWidth = static_cast<int>(PLAYER_HP_BAR_WIDTH * hpPercent);
+
+	// Make sure the HP bar width doesn't exceed its maximum width (PLAYER_HP_BAR_WIDTH)
+	hpBarWidth = std::min(hpBarWidth, PLAYER_HP_BAR_WIDTH);
+
+	// Update the HP bar size
+	playerHpBar = { PLAYER_HP_BAR_X, PLAYER_HP_BAR_Y, hpBarWidth, PLAYER_HP_BAR_HEIGHT };
 }
 
 void GameEngine::updateCamera()
@@ -370,36 +413,6 @@ void GameEngine::updateEnemies()
 		if (e.getPosX() > player1.getXPos()) e.setPosX(e.getPosX() - ENEMY_VEL);
 		if (e.getPosY() < player1.getYPos()) e.setPosY(e.getPosY() + ENEMY_VEL);
 		if (e.getPosY() > player1.getYPos()) e.setPosY(e.getPosY() - ENEMY_VEL);
-	}
-
-	// Check collision between enemies
-	for (size_t i = 0; i < enemies.size(); ++i)
-	{
-		for (size_t j = i + 1; j < enemies.size(); ++j)
-		{
-			if (enemies[i].checkCollisionWith(enemies[j].p))
-			{
-				// Calculate the direction of the collision between enemies
-				float directionX = enemies[i].getPosX() - enemies[j].getPosX();
-				float directionY = enemies[i].getPosY() - enemies[j].getPosY();
-
-				// Normalize the direction vector
-				const float length = sqrt(directionX * directionX + directionY * directionY);
-				directionX /= length;
-				directionY /= length;
-
-				// Calculate the maximum distance the enemies can move back
-				constexpr float maxDistance = 2; // Change this value to adjust the maximum distance
-
-				// Move the colliding enemies one step back in the opposite direction, but limit the distance
-				const float distanceX = directionX * maxDistance;
-				const float distanceY = directionY * maxDistance;
-				enemies[i].setPosX(enemies[i].getPosX() + distanceX);
-				enemies[i].setPosY(enemies[i].getPosY() + distanceY);
-				enemies[j].setPosX(enemies[j].getPosX() - distanceX);
-				enemies[j].setPosY(enemies[j].getPosY() - distanceY);
-			}
-		}
 	}
 }
 
@@ -598,5 +611,28 @@ void GameEngine::run()
 				++countedFrames;
 			}
 		}
+	}
+}
+
+std::string GameEngine::rectToString(const SDL_Rect& rect) const
+{
+	return "SDL_Rect { x: " + std::to_string(rect.x) +
+		", y: " + std::to_string(rect.y) +
+		", w: " + std::to_string(rect.w) +
+		", h: " + std::to_string(rect.h) +
+		" }";
+}
+
+void GameEngine::checkPlayerEnemyCollision(const Enemy& enemy)   // NOLINT(clang-diagnostic-shadow)
+{
+	SDL_Rect playerPositionRect;
+	playerPositionRect.x = static_cast<int>(player1.getXPos());
+	playerPositionRect.y = static_cast<int>(player1.getYPos());
+	playerPositionRect.w = PLAYER1_WIDTH;
+	playerPositionRect.h = PLAYER1_HEIGHT;
+
+	if (enemy.checkCollisionWith(playerPositionRect))
+	{
+		player1.takeDamage(5);
 	}
 }

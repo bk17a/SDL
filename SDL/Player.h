@@ -12,6 +12,8 @@ class Player
 {
 public:
 	// initialize the variables
+	SDL_Rect p{};
+
 	Player();
 	Player(SDL_Renderer* renderer, TextureManager* playerTexture);
 	void handleEvent(const SDL_Event& e);								// handle key presses and adjust dot's velocity
@@ -39,16 +41,22 @@ public:
 
 	int getHp() const;
 	int getHpMax() const;
+	void update();
 private:
 	// x and y offsets
 	Vector2 position;
+
 	// width and height of player
 	Vector2 size;
+
 	// speed of player
 	Vector2 velocity;
 
+	// health and status
 	int hp, hpMax;
 	bool alive;
+
+	int collisionCooldown;
 
 	bool moving;
 

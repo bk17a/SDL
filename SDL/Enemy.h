@@ -5,6 +5,7 @@
 #include <SDL.h>
 #include <stdlib.h>
 #include <vector>
+#include <array>
 #include <algorithm>
 #include "TextureManager.h"
 #include "Constants.h"
