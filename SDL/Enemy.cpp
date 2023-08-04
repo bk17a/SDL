@@ -105,24 +105,21 @@ void Enemy::setVelocityY(const float yVel)  // NOLINT(clang-diagnostic-shadow)
 bool Enemy::checkCollisionWith(const SDL_Rect& rect) const
 {
 	// Calculate sides of the enemy (current enemy)
-	const int leftA = p.x;
-	const int rightA = p.x + p.w;
-	const int topA = p.y;
-	const int botA = p.y + p.h;
+	const auto leftA = static_cast<float>(p.x);
+	const auto rightA = static_cast<float>(p.x + p.w);
+	const auto topA = static_cast<float>(p.y);
+	const auto botA = static_cast<float>(p.y + p.h);
 
 	// Calculate sides of the other SDL_Rect
-	const int leftB = rect.x;
-	const int rightB = rect.x + rect.w;
-	const int topB = rect.y;
-	const int botB = rect.y + rect.h;
+	const auto leftB = static_cast<float>(rect.x);
+	const auto rightB = static_cast<float>(rect.x + rect.w);
+	const auto topB = static_cast<float>(rect.y);
+	const auto botB = static_cast<float>(rect.y + rect.h);
 
-	// Check if any sides from enemy1 are not colliding with the other SDL_Rect
-	// Not colliding if sides of enemy1 are outside of the other SDL_Rect
-	if (botA <= topB || topA >= botB || leftA >= rightB || rightA <= leftB)
-	{
-		return false;
-	}
+	// Check if the rectangles are overlapping on both axes
+	const bool xOverlap = (leftA < rightB) && (rightA > leftB);
+	const bool yOverlap = (topA < botB) && (botA > topB);
 
-	// If no sides are outside of the other SDL_Rect, the two objects are colliding
-	return true;
+	// If both axes are overlapping, the two objects are colliding
+	return xOverlap && yOverlap;
 }

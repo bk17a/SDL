@@ -11,7 +11,7 @@ public:
 	Particles();											// default constructor
 	Particles(int x, int y);		// initialize position and animation
 	void render(SDL_Renderer* renderer);					// render particles
-	bool isDead();											// check to see if particles are dead
+	bool isDead() const;											// check to see if particles are dead
 
 private:
 	int xPos, yPos;					// offsets

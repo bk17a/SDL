@@ -94,6 +94,7 @@ bool GameEngine::loadMedia()
 	{
 		// Create the player object
 		player1 = Player(renderer, &player1Tex);
+
 		player1.spawn();
 
 		// set player 1 rect
@@ -214,11 +215,9 @@ void GameEngine::render()
 	renderEnemies();
 	renderBullets();
 
-	// render background of hp bar
 	SDL_SetRenderDrawColor(renderer, 25, 25, 25, 200); // Grey color with less opacity
 	SDL_RenderFillRect(renderer, &playerHpBarBack);
 
-	// render red hp bar
 	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
 	SDL_RenderFillRect(renderer, &playerHpBar);
 }
@@ -237,7 +236,7 @@ void GameEngine::update()
 	checkCollision();
 	updateGUI();
 	updateCamera();
-	updateEnemies();
+	//updateEnemies();
 	updateBullets();
 	updateEnemiesKilled();
 }
@@ -513,6 +512,26 @@ void GameEngine::renderPlayer()
 			}
 		}
 	}
+
+	// Health bar size factor (adjust this value to change the health bar size)
+	constexpr float healthBarWidthFactor = 0.6f;
+
+	// Render health bar on top of the player's texture
+	playerHpBarBack = { static_cast<int>(player1.getXPos() - static_cast<float>(camera.x)),
+						static_cast<int>(player1.getYPos() + player1.getWidth() - static_cast<float>(camera.y)) - 30,
+						static_cast<int>(player1.getWidth() * healthBarWidthFactor), // Set the width to a fraction of the player's width
+						PLAYER_HP_BAR_HEIGHT };
+
+	float hpPercent = static_cast<float>(player1.getHp()) / static_cast<float>(player1.getHpMax());
+	hpPercent = std::max(0.0f, std::min(hpPercent, 1.0f));
+
+	int hpBarWidth = static_cast<int>(player1.getWidth() * healthBarWidthFactor * hpPercent); // Set the width to player's width * factor * hpPercent
+	hpBarWidth = static_cast<int>(std::min(static_cast<float>(hpBarWidth), player1.getWidth() * healthBarWidthFactor)); // Make sure the hpBarWidth doesn't exceed the adjusted width
+
+	playerHpBar = { static_cast<int>(player1.getXPos() - static_cast<float>(camera.x)),
+					static_cast<int>(player1.getYPos() + player1.getWidth() - static_cast<float>(camera.y)) - 30,
+					hpBarWidth,
+					PLAYER_HP_BAR_HEIGHT };
 }
 
 void GameEngine::renderEnemies() const
@@ -628,11 +647,11 @@ void GameEngine::checkPlayerEnemyCollision(const Enemy& enemy)   // NOLINT(clang
 	SDL_Rect playerPositionRect;
 	playerPositionRect.x = static_cast<int>(player1.getXPos());
 	playerPositionRect.y = static_cast<int>(player1.getYPos());
-	playerPositionRect.w = PLAYER1_WIDTH;
+	playerPositionRect.w = PLAYER1_WIDTH - 60;		// temporary fix for player colliding with enemy false positive
 	playerPositionRect.h = PLAYER1_HEIGHT;
 
 	if (enemy.checkCollisionWith(playerPositionRect))
 	{
-		player1.takeDamage(5);
+		player1.takeDamage(10);
 	}
 }

@@ -10,7 +10,7 @@ static constexpr int LEVEL_WIDTH = 3840;
 static constexpr int LEVEL_HEIGHT = 2160;
 
 // dimensions of the player1 sprite
-static constexpr int PLAYER1_WIDTH = 127;
+static constexpr int PLAYER1_WIDTH = 128;
 static constexpr int PLAYER1_HEIGHT = 70;
 
 static constexpr int PLAYER1RUN_HEIGHT = 90;
@@ -40,8 +40,8 @@ static constexpr int BULLET_SPEED = 10;
 
 // hp bar
 static constexpr int PLAYER_HP_BAR_WIDTH = 300;
-static constexpr int PLAYER_HP_BAR_HEIGHT = 25;
-static constexpr int PLAYER_HP_BAR_X = 10;
-static constexpr int PLAYER_HP_BAR_Y = 10;
+static constexpr int PLAYER_HP_BAR_HEIGHT = 5;
+static constexpr int PLAYER_HP_BAR_X = 0;
+static constexpr int PLAYER_HP_BAR_Y = 0;
 
 #endif

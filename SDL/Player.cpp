@@ -12,7 +12,7 @@ Player::Player(SDL_Renderer* renderer, TextureManager* playerTexture)
 	this->playerTexture = playerTexture;
 	flipType = SDL_FLIP_NONE;
 	alive = false;
-	hpMax = 100;
+	hpMax = 1000;
 	hp = hpMax;
 	p.x = static_cast<int>(position.x);
 	p.y = static_cast<int>(position.y);

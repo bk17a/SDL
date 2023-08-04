@@ -8,7 +8,7 @@ Particles::Particles()
 	texture = nullptr;
 }
 
-bool Particles::isDead()
+bool Particles::isDead() const
 {
 	return frame > 10;
 }
