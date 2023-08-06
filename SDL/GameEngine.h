@@ -17,11 +17,15 @@
 #include "Window.h"
 #include "Enemy.h"
 #include "Bullet.h"
+#include "GameState.h"
 
 class GameEngine
 {
 public:
 	Uint32 lastShotTime = 0;
+
+	static GameEngine& getInstance();
+
 	// initialization
 	GameEngine();  // default constructor
 	~GameEngine(); // default destructor
@@ -50,13 +54,15 @@ public:
 	void renderPlayer();
 	void renderEnemies() const;
 	void renderBullets() const;
-
-	void run();												// run the program
-
-	// Helper function to convert SDL_Rect to a string
-	std::string rectToString(const SDL_Rect& rect) const;
-
+	std::string rectToString(const SDL_Rect& rect) const;		// Helper function to convert SDL_Rect to a string
 	void checkPlayerEnemyCollision(const Enemy& enemy);
+
+	void run();													// run the program
+
+	// state managers
+	void setNextState(GameState* state);
+	void changeState();
+
 private:
 	int countedFrames = 0;
 	int idleAnimationFrame = 0;
@@ -103,6 +109,10 @@ private:
 	// PlayerGUI
 	SDL_Rect playerHpBar;
 	SDL_Rect playerHpBarBack;
+
+	// Game state objects
+	GameState* currentState = nullptr;
+	GameState* nextState = nullptr;
 };
 
 #endif

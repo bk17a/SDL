@@ -1,6 +1,13 @@
 #include "GameEngine.h"
+#include "ExitState.h"
 
 using namespace std;
+
+GameEngine& GameEngine::getInstance()
+{
+	static GameEngine instance; // singleton instance
+	return instance;
+}
 
 GameEngine::GameEngine() : running(true), font(nullptr), window(nullptr), renderer(nullptr),
 player1Rect({ {{0, 0, 0, 0}} }), player1RunRect({ {{0, 0, 0, 0}} }),
@@ -236,7 +243,7 @@ void GameEngine::update()
 	checkCollision();
 	updateGUI();
 	updateCamera();
-	//updateEnemies();
+	updateEnemies();
 	updateBullets();
 	updateEnemiesKilled();
 }
@@ -554,6 +561,29 @@ void GameEngine::renderBullets() const
 	}
 }
 
+std::string GameEngine::rectToString(const SDL_Rect& rect) const
+{
+	return "SDL_Rect { x: " + std::to_string(rect.x) +
+		", y: " + std::to_string(rect.y) +
+		", w: " + std::to_string(rect.w) +
+		", h: " + std::to_string(rect.h) +
+		" }";
+}
+
+void GameEngine::checkPlayerEnemyCollision(const Enemy& enemy)   // NOLINT(clang-diagnostic-shadow)
+{
+	SDL_Rect playerPositionRect;
+	playerPositionRect.x = static_cast<int>(player1.getXPos());
+	playerPositionRect.y = static_cast<int>(player1.getYPos());
+	playerPositionRect.w = PLAYER1_WIDTH - 60;		// temporary fix for player colliding with enemy false positive
+	playerPositionRect.h = PLAYER1_HEIGHT;
+
+	if (enemy.checkCollisionWith(playerPositionRect))
+	{
+		player1.takeDamage(10);
+	}
+}
+
 void GameEngine::run()
 {
 	if (!init())
@@ -633,25 +663,22 @@ void GameEngine::run()
 	}
 }
 
-std::string GameEngine::rectToString(const SDL_Rect& rect) const
+void GameEngine::setNextState(GameState* state)
 {
-	return "SDL_Rect { x: " + std::to_string(rect.x) +
-		", y: " + std::to_string(rect.y) +
-		", w: " + std::to_string(rect.w) +
-		", h: " + std::to_string(rect.h) +
-		" }";
+	if (nextState != ExitState::get())	// if user doesn't want to exit
+	{
+		nextState = state; // set next stage
+	}
 }
 
-void GameEngine::checkPlayerEnemyCollision(const Enemy& enemy)   // NOLINT(clang-diagnostic-shadow)
+void GameEngine::changeState()
 {
-	SDL_Rect playerPositionRect;
-	playerPositionRect.x = static_cast<int>(player1.getXPos());
-	playerPositionRect.y = static_cast<int>(player1.getYPos());
-	playerPositionRect.w = PLAYER1_WIDTH - 60;		// temporary fix for player colliding with enemy false positive
-	playerPositionRect.h = PLAYER1_HEIGHT;
-
-	if (enemy.checkCollisionWith(playerPositionRect))
+	if (nextState != nullptr)		// check if states need to be changed
 	{
-		player1.takeDamage(10);
+		currentState->exit();
+		nextState->enter();
+
+		currentState = nextState;
+		nextState = nullptr;
 	}
 }

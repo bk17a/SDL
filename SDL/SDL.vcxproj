@@ -133,23 +133,32 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Enemy.cpp" />
+    <ClCompile Include="ExitState.cpp" />
     <ClCompile Include="GameEngine.cpp" />
+    <ClCompile Include="IntroState.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="OverWorldState.cpp" />
     <ClCompile Include="Particles.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="TextureManager.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Bullet.cpp" />
+    <ClCompile Include="TitleState.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Constants.h" />
     <ClInclude Include="Enemy.h" />
+    <ClInclude Include="ExitState.h" />
     <ClInclude Include="GameEngine.h" />
+    <ClInclude Include="GameState.h" />
+    <ClInclude Include="IntroState.h" />
+    <ClInclude Include="OverWorldState.h" />
     <ClInclude Include="Particles.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="TextureManager.h" />
     <ClInclude Include="Timer.h" />
+    <ClInclude Include="TitleState.h" />
     <ClInclude Include="Vector2.h" />
     <ClInclude Include="Bullet.h" />
     <ClInclude Include="Window.h" />
