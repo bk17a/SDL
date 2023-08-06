@@ -17,7 +17,6 @@
 #include "Window.h"
 #include "Enemy.h"
 #include "Bullet.h"
-#include "GameState.h"
 
 class GameEngine
 {
@@ -58,10 +57,6 @@ public:
 	void checkPlayerEnemyCollision(const Enemy& enemy);
 
 	void run();													// run the program
-
-	// state managers
-	void setNextState(GameState* state);
-	void changeState();
 
 private:
 	int countedFrames = 0;
@@ -109,10 +104,6 @@ private:
 	// PlayerGUI
 	SDL_Rect playerHpBar;
 	SDL_Rect playerHpBarBack;
-
-	// Game state objects
-	GameState* currentState = nullptr;
-	GameState* nextState = nullptr;
 };
 
 #endif

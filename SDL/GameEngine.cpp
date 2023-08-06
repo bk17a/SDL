@@ -662,23 +662,3 @@ void GameEngine::run()
 		}
 	}
 }
-
-void GameEngine::setNextState(GameState* state)
-{
-	if (nextState != ExitState::get())	// if user doesn't want to exit
-	{
-		nextState = state; // set next stage
-	}
-}
-
-void GameEngine::changeState()
-{
-	if (nextState != nullptr)		// check if states need to be changed
-	{
-		currentState->exit();
-		nextState->enter();
-
-		currentState = nextState;
-		nextState = nullptr;
-	}
-}
