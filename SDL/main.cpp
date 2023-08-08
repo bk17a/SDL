@@ -6,7 +6,7 @@ using namespace std;
 int main(int argc, char* args[])
 {
 	// Create game engine
-	GameEngine& game = GameEngine::getInstance();
+	GameEngine game;
 
 	// Run game
 	game.run();

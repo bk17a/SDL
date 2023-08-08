@@ -1,5 +1,5 @@
+// ReSharper disable CppClangTidyClangDiagnosticShadow
 #include "GameEngine.h"
-#include "ExitState.h"
 
 using namespace std;
 
@@ -12,7 +12,8 @@ GameEngine& GameEngine::getInstance()
 GameEngine::GameEngine() : running(true), font(nullptr), window(nullptr), renderer(nullptr),
 player1Rect({ {{0, 0, 0, 0}} }), player1RunRect({ {{0, 0, 0, 0}} }),
 playerHpBar({ PLAYER_HP_BAR_X, PLAYER_HP_BAR_Y, PLAYER_HP_BAR_WIDTH, PLAYER_HP_BAR_HEIGHT }),
-playerHpBarBack({ PLAYER_HP_BAR_X, PLAYER_HP_BAR_Y, PLAYER_HP_BAR_WIDTH, PLAYER_HP_BAR_HEIGHT }) {}
+playerHpBarBack({ PLAYER_HP_BAR_X, PLAYER_HP_BAR_Y, PLAYER_HP_BAR_WIDTH, PLAYER_HP_BAR_HEIGHT }),
+enemy1Rect({ {{0, 0, 0, 0}} }) {}
 
 GameEngine::~GameEngine()
 {
@@ -161,11 +162,6 @@ bool GameEngine::loadMedia()
 		player1RunRect[3].y = 0;
 		player1RunRect[3].w = PLAYER1_WIDTH;
 		player1RunRect[3].h = PLAYER1RUN_HEIGHT;
-
-		player1RunRect[4].x = PLAYER1_WIDTH * 3;
-		player1RunRect[4].y = 0;
-		player1RunRect[4].w = PLAYER1_WIDTH;
-		player1RunRect[4].h = PLAYER1RUN_HEIGHT;
 	}
 
 	if (!enemyTex.loadFromFile("gfx/testEnemy.png", renderer))
@@ -202,6 +198,52 @@ bool GameEngine::loadMedia()
 		bullet = Bullet(player1.getPlayerPos(), bulletSpeed, bulletSize, renderer, &bulletTex);
 	}
 
+	if (!enemy1Tex.loadFromFile("gfx/enemy1Idle.png", renderer))
+	{
+		cout << "Unable to load enemy1 texture!\n";
+		success = false;
+	}
+	else
+	{
+		// enemy1 = Enemy(renderer, &enemy1Tex);
+		// enemy1.spawn();
+		//
+		// enemy1Rect[0].x = 0;
+		// enemy1Rect[0].y = 0;
+		// enemy1Rect[0].w = ENEMY1_WIDTH;
+		// enemy1Rect[0].h = ENEMY1_HEIGHT;
+		//
+		// enemy1Rect[1].x = ENEMY1_WIDTH;
+		// enemy1Rect[1].y = 0;
+		// enemy1Rect[1].w = ENEMY1_WIDTH;
+		// enemy1Rect[1].h = ENEMY1_HEIGHT;
+		//
+		// enemy1Rect[2].x = ENEMY1_WIDTH * 2;
+		// enemy1Rect[2].y = 0;
+		// enemy1Rect[2].w = ENEMY1_WIDTH;
+		// enemy1Rect[2].h = ENEMY1_HEIGHT;
+		//
+		// enemy1Rect[3].x = ENEMY1_WIDTH * 3;
+		// enemy1Rect[3].y = 0;
+		// enemy1Rect[3].w = ENEMY1_WIDTH;
+		// enemy1Rect[3].h = ENEMY1_HEIGHT;
+		for (int i = 0; i < ENEMY_NUM; ++i)
+		{
+			enemy1 = Enemy(renderer, &enemy1Tex);
+			enemy1.spawn();
+			enemy1Vec.emplace_back(enemy1);
+		}
+
+		// Initialize enemy1Rect
+		for (int i = 0; i < 4; ++i)
+		{
+			enemy1Rect[i].x = i * ENEMY1_WIDTH;
+			enemy1Rect[i].y = 0;
+			enemy1Rect[i].w = ENEMY1_WIDTH;
+			enemy1Rect[i].h = ENEMY1_HEIGHT;
+		}
+	}
+
 	return success;
 }
 
@@ -235,12 +277,9 @@ void GameEngine::update()
 	player1.move();
 	player1Run.move();
 
-	for (auto& e : enemies)
-	{
-		checkPlayerEnemyCollision(e);
-	}
+	checkPlayerEnemyCollision();
 
-	checkCollision();
+	updateCollision();
 	updateGUI();
 	updateCamera();
 	updateEnemies();
@@ -333,7 +372,7 @@ void GameEngine::close()
 	SDL_Quit();
 }
 
-void GameEngine::checkCollision()
+void GameEngine::updateCollision()
 {
 	// Check collision between enemies
 	for (size_t i = 0; i < enemies.size(); ++i)
@@ -342,25 +381,31 @@ void GameEngine::checkCollision()
 		{
 			if (enemies[i].checkCollisionWith(enemies[j].p))
 			{
-				// Calculate the direction of the collision between enemies
-				float directionX = enemies[i].getPosX() - enemies[j].getPosX();
-				float directionY = enemies[i].getPosY() - enemies[j].getPosY();
+				handleCollision(enemies[i], enemies[j]);
+			}
+		}
+	}
 
-				// Normalize the direction vector
-				const float length = sqrt(directionX * directionX + directionY * directionY);
-				directionX /= length;
-				directionY /= length;
+	// Check collision between enemies vec elements and enemy1Vec
+	for (auto& enemy : enemies)
+	{
+		for (auto& enemy1 : enemy1Vec)
+		{
+			if (enemy.checkCollisionWith(enemy1.p))
+			{
+				handleCollision(enemy, enemy1);
+			}
+		}
+	}
 
-				// Calculate the maximum distance the enemies can move back
-				constexpr float maxDistance = 2; // Change this value to adjust the maximum distance
-
-				// Move the colliding enemies one step back in the opposite direction, but limit the distance
-				const float distanceX = directionX * maxDistance;
-				const float distanceY = directionY * maxDistance;
-				enemies[i].setPosX(enemies[i].getPosX() + distanceX);
-				enemies[i].setPosY(enemies[i].getPosY() + distanceY);
-				enemies[j].setPosX(enemies[j].getPosX() - distanceX);
-				enemies[j].setPosY(enemies[j].getPosY() - distanceY);
+	// Check collision between enemy1Vec elements
+	for (size_t i = 0; i < enemy1Vec.size(); ++i)
+	{
+		for (size_t j = i + 1; j < enemy1Vec.size(); ++j)
+		{
+			if (enemy1Vec[i].checkCollisionWith(enemy1Vec[j].p))
+			{
+				handleCollision(enemy1Vec[i], enemy1Vec[j]);
 			}
 		}
 	}
@@ -420,6 +465,16 @@ void GameEngine::updateEnemies()
 		if (e.getPosY() < player1.getYPos()) e.setPosY(e.getPosY() + ENEMY_VEL);
 		if (e.getPosY() > player1.getYPos()) e.setPosY(e.getPosY() - ENEMY_VEL);
 	}
+
+	// move enemy1
+	for (auto& enemy : enemy1Vec)
+	{
+		// Update enemy movement toward player
+		if (enemy.getPosX() < player1.getXPos()) enemy.setPosX(enemy.getPosX() + ENEMY_VEL);
+		if (enemy.getPosX() > player1.getXPos()) enemy.setPosX(enemy.getPosX() - ENEMY_VEL);
+		if (enemy.getPosY() < player1.getYPos()) enemy.setPosY(enemy.getPosY() + ENEMY_VEL);
+		if (enemy.getPosY() > player1.getYPos()) enemy.setPosY(enemy.getPosY() - ENEMY_VEL);
+	}
 }
 
 void GameEngine::updateBullets()
@@ -462,7 +517,7 @@ void GameEngine::updateEnemiesKilled()
 	{
 		if (bullet.isActive() && enemies[i].checkCollisionWith(bullet.p))
 		{
-			enemies[i].takeDamage(25);
+			enemies[i].takeDamage(50);
 			bullet.reload();
 
 			// if enemy is dead, add it to enemiesKilled vector to remove it
@@ -492,28 +547,28 @@ void GameEngine::renderPlayer()
 		// Render player
 		if (isMoving)
 		{
-			const SDL_Rect* currentRunClip = &player1RunRect[runAnimationFrame / RUNNING_ANIMATION_FRAMES];
+			const SDL_Rect* currentRunClip = &player1RunRect[runAnimationFrame / PLAYER_RUNNING_ANIMATION_FRAMES];
 			player1Run.renderAnimated(renderer, currentRunClip, static_cast<float>(camera.x), static_cast<float>(camera.y), NULL, nullptr, player1.getFlipType());
 
 			// Increment the animation frame for the running animation
 			++runAnimationFrame;
 
 			// Cycle animation
-			if (runAnimationFrame / 5 >= RUNNING_ANIMATION_FRAMES)
+			if (runAnimationFrame / 4 >= PLAYER_RUNNING_ANIMATION_FRAMES)
 			{
 				runAnimationFrame = 0;
 			}
 		}
 		else
 		{
-			const SDL_Rect* currentIdleClip = &player1Rect[idleAnimationFrame / IDLE_ANIMATION_FRAMES];
+			const SDL_Rect* currentIdleClip = &player1Rect[idleAnimationFrame / PLAYER_IDLE_ANIMATION_FRAMES];
 			player1.renderAnimated(renderer, currentIdleClip, static_cast<float>(camera.x), static_cast<float>(camera.y), NULL, nullptr, player1.getFlipType());
 
 			// Increment the animation frame for the idle animation
 			++idleAnimationFrame;
 
 			// Cycle animation
-			if (idleAnimationFrame / 5 >= IDLE_ANIMATION_FRAMES)
+			if (idleAnimationFrame / 5 >= PLAYER_IDLE_ANIMATION_FRAMES)
 			{
 				idleAnimationFrame = 0;
 			}
@@ -541,7 +596,7 @@ void GameEngine::renderPlayer()
 					PLAYER_HP_BAR_HEIGHT };
 }
 
-void GameEngine::renderEnemies() const
+void GameEngine::renderEnemies()
 {
 	// Render test enemy
 	for (auto& e : enemies)
@@ -550,6 +605,23 @@ void GameEngine::renderEnemies() const
 		{
 			e.render(renderer, static_cast<float>(camera.x), static_cast<float>(camera.y));
 		}
+	}
+
+	// render enemy1
+	for (const auto& enemy : enemy1Vec)
+	{
+		if (enemy.isAlive())
+		{
+			const SDL_Rect* currentIdleClip = &enemy1Rect[enemyIdleAnimationFrame / ENEMY_IDLE_ANIMATION_FRAMES];
+			enemy.renderAnimated(renderer, currentIdleClip, static_cast<float>(camera.x), static_cast<float>(camera.y), NULL, nullptr, SDL_FLIP_NONE);
+		}
+	}
+
+	// Increment animation frame for the idle animation
+	++enemyIdleAnimationFrame;
+	if (enemyIdleAnimationFrame / 4 >= ENEMY_IDLE_ANIMATION_FRAMES)
+	{
+		enemyIdleAnimationFrame = 0;
 	}
 }
 
@@ -570,7 +642,7 @@ std::string GameEngine::rectToString(const SDL_Rect& rect) const
 		" }";
 }
 
-void GameEngine::checkPlayerEnemyCollision(const Enemy& enemy)   // NOLINT(clang-diagnostic-shadow)
+void GameEngine::checkPlayerEnemyCollision()
 {
 	SDL_Rect playerPositionRect;
 	playerPositionRect.x = static_cast<int>(player1.getXPos());
@@ -578,10 +650,59 @@ void GameEngine::checkPlayerEnemyCollision(const Enemy& enemy)   // NOLINT(clang
 	playerPositionRect.w = PLAYER1_WIDTH - 60;		// temporary fix for player colliding with enemy false positive
 	playerPositionRect.h = PLAYER1_HEIGHT;
 
-	if (enemy.checkCollisionWith(playerPositionRect))
+	SDL_Rect enemyPositionRect;
+	enemyPositionRect.x = static_cast<int>(enemy1.getPosX());
+	enemyPositionRect.y = static_cast<int>(enemy1.getPosY());
+	enemyPositionRect.w = ENEMY1_WIDTH;
+	enemyPositionRect.h = ENEMY1_HEIGHT;
+
+	for (auto& e : enemies)
+	{
+		if (e.checkCollisionWith(playerPositionRect))
+		{
+			player1.takeDamage(10);
+		}
+	}
+
+	if (checkCollision(playerPositionRect, enemyPositionRect))
 	{
 		player1.takeDamage(10);
 	}
+}
+
+bool GameEngine::checkCollision(const SDL_Rect& rectA, const SDL_Rect& rectB)
+{
+	// Check for horizontal collision
+	const bool xCollision = (rectA.x + rectA.w) >= rectB.x && (rectB.x + rectB.w) >= rectA.x;
+
+	// Check for vertical collision
+	const bool yCollision = (rectA.y + rectA.h) >= rectB.y && (rectB.y + rectB.h) >= rectA.y;
+
+	// If there is both horizontal and vertical collision, the rectangles overlap
+	return xCollision && yCollision;
+}
+
+void GameEngine::handleCollision(Enemy& object1, Enemy& object2) const
+{
+	// Calculate the direction of the collision between objects
+	float directionX = object1.getPosX() - object2.getPosX();
+	float directionY = object1.getPosY() - object2.getPosY();
+
+	// Normalize the direction vector
+	const float length = sqrt(directionX * directionX + directionY * directionY);
+	directionX /= length;
+	directionY /= length;
+
+	// Calculate the maximum distance the objects can move back
+	constexpr float maxDistance = 2; // Change this value to adjust the maximum distance
+
+	// Move the colliding objects one step back in the opposite direction, but limit the distance
+	const float distanceX = directionX * maxDistance;
+	const float distanceY = directionY * maxDistance;
+	object1.setPosX(object1.getPosX() + distanceX);
+	object1.setPosY(object1.getPosY() + distanceY);
+	object2.setPosX(object2.getPosX() - distanceX);
+	object2.setPosY(object2.getPosY() - distanceY);
 }
 
 void GameEngine::run()

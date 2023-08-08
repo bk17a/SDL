@@ -23,6 +23,7 @@ public:
 	Enemy(SDL_Renderer* renderer, TextureManager* enemyTex);
 
 	void render(SDL_Renderer* renderer, const float camX, const float camY) const;
+	void renderAnimated(SDL_Renderer* renderer, const SDL_Rect* clip, const float camX, const float camY, const double angle, const SDL_Point* center, const SDL_RendererFlip flipType) const;
 	void spawn();
 	bool isAlive() const;
 	void takeDamage(int damage);
@@ -39,6 +40,7 @@ public:
 	void setVelocityY(float yVel);
 
 	bool checkCollisionWith(const SDL_Rect& rect) const;
+	void setRect(SDL_Rect rect);
 
 private:
 	SDL_Renderer* renderer;
@@ -53,6 +55,10 @@ private:
 	std::vector<Enemy> enemies;
 
 	Bullet bullet;
+
+	bool moving;
+
+	SDL_Rect rect{};
 };
 
 #endif

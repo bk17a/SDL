@@ -44,17 +44,19 @@ public:
 	void quit();											// quit out
 	void close();											// free and destroy after using
 
-	void checkCollision();
+	void updateCollision();
 	void updateGUI();
 	void updateCamera();
 	void updateEnemies();
 	void updateBullets();
 	void updateEnemiesKilled();
 	void renderPlayer();
-	void renderEnemies() const;
+	void renderEnemies();
 	void renderBullets() const;
 	std::string rectToString(const SDL_Rect& rect) const;		// Helper function to convert SDL_Rect to a string
-	void checkPlayerEnemyCollision(const Enemy& enemy);
+	void checkPlayerEnemyCollision();
+	static bool checkCollision(const SDL_Rect& rectA, const SDL_Rect& rectB);
+	void handleCollision(Enemy& object1, Enemy& object2) const;
 
 	void run();													// run the program
 
@@ -62,6 +64,7 @@ private:
 	int countedFrames = 0;
 	int idleAnimationFrame = 0;
 	int runAnimationFrame = 0;
+	int enemyIdleAnimationFrame = 0;
 	bool running;
 
 	// grass texture
@@ -83,12 +86,12 @@ private:
 	SDL_Rect camera = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
 
 	// player idle animation
-	std::array<SDL_Rect, IDLE_ANIMATION_FRAMES> player1Rect;
+	std::array<SDL_Rect, PLAYER_IDLE_ANIMATION_FRAMES> player1Rect;
 	TextureManager player1Tex;
 	Player player1;
 
 	// player run animation
-	std::array<SDL_Rect, RUNNING_ANIMATION_FRAMES> player1RunRect;
+	std::array<SDL_Rect, PLAYER_RUNNING_ANIMATION_FRAMES> player1RunRect;
 	TextureManager player1RunTex;
 	Player player1Run;
 
@@ -104,6 +107,12 @@ private:
 	// PlayerGUI
 	SDL_Rect playerHpBar;
 	SDL_Rect playerHpBarBack;
+
+	// enemy1 members
+	std::array<SDL_Rect, ENEMY_IDLE_ANIMATION_FRAMES> enemy1Rect;
+	Enemy enemy1;
+	TextureManager enemy1Tex;
+	std::vector<Enemy> enemy1Vec;
 };
 
 #endif

@@ -18,6 +18,8 @@ Enemy::Enemy(SDL_Renderer* renderer, TextureManager* enemyTex)
 	p.y = static_cast<int>(position.y);
 	p.w = static_cast<int>(size.x);
 	p.h = static_cast<int>(size.y);
+
+	moving = false;
 }
 
 void Enemy::render(SDL_Renderer* renderer, const float camX, const float camY) const  // NOLINT(clang-diagnostic-shadow)
@@ -25,6 +27,17 @@ void Enemy::render(SDL_Renderer* renderer, const float camX, const float camY) c
 	const int renderX = static_cast<int>(position.x - camX);
 	const int renderY = static_cast<int>(position.y - camY);
 	enemyTex->render2(renderer, renderX, renderY, ENEMY_WIDTH, ENEMY_HEIGHT);
+}
+
+void Enemy::renderAnimated(SDL_Renderer* renderer, const SDL_Rect* clip, const float camX, const float camY, const double angle, const SDL_Point* center, const SDL_RendererFlip flipType) const  // NOLINT(clang-diagnostic-shadow)
+{
+	int renderX = static_cast<int>(position.x - camX);
+	const int renderY = static_cast<int>(position.y - camY);
+	if (flipType == SDL_FLIP_HORIZONTAL)
+	{
+		renderX += ENEMY1_WIDTH;	// flip in place
+	}
+	enemyTex->render(renderX, renderY, renderer, clip, angle, center, flipType);
 }
 
 void Enemy::spawn()
@@ -122,4 +135,9 @@ bool Enemy::checkCollisionWith(const SDL_Rect& rect) const
 
 	// If both axes are overlapping, the two objects are colliding
 	return xOverlap && yOverlap;
+}
+
+void Enemy::setRect(const SDL_Rect rect)  // NOLINT(clang-diagnostic-shadow)
+{
+	this->rect = rect;
 }
