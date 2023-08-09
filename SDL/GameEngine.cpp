@@ -311,7 +311,7 @@ bool GameEngine::handleEvents()
 		windowObj.handleEvent(e, renderer);
 
 		// bullet events
-		if (!enemies.empty())	// disable bullet shoot if all enemies are dead
+		if (!enemies.empty() || !enemy1Vec.empty())	// disable bullet shoot if all enemies are dead
 		{
 			bullet.handleEvent(e, player1.getPlayerPos());
 		}
@@ -501,6 +501,21 @@ void GameEngine::updateBullets()
 		}
 	}
 
+	for (const auto& e : enemy1Vec)
+	{
+		if (e.isAlive())
+		{
+			Vector2 enemyPosition(e.getPosX(), e.getPosY());
+			const float distance = (enemyPosition - playerPosition).calcVecLength();
+
+			if (distance < nearestDistance)
+			{
+				nearestDistance = distance;
+				nearestEnemyPosition = enemyPosition;
+			}
+		}
+	}
+
 	// Update active bullets with the nearest enemy's position as the target
 	if (bullet.isActive())
 	{
@@ -512,6 +527,7 @@ void GameEngine::updateBullets()
 void GameEngine::updateEnemiesKilled()
 {
 	std::vector<size_t> enemiesKilled;
+	std::vector<size_t> enemy1Killed;
 
 	for (size_t i = 0; i < enemies.size(); ++i)
 	{
@@ -520,10 +536,23 @@ void GameEngine::updateEnemiesKilled()
 			enemies[i].takeDamage(50);
 			bullet.reload();
 
-			// if enemy is dead, add it to enemiesKilled vector to remove it
 			if (!enemies[i].isAlive())
 			{
 				enemiesKilled.emplace_back(i);
+			}
+		}
+	}
+
+	for (size_t i = 0; i < enemy1Vec.size(); ++i)
+	{
+		if (bullet.isActive() && enemy1Vec[i].checkCollisionWith(bullet.p))
+		{
+			enemy1Vec[i].takeDamage(50);
+			bullet.reload();
+
+			if (!enemy1Vec[i].isAlive())
+			{
+				enemy1Killed.emplace_back(i);
 			}
 		}
 	}
@@ -534,8 +563,14 @@ void GameEngine::updateEnemiesKilled()
 		enemies.erase(enemies.begin() + *it);
 	}
 
-	// clear the vector
+	for (auto it = enemy1Killed.rbegin(); it != enemy1Killed.rend(); ++it)
+	{
+		enemy1Vec.erase(enemy1Vec.begin() + *it);
+	}
+
+	// clear the vectors
 	enemiesKilled.clear();
+	enemy1Killed.clear();
 }
 
 void GameEngine::renderPlayer()
@@ -664,9 +699,13 @@ void GameEngine::checkPlayerEnemyCollision()
 		}
 	}
 
-	if (checkCollision(playerPositionRect, enemyPositionRect))
+	for (auto& e : enemy1Vec)
 	{
-		player1.takeDamage(10);
+		e.setRect(enemyPositionRect);
+		if (e.checkCollisionWith(playerPositionRect))
+		{
+			player1.takeDamage(10);
+		}
 	}
 }
 
