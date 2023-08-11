@@ -48,6 +48,10 @@ static constexpr int PLAYER_HP_BAR_Y = 0;
 static constexpr int ENEMY1_WIDTH = 192;
 static constexpr int ENEMY1_HEIGHT = 88;
 
-static constexpr int ENEMY_IDLE_ANIMATION_FRAMES = 4 * 5;
+static constexpr int ENEMY_IDLE_ANIMATION_FRAMES = 4 * 5; // multiply to control speed of anim
+static constexpr int ENEMY_WALK_ANIMATION_FRAMES = 6 * 8;
+
+static constexpr int ENEMY1RUN_WIDTH = 190;
+static constexpr int ENEMY1RUN_HEIGHT = 92;
 
 #endif

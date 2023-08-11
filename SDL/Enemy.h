@@ -38,9 +38,16 @@ public:
 	void setPosY(float yPos);
 	void setVelocityX(float xVel);
 	void setVelocityY(float yVel);
+	void setVelocity(Vector2 vec);
 
 	bool checkCollisionWith(const SDL_Rect& rect) const;
 	void setRect(SDL_Rect rect);
+
+	bool isMoving() const;
+	void setMoving(bool flag);
+	static void move(Enemy& enemy, const Player& player);
+	void setFlipType(SDL_RendererFlip flipType);
+	SDL_RendererFlip getFlipType() const;
 
 private:
 	SDL_Renderer* renderer;
@@ -59,6 +66,7 @@ private:
 	bool moving;
 
 	SDL_Rect rect{};
+	SDL_RendererFlip flipType;
 };
 
 #endif

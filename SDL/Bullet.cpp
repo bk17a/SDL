@@ -23,7 +23,6 @@ void Bullet::reload()
 void Bullet::shoot(const Vector2 playerPos)
 {
 	pos = playerPos;
-	vel = Vector2::ZERO_VEC();
 	active = true;
 }
 

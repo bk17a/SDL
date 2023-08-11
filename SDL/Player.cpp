@@ -1,3 +1,4 @@
+// ReSharper disable CppClangTidyClangDiagnosticShadow
 #include "Player.h"
 
 Player::Player() = default; // NOLINT(cppcoreguidelines-pro-type-member-init)
@@ -101,7 +102,7 @@ void Player::move()
 	}
 }
 
-void Player::render(SDL_Renderer* renderer, const float camX, const float camY) const  // NOLINT(clang-diagnostic-shadow)
+void Player::render(SDL_Renderer* renderer, const float camX, const float camY) const
 {
 	const int renderX = static_cast<int>(position.x - camX);
 	const int renderY = static_cast<int>(position.y - camY);
@@ -109,7 +110,7 @@ void Player::render(SDL_Renderer* renderer, const float camX, const float camY) 
 	playerTexture->render(renderX, renderY, renderer);
 }
 
-void Player::renderAnimated(SDL_Renderer* renderer, const SDL_Rect* clip, const float camX, const float camY, const double angle, const SDL_Point* center, const SDL_RendererFlip flipType) const  // NOLINT(clang-diagnostic-shadow)
+void Player::renderAnimated(SDL_Renderer* renderer, const SDL_Rect* clip, const float camX, const float camY, const double angle, const SDL_Point* center, const SDL_RendererFlip flipType) const
 {
 	int renderX = static_cast<int>(position.x - camX);
 	const int renderY = static_cast<int>(position.y - camY);
@@ -172,7 +173,7 @@ void Player::spawn()
 	alive = true;
 }
 
-void Player::setHp(const int hp)  // NOLINT(clang-diagnostic-shadow)
+void Player::setHp(const int hp)
 {
 	this->hp = hp;
 	if (hp <= 0)
@@ -204,7 +205,7 @@ bool Player::isAlive() const
 	return alive;
 }
 
-void Player::setAlive(const bool alive)  // NOLINT(clang-diagnostic-shadow)
+void Player::setAlive(const bool alive)
 {
 	this->alive = alive;
 }

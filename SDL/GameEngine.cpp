@@ -13,7 +13,7 @@ GameEngine::GameEngine() : running(true), font(nullptr), window(nullptr), render
 player1Rect({ {{0, 0, 0, 0}} }), player1RunRect({ {{0, 0, 0, 0}} }),
 playerHpBar({ PLAYER_HP_BAR_X, PLAYER_HP_BAR_Y, PLAYER_HP_BAR_WIDTH, PLAYER_HP_BAR_HEIGHT }),
 playerHpBarBack({ PLAYER_HP_BAR_X, PLAYER_HP_BAR_Y, PLAYER_HP_BAR_WIDTH, PLAYER_HP_BAR_HEIGHT }),
-enemy1Rect({ {{0, 0, 0, 0}} }) {}
+enemy1WalkRect({ {{0, 0, 0, 0}} }) {}
 
 GameEngine::~GameEngine()
 {
@@ -198,49 +198,27 @@ bool GameEngine::loadMedia()
 		bullet = Bullet(player1.getPlayerPos(), bulletSpeed, bulletSize, renderer, &bulletTex);
 	}
 
-	if (!enemy1Tex.loadFromFile("gfx/enemy1Idle.png", renderer))
+	if (!enemy1WalkTex.loadFromFile("gfx/enemy1Walk.png", renderer))
 	{
-		cout << "Unable to load enemy1 texture!\n";
+		cout << "Unable to load enemy1 walk texture!\n";
 		success = false;
 	}
 	else
 	{
-		// enemy1 = Enemy(renderer, &enemy1Tex);
-		// enemy1.spawn();
-		//
-		// enemy1Rect[0].x = 0;
-		// enemy1Rect[0].y = 0;
-		// enemy1Rect[0].w = ENEMY1_WIDTH;
-		// enemy1Rect[0].h = ENEMY1_HEIGHT;
-		//
-		// enemy1Rect[1].x = ENEMY1_WIDTH;
-		// enemy1Rect[1].y = 0;
-		// enemy1Rect[1].w = ENEMY1_WIDTH;
-		// enemy1Rect[1].h = ENEMY1_HEIGHT;
-		//
-		// enemy1Rect[2].x = ENEMY1_WIDTH * 2;
-		// enemy1Rect[2].y = 0;
-		// enemy1Rect[2].w = ENEMY1_WIDTH;
-		// enemy1Rect[2].h = ENEMY1_HEIGHT;
-		//
-		// enemy1Rect[3].x = ENEMY1_WIDTH * 3;
-		// enemy1Rect[3].y = 0;
-		// enemy1Rect[3].w = ENEMY1_WIDTH;
-		// enemy1Rect[3].h = ENEMY1_HEIGHT;
 		for (int i = 0; i < ENEMY_NUM; ++i)
 		{
-			enemy1 = Enemy(renderer, &enemy1Tex);
-			enemy1.spawn();
-			enemy1Vec.emplace_back(enemy1);
+			enemy1Walk = Enemy(renderer, &enemy1WalkTex);
+			enemy1Walk.spawn();
+			enemy1WalkVec.emplace_back(enemy1Walk);
 		}
 
-		// Initialize enemy1Rect
-		for (int i = 0; i < 4; ++i)
+		constexpr int walkingFrames = 6;
+		for (int i = 0; i < walkingFrames; ++i)
 		{
-			enemy1Rect[i].x = i * ENEMY1_WIDTH;
-			enemy1Rect[i].y = 0;
-			enemy1Rect[i].w = ENEMY1_WIDTH;
-			enemy1Rect[i].h = ENEMY1_HEIGHT;
+			enemy1WalkRect[i].x = i * ENEMY1RUN_WIDTH;
+			enemy1WalkRect[i].y = 0;
+			enemy1WalkRect[i].w = ENEMY1RUN_WIDTH;
+			enemy1WalkRect[i].h = ENEMY1RUN_HEIGHT;
 		}
 	}
 
@@ -311,7 +289,7 @@ bool GameEngine::handleEvents()
 		windowObj.handleEvent(e, renderer);
 
 		// bullet events
-		if (!enemies.empty() || !enemy1Vec.empty())	// disable bullet shoot if all enemies are dead
+		if (!enemies.empty() || !enemy1WalkVec.empty())	// disable bullet shoot if all enemies are dead
 		{
 			bullet.handleEvent(e, player1.getPlayerPos());
 		}
@@ -353,9 +331,11 @@ void GameEngine::close()
 	player1Tex.free();
 	player1RunTex.free();
 	bulletTex.free();
+	enemy1WalkTex.free();
 
 	// clear enemy vector
 	enemies.clear();
+	enemy1WalkVec.clear();
 
 	// Close font
 	TTF_CloseFont(font);
@@ -386,26 +366,26 @@ void GameEngine::updateCollision()
 		}
 	}
 
-	// Check collision between enemies vec elements and enemy1Vec
+	// Check collision between enemy1WalkVec elements and enemies
 	for (auto& enemy : enemies)
 	{
-		for (auto& enemy1 : enemy1Vec)
+		for (auto& enemy1Walk : enemy1WalkVec)
 		{
-			if (enemy.checkCollisionWith(enemy1.p))
+			if (enemy.checkCollisionWith(enemy1Walk.p))
 			{
-				handleCollision(enemy, enemy1);
+				handleCollision(enemy, enemy1Walk);
 			}
 		}
 	}
 
-	// Check collision between enemy1Vec elements
-	for (size_t i = 0; i < enemy1Vec.size(); ++i)
+	// Check collision between enemy1WalkVec elements
+	for (size_t i = 0; i < enemy1WalkVec.size(); ++i)
 	{
-		for (size_t j = i + 1; j < enemy1Vec.size(); ++j)
+		for (size_t j = i + 1; j < enemy1WalkVec.size(); ++j)
 		{
-			if (enemy1Vec[i].checkCollisionWith(enemy1Vec[j].p))
+			if (enemy1WalkVec[i].checkCollisionWith(enemy1WalkVec[j].p))
 			{
-				handleCollision(enemy1Vec[i], enemy1Vec[j]);
+				handleCollision(enemy1WalkVec[i], enemy1WalkVec[j]);
 			}
 		}
 	}
@@ -459,21 +439,13 @@ void GameEngine::updateEnemies()
 	// looping through all the enemies in the vector
 	for (auto& e : enemies)
 	{
-		// enemy movement toward player
-		if (e.getPosX() < player1.getXPos()) e.setPosX(e.getPosX() + ENEMY_VEL);
-		if (e.getPosX() > player1.getXPos()) e.setPosX(e.getPosX() - ENEMY_VEL);
-		if (e.getPosY() < player1.getYPos()) e.setPosY(e.getPosY() + ENEMY_VEL);
-		if (e.getPosY() > player1.getYPos()) e.setPosY(e.getPosY() - ENEMY_VEL);
+		Enemy::move(e, player1);
 	}
 
-	// move enemy1
-	for (auto& enemy : enemy1Vec)
+	for (auto& enemy : enemy1WalkVec)
 	{
 		// Update enemy movement toward player
-		if (enemy.getPosX() < player1.getXPos()) enemy.setPosX(enemy.getPosX() + ENEMY_VEL);
-		if (enemy.getPosX() > player1.getXPos()) enemy.setPosX(enemy.getPosX() - ENEMY_VEL);
-		if (enemy.getPosY() < player1.getYPos()) enemy.setPosY(enemy.getPosY() + ENEMY_VEL);
-		if (enemy.getPosY() > player1.getYPos()) enemy.setPosY(enemy.getPosY() - ENEMY_VEL);
+		Enemy::move(enemy, player1);
 	}
 }
 
@@ -501,7 +473,7 @@ void GameEngine::updateBullets()
 		}
 	}
 
-	for (const auto& e : enemy1Vec)
+	for (const auto& e : enemy1WalkVec)
 	{
 		if (e.isAlive())
 		{
@@ -528,6 +500,7 @@ void GameEngine::updateEnemiesKilled()
 {
 	std::vector<size_t> enemiesKilled;
 	std::vector<size_t> enemy1Killed;
+	std::vector<size_t> enemy1WalkKilled;
 
 	for (size_t i = 0; i < enemies.size(); ++i)
 	{
@@ -543,16 +516,16 @@ void GameEngine::updateEnemiesKilled()
 		}
 	}
 
-	for (size_t i = 0; i < enemy1Vec.size(); ++i)
+	for (size_t i = 0; i < enemy1WalkVec.size(); ++i)
 	{
-		if (bullet.isActive() && enemy1Vec[i].checkCollisionWith(bullet.p))
+		if (bullet.isActive() && enemy1WalkVec[i].checkCollisionWith(bullet.p))
 		{
-			enemy1Vec[i].takeDamage(50);
+			enemy1WalkVec[i].takeDamage(50);
 			bullet.reload();
 
-			if (!enemy1Vec[i].isAlive())
+			if (!enemy1WalkVec[i].isAlive())
 			{
-				enemy1Killed.emplace_back(i);
+				enemy1WalkKilled.emplace_back(i);
 			}
 		}
 	}
@@ -563,14 +536,14 @@ void GameEngine::updateEnemiesKilled()
 		enemies.erase(enemies.begin() + *it);
 	}
 
-	for (auto it = enemy1Killed.rbegin(); it != enemy1Killed.rend(); ++it)
+	for (auto it = enemy1WalkKilled.rbegin(); it != enemy1WalkKilled.rend(); ++it)
 	{
-		enemy1Vec.erase(enemy1Vec.begin() + *it);
+		enemy1WalkVec.erase(enemy1WalkVec.begin() + *it);
 	}
 
 	// clear the vectors
 	enemiesKilled.clear();
-	enemy1Killed.clear();
+	enemy1WalkKilled.clear();
 }
 
 void GameEngine::renderPlayer()
@@ -642,21 +615,20 @@ void GameEngine::renderEnemies()
 		}
 	}
 
-	// render enemy1
-	for (const auto& enemy : enemy1Vec)
+	for (const auto& enemy : enemy1WalkVec)
 	{
 		if (enemy.isAlive())
 		{
-			const SDL_Rect* currentIdleClip = &enemy1Rect[enemyIdleAnimationFrame / ENEMY_IDLE_ANIMATION_FRAMES];
-			enemy.renderAnimated(renderer, currentIdleClip, static_cast<float>(camera.x), static_cast<float>(camera.y), NULL, nullptr, SDL_FLIP_NONE);
+			const SDL_Rect* currentWalkClip = &enemy1WalkRect[enemyWalkAnimationFrame / ENEMY_WALK_ANIMATION_FRAMES];
+			enemy.renderAnimated(renderer, currentWalkClip, static_cast<float>(camera.x), static_cast<float>(camera.y), NULL, nullptr, enemy.getFlipType());
 		}
 	}
 
 	// Increment animation frame for the idle animation
-	++enemyIdleAnimationFrame;
-	if (enemyIdleAnimationFrame / 4 >= ENEMY_IDLE_ANIMATION_FRAMES)
+	++enemyWalkAnimationFrame;
+	if (enemyWalkAnimationFrame / 6 >= ENEMY_WALK_ANIMATION_FRAMES)
 	{
-		enemyIdleAnimationFrame = 0;
+		enemyWalkAnimationFrame = 0;
 	}
 }
 
@@ -668,15 +640,6 @@ void GameEngine::renderBullets() const
 	}
 }
 
-std::string GameEngine::rectToString(const SDL_Rect& rect) const
-{
-	return "SDL_Rect { x: " + std::to_string(rect.x) +
-		", y: " + std::to_string(rect.y) +
-		", w: " + std::to_string(rect.w) +
-		", h: " + std::to_string(rect.h) +
-		" }";
-}
-
 void GameEngine::checkPlayerEnemyCollision()
 {
 	SDL_Rect playerPositionRect;
@@ -685,11 +648,11 @@ void GameEngine::checkPlayerEnemyCollision()
 	playerPositionRect.w = PLAYER1_WIDTH - 60;		// temporary fix for player colliding with enemy false positive
 	playerPositionRect.h = PLAYER1_HEIGHT;
 
-	SDL_Rect enemyPositionRect;
-	enemyPositionRect.x = static_cast<int>(enemy1.getPosX());
-	enemyPositionRect.y = static_cast<int>(enemy1.getPosY());
-	enemyPositionRect.w = ENEMY1_WIDTH;
-	enemyPositionRect.h = ENEMY1_HEIGHT;
+	SDL_Rect enemy1PositionRect;
+	enemy1PositionRect.x = static_cast<int>(enemy1Walk.getPosX());
+	enemy1PositionRect.y = static_cast<int>(enemy1Walk.getPosY());
+	enemy1PositionRect.w = ENEMY1RUN_WIDTH;
+	enemy1PositionRect.h = ENEMY1RUN_HEIGHT;
 
 	for (auto& e : enemies)
 	{
@@ -699,9 +662,9 @@ void GameEngine::checkPlayerEnemyCollision()
 		}
 	}
 
-	for (auto& e : enemy1Vec)
+	for (auto& e : enemy1WalkVec)
 	{
-		e.setRect(enemyPositionRect);
+		e.setRect(enemy1PositionRect);
 		if (e.checkCollisionWith(playerPositionRect))
 		{
 			player1.takeDamage(10);
@@ -738,8 +701,10 @@ void GameEngine::handleCollision(Enemy& object1, Enemy& object2) const
 	// Move the colliding objects one step back in the opposite direction, but limit the distance
 	const float distanceX = directionX * maxDistance;
 	const float distanceY = directionY * maxDistance;
+
 	object1.setPosX(object1.getPosX() + distanceX);
 	object1.setPosY(object1.getPosY() + distanceY);
+
 	object2.setPosX(object2.getPosX() - distanceX);
 	object2.setPosY(object2.getPosY() - distanceY);
 }

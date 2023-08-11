@@ -53,7 +53,6 @@ public:
 	void renderPlayer();
 	void renderEnemies();
 	void renderBullets() const;
-	std::string rectToString(const SDL_Rect& rect) const;		// Helper function to convert SDL_Rect to a string
 	void checkPlayerEnemyCollision();
 	static bool checkCollision(const SDL_Rect& rectA, const SDL_Rect& rectB);
 	void handleCollision(Enemy& object1, Enemy& object2) const;
@@ -64,7 +63,7 @@ private:
 	int countedFrames = 0;
 	int idleAnimationFrame = 0;
 	int runAnimationFrame = 0;
-	int enemyIdleAnimationFrame = 0;
+	int enemyWalkAnimationFrame = 0;
 	bool running;
 
 	// grass texture
@@ -109,10 +108,10 @@ private:
 	SDL_Rect playerHpBarBack;
 
 	// enemy1 members
-	std::array<SDL_Rect, ENEMY_IDLE_ANIMATION_FRAMES> enemy1Rect;
-	Enemy enemy1;
-	TextureManager enemy1Tex;
-	std::vector<Enemy> enemy1Vec;
+	std::array<SDL_Rect, ENEMY_WALK_ANIMATION_FRAMES> enemy1WalkRect;
+	std::vector<Enemy> enemy1WalkVec;
+	TextureManager enemy1WalkTex;
+	Enemy enemy1Walk;
 };
 
 #endif

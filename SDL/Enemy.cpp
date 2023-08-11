@@ -1,3 +1,4 @@
+// ReSharper disable CppClangTidyClangDiagnosticShadow
 #include "Enemy.h"
 #include "Player.h"
 
@@ -20,22 +21,23 @@ Enemy::Enemy(SDL_Renderer* renderer, TextureManager* enemyTex)
 	p.h = static_cast<int>(size.y);
 
 	moving = false;
+	flipType = SDL_FLIP_NONE;
 }
 
-void Enemy::render(SDL_Renderer* renderer, const float camX, const float camY) const  // NOLINT(clang-diagnostic-shadow)
+void Enemy::render(SDL_Renderer* renderer, const float camX, const float camY) const
 {
 	const int renderX = static_cast<int>(position.x - camX);
 	const int renderY = static_cast<int>(position.y - camY);
 	enemyTex->render2(renderer, renderX, renderY, ENEMY_WIDTH, ENEMY_HEIGHT);
 }
 
-void Enemy::renderAnimated(SDL_Renderer* renderer, const SDL_Rect* clip, const float camX, const float camY, const double angle, const SDL_Point* center, const SDL_RendererFlip flipType) const  // NOLINT(clang-diagnostic-shadow)
+void Enemy::renderAnimated(SDL_Renderer* renderer, const SDL_Rect* clip, const float camX, const float camY, const double angle, const SDL_Point* center, const SDL_RendererFlip flipType) const
 {
 	int renderX = static_cast<int>(position.x - camX);
 	const int renderY = static_cast<int>(position.y - camY);
 	if (flipType == SDL_FLIP_HORIZONTAL)
 	{
-		renderX += ENEMY1_WIDTH;	// flip in place
+		renderX += ENEMY1_WIDTH - 270;	// flip with offset
 	}
 	enemyTex->render(renderX, renderY, renderer, clip, angle, center, flipType);
 }
@@ -78,13 +80,13 @@ float Enemy::getPosY() const
 	return position.y;
 }
 
-void Enemy::setPosX(const float xPos)  // NOLINT(clang-diagnostic-shadow)
+void Enemy::setPosX(const float xPos)
 {
 	position.x = xPos;
 	p.x = static_cast<int>(xPos);			// update p.x to update new pos
 }
 
-void Enemy::setPosY(const float yPos) // NOLINT(clang-diagnostic-shadow)
+void Enemy::setPosY(const float yPos)
 {
 	position.y = yPos;
 	p.y = static_cast<int>(yPos);			// update p.y to update new pos
@@ -105,14 +107,19 @@ Vector2 Enemy::getEnemyPos() const
 	return position;
 }
 
-void Enemy::setVelocityX(const float xVel) // NOLINT(clang-diagnostic-shadow)
+void Enemy::setVelocityX(const float xVel)
 {
 	velocity.x = xVel;
 }
 
-void Enemy::setVelocityY(const float yVel)  // NOLINT(clang-diagnostic-shadow)
+void Enemy::setVelocityY(const float yVel)
 {
 	velocity.y = yVel;
+}
+
+void Enemy::setVelocity(const Vector2 vec)
+{
+	velocity = vec;
 }
 
 bool Enemy::checkCollisionWith(const SDL_Rect& rect) const
@@ -137,7 +144,61 @@ bool Enemy::checkCollisionWith(const SDL_Rect& rect) const
 	return xOverlap && yOverlap;
 }
 
-void Enemy::setRect(const SDL_Rect rect)  // NOLINT(clang-diagnostic-shadow)
+void Enemy::setRect(const SDL_Rect rect)
 {
 	this->rect = rect;
+}
+
+bool Enemy::isMoving() const
+{
+	return moving;
+}
+
+void Enemy::setMoving(const bool flag)
+{
+	moving = flag;
+}
+
+void Enemy::move(Enemy& enemy, const Player& player)
+{
+	// if (enemy.getPosX() < player.getXPos()) enemy.setPosX(enemy.getPosX() + ENEMY_VEL);
+	// if (enemy.getPosX() > player.getXPos()) enemy.setPosX(enemy.getPosX() - ENEMY_VEL);
+	// if (enemy.getPosY() < player.getYPos()) enemy.setPosY(enemy.getPosY() + ENEMY_VEL);
+	// if (enemy.getPosY() > player.getYPos()) enemy.setPosY(enemy.getPosY() - ENEMY_VEL);
+	bool moved = false; // Flag to track if any movement occurred
+
+	if (enemy.getPosX() < player.getXPos())
+	{
+		enemy.setPosX(enemy.getPosX() + ENEMY_VEL);
+		moved = true;
+		enemy.setFlipType(SDL_FLIP_NONE); // Not flipped when moving right
+	}
+	if (enemy.getPosX() > player.getXPos())
+	{
+		enemy.setPosX(enemy.getPosX() - ENEMY_VEL);
+		moved = true;
+		enemy.setFlipType(SDL_FLIP_HORIZONTAL); // Flipped when moving left
+	}
+	if (enemy.getPosY() < player.getYPos())
+	{
+		enemy.setPosY(enemy.getPosY() + ENEMY_VEL);
+		moved = true;
+	}
+	if (enemy.getPosY() > player.getYPos())
+	{
+		enemy.setPosY(enemy.getPosY() - ENEMY_VEL);
+		moved = true;
+	}
+
+	enemy.setMoving(moved); // Set moving flag based on whether any movement occurred
+}
+
+void Enemy::setFlipType(const SDL_RendererFlip flipType)
+{
+	this->flipType = flipType;
+}
+
+SDL_RendererFlip Enemy::getFlipType() const
+{
+	return flipType;
 }
