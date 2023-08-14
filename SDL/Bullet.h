@@ -23,6 +23,10 @@ public:
 	Vector2 getPos() const;
 	void setPos(Vector2 pos);
 
+	void enableAutoShooting();
+	void disableAutoShooting();
+	bool isAutoShootingEnabled() const;
+
 private:
 	Vector2 pos;
 	Vector2 vel;
@@ -34,6 +38,8 @@ private:
 
 	bool active;
 	float OFFSCREEN_BUFFER = 10;
+
+	bool autoShootEnabled;
 };
 
 #endif 

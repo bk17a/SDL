@@ -21,8 +21,6 @@
 class GameEngine
 {
 public:
-	Uint32 lastShotTime = 0;
-
 	static GameEngine& getInstance();
 
 	// initialization
@@ -56,6 +54,7 @@ public:
 	void checkPlayerEnemyCollision();
 	static bool checkCollision(const SDL_Rect& rectA, const SDL_Rect& rectB);
 	void handleCollision(Enemy& object1, Enemy& object2) const;
+	void renderFPS();
 
 	void run();													// run the program
 
@@ -65,6 +64,12 @@ private:
 	int runAnimationFrame = 0;
 	int enemyWalkAnimationFrame = 0;
 	bool running;
+
+	Uint32 currentFrameTime = 0;
+	Uint32 frameTime = 0;
+	Uint32 prevFrameTime = 0;
+	Uint32 shootInterval = 700;
+	Uint32 lastShotTime = 0;
 
 	// grass texture
 	TextureManager grass;

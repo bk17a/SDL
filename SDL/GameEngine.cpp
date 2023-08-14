@@ -289,10 +289,23 @@ bool GameEngine::handleEvents()
 		windowObj.handleEvent(e, renderer);
 
 		// bullet events
-		if (!enemies.empty() || !enemy1WalkVec.empty())	// disable bullet shoot if all enemies are dead
+		currentFrameTime = SDL_GetTicks();
+		frameTime = currentFrameTime - lastShotTime;
+
+		bullet.handleEvent(e, player1.getPlayerPos());
+
+		if (bullet.isAutoShootingEnabled() && (frameTime >= shootInterval))
 		{
-			bullet.handleEvent(e, player1.getPlayerPos());
+			bullet.shoot(player1.getPlayerPos());
+			lastShotTime = currentFrameTime; // Update the last shot time
 		}
+	}
+
+	// Ensure bullets continue to shoot even if no events are processed
+	if (bullet.isAutoShootingEnabled() && (currentFrameTime - lastShotTime >= shootInterval))
+	{
+		bullet.shoot(player1.getPlayerPos());
+		lastShotTime = currentFrameTime; // Update the last shot time
 	}
 
 	return running;
@@ -333,20 +346,16 @@ void GameEngine::close()
 	bulletTex.free();
 	enemy1WalkTex.free();
 
-	// clear enemy vector
 	enemies.clear();
 	enemy1WalkVec.clear();
 
-	// Close font
 	TTF_CloseFont(font);
 	font = nullptr;
 
-	// Destory window
 	windowObj.free();
 	SDL_DestroyRenderer(renderer);
 	renderer = nullptr;
 
-	// Quit SDL Subsystems
 	IMG_Quit();
 	TTF_Quit();
 	SDL_Quit();
@@ -709,6 +718,10 @@ void GameEngine::handleCollision(Enemy& object1, Enemy& object2) const
 	object2.setPosY(object2.getPosY() - distanceY);
 }
 
+void GameEngine::renderFPS()
+{
+}
+
 void GameEngine::run()
 {
 	if (!init())
@@ -730,13 +743,12 @@ void GameEngine::run()
 			fpsTimer.start();
 			stringstream timeText;
 			constexpr SDL_Color textColor = { 0, 0, 0, 255 };
-			Uint32 prevFrameTime = 0;
 
 			// Game loop
 			while (isRunning())
 			{
-				const Uint32 currentFrameTime = SDL_GetTicks();
-				const Uint32 frameTime = currentFrameTime - prevFrameTime;
+				currentFrameTime = SDL_GetTicks();
+				frameTime = currentFrameTime - prevFrameTime;
 
 				// event handler
 				handleEvents();

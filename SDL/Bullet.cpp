@@ -13,6 +13,8 @@ Bullet::Bullet(const Vector2 position, const Vector2 velocity, const Vector2 siz
 	p.y = static_cast<int>(pos.y);
 	p.w = static_cast<int>(this->size.x);
 	p.h = static_cast<int>(this->size.y);
+
+	autoShootEnabled = false;
 };
 
 void Bullet::reload()
@@ -37,20 +39,17 @@ void Bullet::handleEvent(const SDL_Event& e, const Vector2 playerPos)
 {
 	if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_SPACE)
 	{
-		active = !active;
-		if (active)
-		{
-			shoot(playerPos);
-		}
+		// active = !active;
+		// if (active)
+		// {
+		// 	shoot(playerPos);
+		// }
+		autoShootEnabled = !autoShootEnabled;
 	}
 }
 
 void Bullet::update()
 {
-	if (!active)
-	{
-		return;
-	}
 	Vector2 dir = targetPos - pos;		// we get targetPos from calling setTargetPos in the GameEngine class
 	dir.normalize();
 
@@ -93,4 +92,19 @@ Vector2 Bullet::getPos() const
 void Bullet::setPos(const Vector2 pos)  // NOLINT(clang-diagnostic-shadow)
 {
 	this->pos = pos;
+}
+
+void Bullet::enableAutoShooting()
+{
+	autoShootEnabled = true;
+}
+
+void Bullet::disableAutoShooting()
+{
+	autoShootEnabled = false;
+}
+
+bool Bullet::isAutoShootingEnabled() const
+{
+	return autoShootEnabled;
 }
