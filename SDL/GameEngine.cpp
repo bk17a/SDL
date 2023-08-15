@@ -13,7 +13,7 @@ GameEngine::GameEngine() : running(true), font(nullptr), window(nullptr), render
 player1Rect({ {{0, 0, 0, 0}} }), player1RunRect({ {{0, 0, 0, 0}} }),
 playerHpBar({ PLAYER_HP_BAR_X, PLAYER_HP_BAR_Y, PLAYER_HP_BAR_WIDTH, PLAYER_HP_BAR_HEIGHT }),
 playerHpBarBack({ PLAYER_HP_BAR_X, PLAYER_HP_BAR_Y, PLAYER_HP_BAR_WIDTH, PLAYER_HP_BAR_HEIGHT }),
-enemy1WalkRect({ {{0, 0, 0, 0}} }) {}
+enemy1WalkRect({ {{0, 0, 0, 0}} }), start(false), hide(false) {}
 
 GameEngine::~GameEngine()
 {
@@ -86,11 +86,36 @@ bool GameEngine::loadMedia()
 	}
 
 	// load text
-	font = TTF_OpenFont("fonts/press_start.ttf", 18);
+	font = TTF_OpenFont("fonts/press_start.ttf", 24);
 	if (font == nullptr)
 	{
 		cout << "Failed to load press_start font! SDL_ttf Error: " << TTF_GetError() << endl;
 		success = false;
+	}
+	else
+	{
+		constexpr SDL_Color textColor{ 0, 0, 0, 255 };
+		stringstream text;
+		text.str("Press ENTER to start");
+		if (!startText.loadFromRenderedText(text.str().c_str(), textColor, renderer, font))
+		{
+			cout << "Failed to render start text texture!\n";
+			success = false;
+		}
+
+		text.str("Press SPACE to toggle auto shoot on/off");
+		if (!helpText.loadFromRenderedText(text.str().c_str(), textColor, renderer, font))
+		{
+			cout << "Failed to render help text texture!\n";
+			success = false;
+		}
+
+		text.str("Score: ");
+		if (!scoreText.loadFromRenderedText(text.str().c_str(), textColor, renderer, font))
+		{
+			cout << "Failed to render score text texture!\n";
+			success = false;
+		}
 	}
 
 	if (!player1Tex.loadFromFile("gfx/player1Idle.png", renderer))
@@ -242,6 +267,8 @@ void GameEngine::render()
 	renderEnemies();
 	renderBullets();
 
+	renderText();
+
 	SDL_SetRenderDrawColor(renderer, 25, 25, 25, 200); // Grey color with less opacity
 	SDL_RenderFillRect(renderer, &playerHpBarBack);
 
@@ -251,18 +278,20 @@ void GameEngine::render()
 
 void GameEngine::update()
 {
-	player1.update();
-	player1.move();
-	player1Run.move();
+	if (start)
+	{
+		player1.update();
+		player1.move();
+		player1Run.move();
 
-	checkPlayerEnemyCollision();
-
-	updateCollision();
-	updateGUI();
-	updateCamera();
-	updateEnemies();
-	updateBullets();
-	updateEnemiesKilled();
+		updateEnemies();
+		checkPlayerEnemyCollision();
+		updateCollision();
+		updateGUI();
+		updateCamera();
+		updateBullets();
+		updateEnemiesKilled();
+	}
 }
 
 bool GameEngine::handleEvents()
@@ -276,6 +305,12 @@ bool GameEngine::handleEvents()
 		if (e.type == SDL_QUIT)
 		{
 			running = false;
+		}
+
+		if (e.type == SDL_KEYDOWN)
+		{
+			if (e.key.keysym.sym == SDLK_RETURN) start = true;
+			if (e.key.keysym.sym == SDLK_SPACE) hide = true;
 		}
 
 		// player movement
@@ -292,9 +327,12 @@ bool GameEngine::handleEvents()
 		currentFrameTime = SDL_GetTicks();
 		frameTime = currentFrameTime - lastShotTime;
 
-		bullet.handleEvent(e, player1.getPlayerPos());
+		if (start)
+		{
+			bullet.handleEvent(e, player1.getPlayerPos());
+		}
 
-		if (bullet.isAutoShootingEnabled() && (frameTime >= shootInterval))
+		if (bullet.isAutoShootingEnabled() && (!enemies.empty() || !enemy1WalkVec.empty()) && (frameTime >= shootInterval) && player1.isAlive())
 		{
 			bullet.shoot(player1.getPlayerPos());
 			lastShotTime = currentFrameTime; // Update the last shot time
@@ -302,7 +340,7 @@ bool GameEngine::handleEvents()
 	}
 
 	// Ensure bullets continue to shoot even if no events are processed
-	if (bullet.isAutoShootingEnabled() && (currentFrameTime - lastShotTime >= shootInterval))
+	if (bullet.isAutoShootingEnabled() && (!enemies.empty() || !enemy1WalkVec.empty()) && (currentFrameTime - lastShotTime >= shootInterval) && player1.isAlive())
 	{
 		bullet.shoot(player1.getPlayerPos());
 		lastShotTime = currentFrameTime; // Update the last shot time
@@ -345,6 +383,7 @@ void GameEngine::close()
 	player1RunTex.free();
 	bulletTex.free();
 	enemy1WalkTex.free();
+	startText.free();
 
 	enemies.clear();
 	enemy1WalkVec.clear();
@@ -593,22 +632,22 @@ void GameEngine::renderPlayer()
 	}
 
 	// Health bar size factor (adjust this value to change the health bar size)
-	constexpr float healthBarWidthFactor = 0.6f;
+	constexpr float healthBarWidthFactor = 0.5f;
 
 	// Render health bar on top of the player's texture
 	playerHpBarBack = { static_cast<int>(player1.getXPos() - static_cast<float>(camera.x)),
-						static_cast<int>(player1.getYPos() + player1.getWidth() - static_cast<float>(camera.y)) - 30,
-						static_cast<int>(player1.getWidth() * healthBarWidthFactor), // Set the width to a fraction of the player's width
+						static_cast<int>(player1.getYPos() - static_cast<float>(camera.y)) - PLAYER_HP_BAR_HEIGHT - 10, // Adjust the Y coordinate to be above the player
+						static_cast<int>(player1.getWidth() * healthBarWidthFactor),									// Set the width to a fraction of the player's width
 						PLAYER_HP_BAR_HEIGHT };
 
 	float hpPercent = static_cast<float>(player1.getHp()) / static_cast<float>(player1.getHpMax());
 	hpPercent = std::max(0.0f, std::min(hpPercent, 1.0f));
 
-	int hpBarWidth = static_cast<int>(player1.getWidth() * healthBarWidthFactor * hpPercent); // Set the width to player's width * factor * hpPercent
+	int hpBarWidth = static_cast<int>(player1.getWidth() * healthBarWidthFactor * hpPercent);										// Set the width to player's width * factor * hpPercent
 	hpBarWidth = static_cast<int>(std::min(static_cast<float>(hpBarWidth), player1.getWidth() * healthBarWidthFactor)); // Make sure the hpBarWidth doesn't exceed the adjusted width
 
 	playerHpBar = { static_cast<int>(player1.getXPos() - static_cast<float>(camera.x)),
-					static_cast<int>(player1.getYPos() + player1.getWidth() - static_cast<float>(camera.y)) - 30,
+					 static_cast<int>(player1.getYPos() - static_cast<float>(camera.y)) - PLAYER_HP_BAR_HEIGHT - 10, // Same adjustment for the Y coordinate
 					hpBarWidth,
 					PLAYER_HP_BAR_HEIGHT };
 }
@@ -667,7 +706,7 @@ void GameEngine::checkPlayerEnemyCollision()
 	{
 		if (e.checkCollisionWith(playerPositionRect))
 		{
-			player1.takeDamage(10);
+			player1.takeDamage(5);
 		}
 	}
 
@@ -676,7 +715,7 @@ void GameEngine::checkPlayerEnemyCollision()
 		e.setRect(enemy1PositionRect);
 		if (e.checkCollisionWith(playerPositionRect))
 		{
-			player1.takeDamage(10);
+			player1.takeDamage(5);
 		}
 	}
 }
@@ -693,7 +732,7 @@ bool GameEngine::checkCollision(const SDL_Rect& rectA, const SDL_Rect& rectB)
 	return xCollision && yCollision;
 }
 
-void GameEngine::handleCollision(Enemy& object1, Enemy& object2) const
+void GameEngine::handleCollision(Enemy& object1, Enemy& object2)
 {
 	// Calculate the direction of the collision between objects
 	float directionX = object1.getPosX() - object2.getPosX();
@@ -718,8 +757,21 @@ void GameEngine::handleCollision(Enemy& object1, Enemy& object2) const
 	object2.setPosY(object2.getPosY() - distanceY);
 }
 
-void GameEngine::renderFPS()
+void GameEngine::renderText() const
 {
+	if (!start)
+	{
+		startText.render((SCREEN_WIDTH - startText.getWidth()) / 2, (SCREEN_HEIGHT - startText.getHeight()) / 2, renderer);
+	}
+	else
+	{
+		scoreText.render(0, 0, renderer);
+	}
+
+	if (!hide)
+	{
+		helpText.render(0, SCREEN_HEIGHT - 50, renderer);
+	}
 }
 
 void GameEngine::run()
@@ -767,7 +819,7 @@ void GameEngine::run()
 				prevFrameTime = currentFrameTime;
 
 				// Calculate average FPS
-				const float avgFPS = countedFrames / (fpsTimer.getTicks() / 1000.0f);  // NOLINT(clang-diagnostic-implicit-int-float-conversion, cppcoreguidelines-narrowing-conversions)
+				const float avgFPS = static_cast<float>(countedFrames) / (static_cast<float>(fpsTimer.getTicks()) / 1000.0f);
 
 				// update function
 				update();

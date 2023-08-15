@@ -53,10 +53,10 @@ public:
 	void renderBullets() const;
 	void checkPlayerEnemyCollision();
 	static bool checkCollision(const SDL_Rect& rectA, const SDL_Rect& rectB);
-	void handleCollision(Enemy& object1, Enemy& object2) const;
-	void renderFPS();
+	static void handleCollision(Enemy& object1, Enemy& object2);
+	void renderText() const;
 
-	void run();													// run the program
+	void run();
 
 private:
 	int countedFrames = 0;
@@ -117,6 +117,13 @@ private:
 	std::vector<Enemy> enemy1WalkVec;
 	TextureManager enemy1WalkTex;
 	Enemy enemy1Walk;
+
+	TextureManager startText;
+	TextureManager helpText;
+	TextureManager scoreText;
+
+	bool start;
+	bool hide;
 };
 
 #endif
