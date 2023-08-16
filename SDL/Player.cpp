@@ -20,6 +20,7 @@ Player::Player(SDL_Renderer* renderer, TextureManager* playerTexture)
 	p.w = static_cast<int>(size.x);
 	p.h = static_cast<int>(size.y);
 	collisionCooldown = 0;
+	score = 0;
 }
 
 void Player::handleEvent(const SDL_Event& e)
@@ -224,4 +225,19 @@ void Player::update()
 {
 	if (collisionCooldown > 0)
 		collisionCooldown--;
+}
+
+void Player::setScore(const int score)
+{
+	this->score = score;
+}
+
+int Player::getScore() const
+{
+	return score;
+}
+
+void Player::increaseScore(const int points)
+{
+	score += points;
 }

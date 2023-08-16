@@ -22,8 +22,8 @@ public:
 	Enemy();
 	Enemy(SDL_Renderer* renderer, TextureManager* enemyTex);
 
-	void render(SDL_Renderer* renderer, const float camX, const float camY) const;
-	void renderAnimated(SDL_Renderer* renderer, const SDL_Rect* clip, const float camX, const float camY, const double angle, const SDL_Point* center, const SDL_RendererFlip flipType) const;
+	void render(SDL_Renderer* renderer, float camX, float camY) const;
+	void renderAnimated(SDL_Renderer* renderer, const SDL_Rect* clip, float camX, float camY, double angle, const SDL_Point* center, SDL_RendererFlip flipType) const;
 	void spawn();
 	bool isAlive() const;
 	void takeDamage(int damage);

@@ -15,7 +15,7 @@ public:
 
 	bool init();
 	SDL_Renderer* createRenderer() const;										// renderer from internal window
-	void handleEvent(SDL_Event& e, SDL_Renderer* renderer);				// window events
+	void handleEvent(const SDL_Event& e, SDL_Renderer* renderer);				// window events
 	void free();														// deallocate internals
 
 	int getWidth() const;

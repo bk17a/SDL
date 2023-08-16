@@ -43,6 +43,11 @@ public:
 	int getHp() const;
 	int getHpMax() const;
 	void update();
+
+	void setScore(int score);
+	int getScore() const;
+	void increaseScore(int points);
+
 private:
 	// x and y offsets
 	Vector2 position;
@@ -65,6 +70,8 @@ private:
 	TextureManager* playerTexture;
 
 	SDL_RendererFlip flipType;
+
+	int score;
 };
 
 #endif //PLAYER_H_

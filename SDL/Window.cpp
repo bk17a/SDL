@@ -40,7 +40,7 @@ SDL_Renderer* Window::createRenderer() const
 	return SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 }
 
-void Window::handleEvent(SDL_Event& e, SDL_Renderer* renderer)
+void Window::handleEvent(const SDL_Event& e, SDL_Renderer* renderer)
 {
 	if (e.type == SDL_WINDOWEVENT) // window event occured
 	{

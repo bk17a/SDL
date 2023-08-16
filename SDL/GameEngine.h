@@ -22,7 +22,6 @@ class GameEngine
 {
 public:
 	static GameEngine& getInstance();
-
 	// initialization
 	GameEngine();  // default constructor
 	~GameEngine(); // default destructor

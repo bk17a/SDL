@@ -40,7 +40,7 @@ public:
 
 	bool operator==(const Vector2& other) const
 	{
-		return (x == other.x) && (y == other.y);
+		return (x == other.x) && (y == other.y);  // NOLINT(clang-diagnostic-float-equal)
 	}
 
 	static Vector2 ZERO_VEC()

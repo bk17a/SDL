@@ -64,7 +64,7 @@ void Timer::unpause()
 
 Uint32 Timer::getTicks() const
 {
-	// the actua ltimer time
+	// the actual timer time
 	Uint32 time = 0;
 
 	// if time is running

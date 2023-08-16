@@ -110,12 +110,13 @@ bool GameEngine::loadMedia()
 			success = false;
 		}
 
-		text.str("Score: ");
-		if (!scoreText.loadFromRenderedText(text.str().c_str(), textColor, renderer, font))
-		{
-			cout << "Failed to render score text texture!\n";
-			success = false;
-		}
+		//text.str("");
+		//text << "Score: " << player1.getScore();
+		//if (!scoreText.loadFromRenderedText(text.str().c_str(), textColor, renderer, font))
+		//{
+		//	cout << "Failed to render score text texture!\n";
+		//	success = false;
+		//}
 	}
 
 	if (!player1Tex.loadFromFile("gfx/player1Idle.png", renderer))
@@ -313,6 +314,9 @@ bool GameEngine::handleEvents()
 			if (e.key.keysym.sym == SDLK_SPACE) hide = true;
 		}
 
+		currentFrameTime = SDL_GetTicks();
+		frameTime = currentFrameTime - lastShotTime;
+
 		// player movement
 		if (player1.isAlive())
 		{
@@ -324,8 +328,6 @@ bool GameEngine::handleEvents()
 		windowObj.handleEvent(e, renderer);
 
 		// bullet events
-		currentFrameTime = SDL_GetTicks();
-		frameTime = currentFrameTime - lastShotTime;
 
 		if (start)
 		{
@@ -559,6 +561,7 @@ void GameEngine::updateEnemiesKilled()
 
 			if (!enemies[i].isAlive())
 			{
+				player1.increaseScore(100);
 				enemiesKilled.emplace_back(i);
 			}
 		}
@@ -573,6 +576,7 @@ void GameEngine::updateEnemiesKilled()
 
 			if (!enemy1WalkVec[i].isAlive())
 			{
+				player1.increaseScore(100);
 				enemy1WalkKilled.emplace_back(i);
 			}
 		}
@@ -796,6 +800,9 @@ void GameEngine::run()
 			stringstream timeText;
 			constexpr SDL_Color textColor = { 0, 0, 0, 255 };
 
+			// score text
+			stringstream score;
+
 			// Game loop
 			while (isRunning())
 			{
@@ -829,13 +836,21 @@ void GameEngine::run()
 					// Render FPS
 					if (avgFPS > 0)
 					{
-						// Render text
+						// Render fps text
 						timeText.str("");
 						timeText << "FPS: " << fixed << setprecision(0) << avgFPS;
 						if (!fpsTexture.loadFromRenderedText(timeText.str().c_str(), textColor, renderer, font))
 						{
 							cout << "Unable to render FPS texture!\n";
 						}
+					}
+
+					// Render score
+					score.str("");
+					score << "Score: " << player1.getScore();
+					if (!scoreText.loadFromRenderedText(score.str().c_str(), textColor, renderer, font))
+					{
+						cout << "Failed to render score text texture!\n";
 					}
 
 					// Render function
