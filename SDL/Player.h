@@ -47,6 +47,8 @@ public:
 	void setScore(int score);
 	int getScore() const;
 	void increaseScore(int points);
+	void resetScore();
+	void resetHealth();
 
 private:
 	// x and y offsets

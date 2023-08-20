@@ -21,9 +21,9 @@ public:
 	int getWidth() const;
 	int getHeight() const;
 
-	bool hasMouseFocus();												// check for mouse focus
-	bool hasKbFocus();													// check for keyboard focus
-	bool isMin();														// check for minimized
+	bool hasMouseFocus() const;												// check for mouse focus
+	bool hasKbFocus() const;													// check for keyboard focus
+	bool isMin() const;														// check for minimized
 	SDL_Window* getWindow() const;
 
 private:

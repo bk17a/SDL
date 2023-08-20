@@ -13,7 +13,7 @@ GameEngine::GameEngine() : running(true), font(nullptr), window(nullptr), render
 player1Rect({ {{0, 0, 0, 0}} }), player1RunRect({ {{0, 0, 0, 0}} }),
 playerHpBar({ PLAYER_HP_BAR_X, PLAYER_HP_BAR_Y, PLAYER_HP_BAR_WIDTH, PLAYER_HP_BAR_HEIGHT }),
 playerHpBarBack({ PLAYER_HP_BAR_X, PLAYER_HP_BAR_Y, PLAYER_HP_BAR_WIDTH, PLAYER_HP_BAR_HEIGHT }),
-enemy1WalkRect({ {{0, 0, 0, 0}} }), start(false), hide(false) {}
+enemy1WalkRect({ {{0, 0, 0, 0}} }), start(false), hide(false), pause(false) {}
 
 GameEngine::~GameEngine()
 {
@@ -109,14 +109,6 @@ bool GameEngine::loadMedia()
 			cout << "Failed to render help text texture!\n";
 			success = false;
 		}
-
-		//text.str("");
-		//text << "Score: " << player1.getScore();
-		//if (!scoreText.loadFromRenderedText(text.str().c_str(), textColor, renderer, font))
-		//{
-		//	cout << "Failed to render score text texture!\n";
-		//	success = false;
-		//}
 	}
 
 	if (!player1Tex.loadFromFile("gfx/player1Idle.png", renderer))
@@ -224,7 +216,7 @@ bool GameEngine::loadMedia()
 		bullet = Bullet(player1.getPlayerPos(), bulletSpeed, bulletSize, renderer, &bulletTex);
 	}
 
-	if (!enemy1WalkTex.loadFromFile("gfx/enemy1Walk.png", renderer))
+	if (!enemy1WalkTex.loadFromFile("gfx/enemy1.png", renderer))
 	{
 		cout << "Unable to load enemy1 walk texture!\n";
 		success = false;
@@ -233,9 +225,17 @@ bool GameEngine::loadMedia()
 	{
 		for (int i = 0; i < ENEMY_NUM; ++i)
 		{
-			enemy1Walk = Enemy(renderer, &enemy1WalkTex);
-			enemy1Walk.spawn();
-			enemy1WalkVec.emplace_back(enemy1Walk);
+			enemy1 = Enemy(renderer, &enemy1WalkTex);
+			//enemy1.spawn();
+			enemy1Vec.emplace_back(enemy1);
+		}
+
+		if (!enemy1.isAlive())
+		{
+			for (auto& e : enemy1Vec)
+			{
+				e.spawn();
+			}
 		}
 
 		constexpr int walkingFrames = 6;
@@ -246,6 +246,47 @@ bool GameEngine::loadMedia()
 			enemy1WalkRect[i].w = ENEMY1RUN_WIDTH;
 			enemy1WalkRect[i].h = ENEMY1RUN_HEIGHT;
 		}
+	}
+
+	if (!continueButtonTex.loadFromFile("gfx/continueButton.png", renderer))
+	{
+		cout << "Unable to load continue button texture!\n";
+		success = false;
+	}
+	else
+	{
+		constexpr int yOffset = 15;
+		const int xPos = ((SCREEN_WIDTH + continueButtonTex.getWidth()) / 2) - continueButtonTex.getWidth();
+		const int yPos = ((SCREEN_HEIGHT - continueButtonTex.getHeight()) / 2) - continueButtonTex.getHeight() - yOffset;
+		const Vector2 pos(static_cast<float>(xPos), static_cast<float>(yPos));
+		continueButton = Button(renderer, &continueButtonTex, pos);
+	}
+
+	if (!restartButtonTex.loadFromFile("gfx/restartButton.png", renderer))
+	{
+		cout << "Unable to load continue button texture!\n";
+		success = false;
+	}
+	else
+	{
+		const int xPos = (SCREEN_WIDTH - restartButtonTex.getWidth()) / 2;
+		const int yPos = (SCREEN_HEIGHT - restartButtonTex.getHeight()) / 2;
+		const Vector2 pos(static_cast<float>(xPos), static_cast<float>(yPos));
+		restartButton = Button(renderer, &restartButtonTex, pos);
+	}
+
+	if (!quitButtonTex.loadFromFile("gfx/quitButton.png", renderer))
+	{
+		cout << "Unable to load continue button texture!\n";
+		success = false;
+	}
+	else
+	{
+		constexpr int yOffset = 15;
+		const int xPos = ((SCREEN_WIDTH + quitButtonTex.getWidth()) / 2) - quitButtonTex.getWidth();
+		const int yPos = ((SCREEN_HEIGHT - quitButtonTex.getHeight()) / 2) + quitButtonTex.getHeight() + yOffset;
+		const Vector2 pos(static_cast<float>(xPos), static_cast<float>(yPos));
+		quitButton = Button(renderer, &quitButtonTex, pos);
 	}
 
 	return success;
@@ -263,6 +304,15 @@ void GameEngine::render()
 	// Render fps
 	fpsTexture.render(SCREEN_WIDTH - fpsTexture.getWidth(), 0, renderer);
 
+	if (pause) // Assuming `pause` is a flag indicating if the game is paused
+	{
+		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 128); // Semi-transparent black overlay
+		constexpr SDL_Rect overlayRect = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
+		SDL_RenderFillRect(renderer, &overlayRect);
+		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
+	}
+
 	// render game elements
 	renderPlayer();
 	renderEnemies();
@@ -275,23 +325,28 @@ void GameEngine::render()
 
 	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
 	SDL_RenderFillRect(renderer, &playerHpBar);
+
+	renderPauseScreen();
 }
 
 void GameEngine::update()
 {
 	if (start)
 	{
-		player1.update();
-		player1.move();
-		player1Run.move();
+		if (!pause)
+		{
+			player1.update();
+			player1.move();
+			player1Run.move();
 
-		updateEnemies();
-		checkPlayerEnemyCollision();
-		updateCollision();
-		updateGUI();
-		updateCamera();
-		updateBullets();
-		updateEnemiesKilled();
+			updateEnemies();
+			checkPlayerEnemyCollision();
+			updateCollision();
+			updateGUI();
+			updateCamera();
+			updateBullets();
+			updateEnemiesKilled();
+		}
 	}
 }
 
@@ -312,40 +367,74 @@ bool GameEngine::handleEvents()
 		{
 			if (e.key.keysym.sym == SDLK_RETURN) start = true;
 			if (e.key.keysym.sym == SDLK_SPACE) hide = true;
+			if (e.key.keysym.sym == SDLK_ESCAPE) pause = !pause;
 		}
 
+		if (pause)
+		{
+			if (continueButton.handleEvents(e))
+			{
+				pause = !pause;
+			}
+
+			if (restartButton.handleEvents(e))
+			{
+				restartGame();
+				pause = !pause;
+				start = false;
+			}
+
+			if (quitButton.handleEvents(e))
+			{
+				running = false;
+			}
+		}
+
+		// for bullet auto shoot time
 		currentFrameTime = SDL_GetTicks();
 		frameTime = currentFrameTime - lastShotTime;
-
-		// player movement
-		if (player1.isAlive())
-		{
-			player1.handleEvent(e);
-			player1Run.handleEvent(e);
-		}
 
 		// window events
 		windowObj.handleEvent(e, renderer);
 
 		// bullet events
 
-		if (start)
+		// player movement
+		if (player1.isAlive())
 		{
-			bullet.handleEvent(e, player1.getPlayerPos());
+			if (!pause)
+			{
+				player1.handleEvent(e);
+				player1Run.handleEvent(e);
+			}
 		}
 
-		if (bullet.isAutoShootingEnabled() && (!enemies.empty() || !enemy1WalkVec.empty()) && (frameTime >= shootInterval) && player1.isAlive())
+		if (start)
 		{
-			bullet.shoot(player1.getPlayerPos());
-			lastShotTime = currentFrameTime; // Update the last shot time
+			if (!pause)
+			{
+				bullet.handleEvent(e, player1.getPlayerPos());
+			}
+		}
+
+		if (bullet.isAutoShootingEnabled() && (!enemies.empty() || !enemy1Vec.empty()) && (frameTime >= shootInterval) && player1.isAlive())
+		{
+			if (!pause)
+			{
+				bullet.shoot(player1.getPlayerPos());
+				lastShotTime = currentFrameTime; // Update the last shot time
+			}
 		}
 	}
 
 	// Ensure bullets continue to shoot even if no events are processed
-	if (bullet.isAutoShootingEnabled() && (!enemies.empty() || !enemy1WalkVec.empty()) && (currentFrameTime - lastShotTime >= shootInterval) && player1.isAlive())
+	if (bullet.isAutoShootingEnabled() && (!enemies.empty() || !enemy1Vec.empty()) && (currentFrameTime - lastShotTime >= shootInterval) && player1.isAlive())
 	{
-		bullet.shoot(player1.getPlayerPos());
-		lastShotTime = currentFrameTime; // Update the last shot time
+		if (!pause)
+		{
+			bullet.shoot(player1.getPlayerPos());
+			lastShotTime = currentFrameTime; // Update the last shot time
+		}
 	}
 
 	return running;
@@ -388,7 +477,7 @@ void GameEngine::close()
 	startText.free();
 
 	enemies.clear();
-	enemy1WalkVec.clear();
+	enemy1Vec.clear();
 
 	TTF_CloseFont(font);
 	font = nullptr;
@@ -416,10 +505,10 @@ void GameEngine::updateCollision()
 		}
 	}
 
-	// Check collision between enemy1WalkVec elements and enemies
+	// Check collision between enemy1Vec elements and enemies
 	for (auto& enemy : enemies)
 	{
-		for (auto& enemy1Walk : enemy1WalkVec)
+		for (auto& enemy1Walk : enemy1Vec)
 		{
 			if (enemy.checkCollisionWith(enemy1Walk.p))
 			{
@@ -428,14 +517,14 @@ void GameEngine::updateCollision()
 		}
 	}
 
-	// Check collision between enemy1WalkVec elements
-	for (size_t i = 0; i < enemy1WalkVec.size(); ++i)
+	// Check collision between enemy1Vec elements
+	for (size_t i = 0; i < enemy1Vec.size(); ++i)
 	{
-		for (size_t j = i + 1; j < enemy1WalkVec.size(); ++j)
+		for (size_t j = i + 1; j < enemy1Vec.size(); ++j)
 		{
-			if (enemy1WalkVec[i].checkCollisionWith(enemy1WalkVec[j].p))
+			if (enemy1Vec[i].checkCollisionWith(enemy1Vec[j].p))
 			{
-				handleCollision(enemy1WalkVec[i], enemy1WalkVec[j]);
+				handleCollision(enemy1Vec[i], enemy1Vec[j]);
 			}
 		}
 	}
@@ -492,7 +581,7 @@ void GameEngine::updateEnemies()
 		Enemy::move(e, player1);
 	}
 
-	for (auto& enemy : enemy1WalkVec)
+	for (auto& enemy : enemy1Vec)
 	{
 		// Update enemy movement toward player
 		Enemy::move(enemy, player1);
@@ -523,7 +612,7 @@ void GameEngine::updateBullets()
 		}
 	}
 
-	for (const auto& e : enemy1WalkVec)
+	for (const auto& e : enemy1Vec)
 	{
 		if (e.isAlive())
 		{
@@ -567,14 +656,14 @@ void GameEngine::updateEnemiesKilled()
 		}
 	}
 
-	for (size_t i = 0; i < enemy1WalkVec.size(); ++i)
+	for (size_t i = 0; i < enemy1Vec.size(); ++i)
 	{
-		if (bullet.isActive() && enemy1WalkVec[i].checkCollisionWith(bullet.p))
+		if (bullet.isActive() && enemy1Vec[i].checkCollisionWith(bullet.p))
 		{
-			enemy1WalkVec[i].takeDamage(50);
+			enemy1Vec[i].takeDamage(50);
 			bullet.reload();
 
-			if (!enemy1WalkVec[i].isAlive())
+			if (!enemy1Vec[i].isAlive())
 			{
 				player1.increaseScore(100);
 				enemy1WalkKilled.emplace_back(i);
@@ -590,7 +679,7 @@ void GameEngine::updateEnemiesKilled()
 
 	for (auto it = enemy1WalkKilled.rbegin(); it != enemy1WalkKilled.rend(); ++it)
 	{
-		enemy1WalkVec.erase(enemy1WalkVec.begin() + *it);
+		enemy1Vec.erase(enemy1Vec.begin() + *it);
 	}
 
 	// clear the vectors
@@ -667,7 +756,7 @@ void GameEngine::renderEnemies()
 		}
 	}
 
-	for (const auto& enemy : enemy1WalkVec)
+	for (const auto& enemy : enemy1Vec)
 	{
 		if (enemy.isAlive())
 		{
@@ -701,8 +790,8 @@ void GameEngine::checkPlayerEnemyCollision()
 	playerPositionRect.h = PLAYER1_HEIGHT;
 
 	SDL_Rect enemy1PositionRect;
-	enemy1PositionRect.x = static_cast<int>(enemy1Walk.getPosX());
-	enemy1PositionRect.y = static_cast<int>(enemy1Walk.getPosY());
+	enemy1PositionRect.x = static_cast<int>(enemy1.getPosX());
+	enemy1PositionRect.y = static_cast<int>(enemy1.getPosY());
 	enemy1PositionRect.w = ENEMY1RUN_WIDTH;
 	enemy1PositionRect.h = ENEMY1RUN_HEIGHT;
 
@@ -714,7 +803,7 @@ void GameEngine::checkPlayerEnemyCollision()
 		}
 	}
 
-	for (auto& e : enemy1WalkVec)
+	for (auto& e : enemy1Vec)
 	{
 		e.setRect(enemy1PositionRect);
 		if (e.checkCollisionWith(playerPositionRect))
@@ -778,6 +867,72 @@ void GameEngine::renderText() const
 	}
 }
 
+void GameEngine::renderPauseScreen() const
+{
+	if (pause)
+	{
+		restartButton.render(renderer);
+		continueButton.render(renderer);
+		quitButton.render(renderer);
+	}
+}
+
+void GameEngine::restartGame()
+{
+	// reset default enemy
+	enemies.clear();
+	for (int i = 0; i < ENEMY_NUM; ++i)
+	{
+		enemy = Enemy(renderer, &enemyTex);
+		enemies.emplace_back(enemy);
+	}
+
+	if (!enemy.isAlive())
+	{
+		for (auto& e : enemies)
+		{
+			e.spawn();
+		}
+	}
+
+	// reset other enemy
+	enemy1Vec.clear();
+	for (int i = 0; i < ENEMY_NUM; ++i)
+	{
+		enemy1 = Enemy(renderer, &enemy1WalkTex);
+		enemy1Vec.emplace_back(enemy1);
+	}
+
+	if (!enemy1.isAlive())
+	{
+		for (auto& e : enemy1Vec)
+		{
+			e.spawn();
+		}
+	}
+
+	constexpr int walkingFrames = 6;
+	for (int i = 0; i < walkingFrames; ++i)
+	{
+		enemy1WalkRect[i].x = i * ENEMY1RUN_WIDTH;
+		enemy1WalkRect[i].y = 0;
+		enemy1WalkRect[i].w = ENEMY1RUN_WIDTH;
+		enemy1WalkRect[i].h = ENEMY1RUN_HEIGHT;
+	}
+
+	// spawn player at default location
+	player1.spawn();
+	player1Run.spawn();
+
+	player1.resetScore();
+	player1.resetHealth();
+
+	bullet.setActive(false);
+	bullet.disableAutoShooting();
+
+	hide = false;
+}
+
 void GameEngine::run()
 {
 	if (!init())
@@ -813,7 +968,7 @@ void GameEngine::run()
 				handleEvents();
 
 				// constants for frame rate limiting
-				constexpr int TARGET_FPS = 165;
+				constexpr int TARGET_FPS = 170;
 				constexpr int SCREEN_TICKS_PER_FRAME = 1000 / TARGET_FPS;
 
 				// Calculate the time taken for the frame

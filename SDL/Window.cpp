@@ -141,17 +141,17 @@ int Window::getHeight() const
 	return height;
 }
 
-bool Window::hasKbFocus()
+bool Window::hasKbFocus() const
 {
 	return kbFocus;
 }
 
-bool Window::hasMouseFocus()
+bool Window::hasMouseFocus() const
 {
 	return mouseFocus;
 }
 
-bool Window::isMin()
+bool Window::isMin() const
 {
 	return min;
 }

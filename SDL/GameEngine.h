@@ -17,6 +17,7 @@
 #include "Window.h"
 #include "Enemy.h"
 #include "Bullet.h"
+#include "Button.h"
 
 class GameEngine
 {
@@ -54,6 +55,8 @@ public:
 	static bool checkCollision(const SDL_Rect& rectA, const SDL_Rect& rectB);
 	static void handleCollision(Enemy& object1, Enemy& object2);
 	void renderText() const;
+	void renderPauseScreen() const;
+	void restartGame();
 
 	void run();
 
@@ -113,9 +116,9 @@ private:
 
 	// enemy1 members
 	std::array<SDL_Rect, ENEMY_WALK_ANIMATION_FRAMES> enemy1WalkRect;
-	std::vector<Enemy> enemy1WalkVec;
+	std::vector<Enemy> enemy1Vec;
 	TextureManager enemy1WalkTex;
-	Enemy enemy1Walk;
+	Enemy enemy1;
 
 	TextureManager startText;
 	TextureManager helpText;
@@ -123,6 +126,17 @@ private:
 
 	bool start;
 	bool hide;
+
+	TextureManager continueButtonTex;
+	Button continueButton;
+
+	TextureManager restartButtonTex;
+	Button restartButton;
+
+	TextureManager quitButtonTex;
+	Button quitButton;
+
+	bool pause;
 };
 
 #endif

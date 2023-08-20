@@ -241,3 +241,13 @@ void Player::increaseScore(const int points)
 {
 	score += points;
 }
+
+void Player::resetScore()
+{
+	score = 0;
+}
+
+void Player::resetHealth()
+{
+	hp = 100;
+}

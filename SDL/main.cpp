@@ -1,7 +1,7 @@
 #include <iostream>
 #include "GameEngine.h"
 
-int main(int argc, char* args[])
+int main(int argc, char* argv[])
 {
 	// Create game engine
 	GameEngine game;
