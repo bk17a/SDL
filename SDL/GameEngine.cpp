@@ -109,6 +109,13 @@ bool GameEngine::loadMedia()
 			cout << "Failed to render help text texture!\n";
 			success = false;
 		}
+
+		text.str("YOU DIED!");
+		if (!deathText.loadFromRenderedText(text.str().c_str(), textColor, renderer, font))
+		{
+			cout << "Failed to render death text texture!\n";
+			success = false;
+		}
 	}
 
 	if (!player1Tex.loadFromFile("gfx/player1Idle.png", renderer))
@@ -314,9 +321,12 @@ void GameEngine::render()
 	}
 
 	// render game elements
-	renderPlayer();
-	renderEnemies();
-	renderBullets();
+	if (player1.isAlive() && player1Run.isAlive())
+	{
+		renderPlayer();
+		renderEnemies();
+		renderBullets();
+	}
 
 	renderText();
 
@@ -327,6 +337,7 @@ void GameEngine::render()
 	SDL_RenderFillRect(renderer, &playerHpBar);
 
 	renderPauseScreen();
+	renderDeathScreen();
 }
 
 void GameEngine::update()
@@ -335,17 +346,21 @@ void GameEngine::update()
 	{
 		if (!pause)
 		{
-			player1.update();
-			player1.move();
-			player1Run.move();
+			if (player1.isAlive())
+			{
+				player1.update();
+				player1.move();
+				player1Run.update();
+				player1Run.move();
 
-			updateEnemies();
-			checkPlayerEnemyCollision();
-			updateCollision();
-			updateGUI();
-			updateCamera();
-			updateBullets();
-			updateEnemiesKilled();
+				updateEnemies();
+				checkPlayerEnemyCollision();
+				updateCollision();
+				updateGUI();
+				updateCamera();
+				updateBullets();
+				updateEnemiesKilled();
+			}
 		}
 	}
 }
@@ -370,7 +385,7 @@ bool GameEngine::handleEvents()
 			if (e.key.keysym.sym == SDLK_ESCAPE) pause = !pause;
 		}
 
-		if (pause)
+		if (pause || !player1.isAlive())
 		{
 			if (continueButton.handleEvents(e))
 			{
@@ -865,6 +880,11 @@ void GameEngine::renderText() const
 	{
 		helpText.render(0, SCREEN_HEIGHT - 50, renderer);
 	}
+
+	if (!player1.isAlive())
+	{
+		deathText.render((SCREEN_WIDTH - deathText.getWidth()) / 2, (SCREEN_HEIGHT - deathText.getHeight()) / 2, renderer);
+	}
 }
 
 void GameEngine::renderPauseScreen() const
@@ -873,6 +893,27 @@ void GameEngine::renderPauseScreen() const
 	{
 		restartButton.render(renderer);
 		continueButton.render(renderer);
+		quitButton.render(renderer);
+	}
+}
+
+void GameEngine::renderDeathScreen()
+{
+	if (!pause && !player1.isAlive())
+	{
+		const int yOffset = (restartButtonTex.getHeight() * 3) - 30;
+		const int xPos = (SCREEN_WIDTH - restartButtonTex.getWidth()) / 2;
+		const int yPos = ((SCREEN_HEIGHT - restartButtonTex.getHeight()) / 2) + yOffset;
+		const Vector2 pos(static_cast<float>(xPos), static_cast<float>(yPos));
+		restartButton = Button(renderer, &restartButtonTex, pos);
+		restartButton.render(renderer);
+
+		const int xOffset = quitButtonTex.getWidth();
+		const int yOffset2 = quitButtonTex.getHeight() + 15;
+		const int xPos2 = ((SCREEN_WIDTH + quitButtonTex.getWidth()) / 2) - xOffset;
+		const int yPos2 = ((SCREEN_HEIGHT - quitButtonTex.getHeight()) / 2) + yOffset2;
+		const Vector2 pos2(static_cast<float>(xPos2), static_cast<float>(yPos2));
+		quitButton = Button(renderer, &quitButtonTex, pos2);
 		quitButton.render(renderer);
 	}
 }

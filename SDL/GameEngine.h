@@ -56,6 +56,7 @@ public:
 	static void handleCollision(Enemy& object1, Enemy& object2);
 	void renderText() const;
 	void renderPauseScreen() const;
+	void renderDeathScreen();
 	void restartGame();
 
 	void run();
@@ -123,6 +124,7 @@ private:
 	TextureManager startText;
 	TextureManager helpText;
 	TextureManager scoreText;
+	TextureManager deathText;
 
 	bool start;
 	bool hide;
