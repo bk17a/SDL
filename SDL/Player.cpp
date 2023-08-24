@@ -24,7 +24,6 @@ Player::Player(SDL_Renderer* renderer, TextureManager* playerTexture)
 
 	exp = 0;
 	level = 1;
-	levelUpExp = 60;
 	maxExp = 100;
 }
 
@@ -274,7 +273,7 @@ void Player::increaseMaxExp(const int exp)
 
 void Player::resetMaxExp()
 {
-	maxExp = 0;
+	maxExp = 100;
 }
 
 bool Player::levelUp()
@@ -290,11 +289,6 @@ bool Player::levelUp()
 void Player::resetLevel()
 {
 	level = 1;
-}
-
-void Player::increaseLevelUpExp(const int exp)
-{
-	levelUpExp += exp;
 }
 
 int Player::getLevel() const

@@ -58,8 +58,6 @@ public:
 	bool levelUp();
 	void resetLevel();
 
-	void increaseLevelUpExp(int exp);
-
 	int getLevel() const;
 	int getExp() const;
 	int getMaxExp() const;
@@ -91,7 +89,6 @@ private:
 	int exp;
 	int maxExp;
 	int level;
-	int levelUpExp;
 };
 
 #endif //PLAYER_H_

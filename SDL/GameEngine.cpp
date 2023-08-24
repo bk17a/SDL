@@ -425,8 +425,6 @@ bool GameEngine::handleEvents()
 		// window events
 		windowObj.handleEvent(e, renderer);
 
-		// bullet events
-
 		// player movement
 		if (player1.isAlive())
 		{
@@ -1030,16 +1028,14 @@ void GameEngine::renderXpBarLines() const
 	constexpr int numLines = 5;
 	const int lineSpacing = playerXpBarBack.w / numLines;
 
-	// Height of the lines (adjust this value to change the line height)
-
 	// Render lines on the XP bar background
-	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Set color to white (you can adjust the color)
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 	for (int i = 1; i < numLines; ++i)
 	{
 		constexpr int lineHeight = 4;
 		const int xPos = playerXpBarBack.x + i * lineSpacing;
 		const int startY = playerXpBarBack.y + (PLAYER_HP_BAR_HEIGHT - lineHeight) / 2; // Adjust the starting Y position
-		const int endY = startY + lineHeight; // Calculate the ending Y position
+		const int endY = startY + lineHeight;											// Calculate the ending Y position
 		SDL_RenderDrawLine(renderer, xPos, startY, xPos, endY);
 	}
 }
@@ -1127,9 +1123,10 @@ void GameEngine::run()
 					// Render level
 					level.str("");
 					level << "Level: " << player1.getLevel();
+					cout << "Debug - Current Player Level: " << player1.getLevel() << endl; // Debug output
 					if (!levelText.loadFromRenderedText(level.str().c_str(), textColor, renderer, font))
 					{
-						cout << "Failed to render score text texture!\n";
+						cout << "Failed to render level text texture!\n";
 					}
 
 					// Render function
