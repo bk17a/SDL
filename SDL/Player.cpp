@@ -21,6 +21,11 @@ Player::Player(SDL_Renderer* renderer, TextureManager* playerTexture)
 	p.h = static_cast<int>(size.y);
 	collisionCooldown = 0;
 	score = 0;
+
+	exp = 0;
+	level = 1;
+	levelUpExp = 60;
+	maxExp = 100;
 }
 
 void Player::handleEvent(const SDL_Event& e)
@@ -250,4 +255,59 @@ void Player::resetScore()
 void Player::resetHealth()
 {
 	hp = 100;
+}
+
+void Player::increaseExp(const int exp)
+{
+	this->exp += exp;
+}
+
+void Player::resetExp()
+{
+	this->exp = 0;
+}
+
+void Player::increaseMaxExp(const int exp)
+{
+	maxExp += exp;
+}
+
+void Player::resetMaxExp()
+{
+	maxExp = 0;
+}
+
+bool Player::levelUp()
+{
+	if (exp >= maxExp)
+	{
+		level += 1;
+		return true;
+	}
+	return false;
+}
+
+void Player::resetLevel()
+{
+	level = 1;
+}
+
+void Player::increaseLevelUpExp(const int exp)
+{
+	levelUpExp += exp;
+}
+
+int Player::getLevel() const
+{
+	return level;
+}
+
+int Player::getExp() const
+{
+	return exp;
+}
+
+int Player::getMaxExp() const
+{
+	return maxExp;
 }

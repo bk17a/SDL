@@ -49,6 +49,9 @@ public:
 	void setFlipType(SDL_RendererFlip flipType);
 	SDL_RendererFlip getFlipType() const;
 
+	void setExpPoints(int exp);
+	int getExpPoints() const;
+
 private:
 	SDL_Renderer* renderer;
 	TextureManager* enemyTex;
@@ -67,6 +70,7 @@ private:
 
 	SDL_Rect rect{};
 	SDL_RendererFlip flipType;
+	int expPoints;
 };
 
 #endif

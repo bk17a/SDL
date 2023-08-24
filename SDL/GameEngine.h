@@ -58,6 +58,8 @@ public:
 	void renderPauseScreen() const;
 	void renderDeathScreen();
 	void restartGame();
+	void updatePlayerLevel();
+	void renderXpBarLines() const;
 
 	void run();
 
@@ -114,6 +116,8 @@ private:
 	// PlayerGUI
 	SDL_Rect playerHpBar;
 	SDL_Rect playerHpBarBack;
+	SDL_Rect playerXpBarBack;
+	SDL_Rect playerXpBar;
 
 	// enemy1 members
 	std::array<SDL_Rect, ENEMY_WALK_ANIMATION_FRAMES> enemy1WalkRect;
@@ -125,6 +129,7 @@ private:
 	TextureManager helpText;
 	TextureManager scoreText;
 	TextureManager deathText;
+	TextureManager levelText;
 
 	bool start;
 	bool hide;

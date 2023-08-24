@@ -50,6 +50,20 @@ public:
 	void resetScore();
 	void resetHealth();
 
+	void increaseExp(int exp);
+	void resetExp();
+	void increaseMaxExp(int exp);
+	void resetMaxExp();
+
+	bool levelUp();
+	void resetLevel();
+
+	void increaseLevelUpExp(int exp);
+
+	int getLevel() const;
+	int getExp() const;
+	int getMaxExp() const;
+
 private:
 	// x and y offsets
 	Vector2 position;
@@ -74,6 +88,10 @@ private:
 	SDL_RendererFlip flipType;
 
 	int score;
+	int exp;
+	int maxExp;
+	int level;
+	int levelUpExp;
 };
 
 #endif //PLAYER_H_

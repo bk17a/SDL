@@ -22,6 +22,8 @@ Enemy::Enemy(SDL_Renderer* renderer, TextureManager* enemyTex)
 
 	moving = false;
 	flipType = SDL_FLIP_NONE;
+
+	expPoints = 20;
 }
 
 void Enemy::render(SDL_Renderer* renderer, const float camX, const float camY) const
@@ -191,6 +193,16 @@ void Enemy::move(Enemy& enemy, const Player& player)
 	}
 
 	enemy.setMoving(moved); // Set moving flag based on whether any movement occurred
+}
+
+void Enemy::setExpPoints(const int exp)
+{
+	expPoints = exp;
+}
+
+int Enemy::getExpPoints() const
+{
+	return expPoints;
 }
 
 void Enemy::setFlipType(const SDL_RendererFlip flipType)

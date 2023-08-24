@@ -13,7 +13,11 @@ GameEngine::GameEngine() : running(true), font(nullptr), window(nullptr), render
 player1Rect({ {{0, 0, 0, 0}} }), player1RunRect({ {{0, 0, 0, 0}} }),
 playerHpBar({ PLAYER_HP_BAR_X, PLAYER_HP_BAR_Y, PLAYER_HP_BAR_WIDTH, PLAYER_HP_BAR_HEIGHT }),
 playerHpBarBack({ PLAYER_HP_BAR_X, PLAYER_HP_BAR_Y, PLAYER_HP_BAR_WIDTH, PLAYER_HP_BAR_HEIGHT }),
-enemy1WalkRect({ {{0, 0, 0, 0}} }), start(false), hide(false), pause(false) {}
+playerXpBarBack({ PLAYER_HP_BAR_X, PLAYER_HP_BAR_Y, PLAYER_HP_BAR_WIDTH, PLAYER_HP_BAR_HEIGHT }),
+playerXpBar({ PLAYER_HP_BAR_X, PLAYER_HP_BAR_Y, PLAYER_HP_BAR_WIDTH, PLAYER_HP_BAR_HEIGHT }),
+enemy1WalkRect({ {{0, 0, 0, 0}} }), start(false),
+hide(false),
+pause(false) {}
 
 GameEngine::~GameEngine()
 {
@@ -86,7 +90,7 @@ bool GameEngine::loadMedia()
 	}
 
 	// load text
-	font = TTF_OpenFont("fonts/press_start.ttf", 24);
+	font = TTF_OpenFont("fonts/press_start.ttf", 20);
 	if (font == nullptr)
 	{
 		cout << "Failed to load press_start font! SDL_ttf Error: " << TTF_GetError() << endl;
@@ -336,6 +340,14 @@ void GameEngine::render()
 	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
 	SDL_RenderFillRect(renderer, &playerHpBar);
 
+	SDL_SetRenderDrawColor(renderer, 25, 25, 25, 200); // Grey color with less opacity
+	SDL_RenderFillRect(renderer, &playerXpBarBack);
+
+	SDL_SetRenderDrawColor(renderer, 0, 255, 255, 255);
+	SDL_RenderFillRect(renderer, &playerXpBar);
+
+	renderXpBarLines();
+
 	renderPauseScreen();
 	renderDeathScreen();
 }
@@ -353,6 +365,7 @@ void GameEngine::update()
 				player1Run.update();
 				player1Run.move();
 
+				updatePlayerLevel();
 				updateEnemies();
 				checkPlayerEnemyCollision();
 				updateCollision();
@@ -666,6 +679,7 @@ void GameEngine::updateEnemiesKilled()
 			if (!enemies[i].isAlive())
 			{
 				player1.increaseScore(100);
+				player1.increaseExp(enemies[i].getExpPoints());
 				enemiesKilled.emplace_back(i);
 			}
 		}
@@ -681,6 +695,7 @@ void GameEngine::updateEnemiesKilled()
 			if (!enemy1Vec[i].isAlive())
 			{
 				player1.increaseScore(100);
+				player1.increaseExp(enemy1Vec[i].getExpPoints());
 				enemy1WalkKilled.emplace_back(i);
 			}
 		}
@@ -757,6 +772,29 @@ void GameEngine::renderPlayer()
 	playerHpBar = { static_cast<int>(player1.getXPos() - static_cast<float>(camera.x)),
 					 static_cast<int>(player1.getYPos() - static_cast<float>(camera.y)) - PLAYER_HP_BAR_HEIGHT - 10, // Same adjustment for the Y coordinate
 					hpBarWidth,
+					PLAYER_HP_BAR_HEIGHT };
+
+	// Experience bar size factor (adjust this value to change the XP bar size)
+	constexpr float xpBarWidthFactor = 0.5f;
+
+	// Calculate position for the XP bar below the player
+	const float xpBarYPos = (player1.getYPos() + player1.getHeight() + 10) - static_cast<float>(camera.y);
+
+	// Render XP bar below the player's texture
+	playerXpBarBack = { static_cast<int>(player1.getXPos() - static_cast<float>(camera.x)),
+						static_cast<int>(xpBarYPos),
+						static_cast<int>(player1.getWidth() * xpBarWidthFactor),
+						PLAYER_HP_BAR_HEIGHT };
+
+	float xpPercent = static_cast<float>(player1.getExp()) / static_cast<float>(player1.getMaxExp());
+	xpPercent = std::max(0.0f, std::min(xpPercent, 1.0f));
+
+	int xpBarWidth = static_cast<int>(player1.getWidth() * xpBarWidthFactor * xpPercent);
+	xpBarWidth = static_cast<int>(std::min(static_cast<float>(xpBarWidth), player1.getWidth() * xpBarWidthFactor));
+
+	playerXpBar = { static_cast<int>(player1.getXPos() - static_cast<float>(camera.x)),
+					static_cast<int>(xpBarYPos),
+					xpBarWidth,
 					PLAYER_HP_BAR_HEIGHT };
 }
 
@@ -874,6 +912,7 @@ void GameEngine::renderText() const
 	else
 	{
 		scoreText.render(0, 0, renderer);
+		levelText.render(0, scoreText.getHeight(), renderer);
 	}
 
 	if (!hide)
@@ -967,11 +1006,42 @@ void GameEngine::restartGame()
 
 	player1.resetScore();
 	player1.resetHealth();
+	player1.resetExp();
+	player1.resetLevel();
+	player1.resetMaxExp();
 
 	bullet.setActive(false);
 	bullet.disableAutoShooting();
 
 	hide = false;
+}
+
+void GameEngine::updatePlayerLevel()
+{
+	if (player1.levelUp())
+	{
+		player1.increaseMaxExp(150);
+	}
+}
+
+void GameEngine::renderXpBarLines() const
+{
+	// Number of lines you want to display on the XP bar
+	constexpr int numLines = 5;
+	const int lineSpacing = playerXpBarBack.w / numLines;
+
+	// Height of the lines (adjust this value to change the line height)
+
+	// Render lines on the XP bar background
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Set color to white (you can adjust the color)
+	for (int i = 1; i < numLines; ++i)
+	{
+		constexpr int lineHeight = 4;
+		const int xPos = playerXpBarBack.x + i * lineSpacing;
+		const int startY = playerXpBarBack.y + (PLAYER_HP_BAR_HEIGHT - lineHeight) / 2; // Adjust the starting Y position
+		const int endY = startY + lineHeight; // Calculate the ending Y position
+		SDL_RenderDrawLine(renderer, xPos, startY, xPos, endY);
+	}
 }
 
 void GameEngine::run()
@@ -999,6 +1069,9 @@ void GameEngine::run()
 			// score text
 			stringstream score;
 
+			// level text
+			stringstream level;
+
 			// Game loop
 			while (isRunning())
 			{
@@ -1013,7 +1086,8 @@ void GameEngine::run()
 				constexpr int SCREEN_TICKS_PER_FRAME = 1000 / TARGET_FPS;
 
 				// Calculate the time taken for the frame
-				const int delayTime = SCREEN_TICKS_PER_FRAME - frameTime;  // NOLINT(cppcoreguidelines-narrowing-conversions)
+				const int delayTime = SCREEN_TICKS_PER_FRAME - frameTime;
+				// NOLINT(cppcoreguidelines-narrowing-conversions)
 				if (delayTime > 0)
 				{
 					SDL_Delay(delayTime);
@@ -1022,7 +1096,8 @@ void GameEngine::run()
 				prevFrameTime = currentFrameTime;
 
 				// Calculate average FPS
-				const float avgFPS = static_cast<float>(countedFrames) / (static_cast<float>(fpsTimer.getTicks()) / 1000.0f);
+				const float avgFPS = static_cast<float>(countedFrames) / (static_cast<float>(fpsTimer.getTicks()) /
+					1000.0f);
 
 				// update function
 				update();
@@ -1045,6 +1120,14 @@ void GameEngine::run()
 					score.str("");
 					score << "Score: " << player1.getScore();
 					if (!scoreText.loadFromRenderedText(score.str().c_str(), textColor, renderer, font))
+					{
+						cout << "Failed to render score text texture!\n";
+					}
+
+					// Render level
+					level.str("");
+					level << "Level: " << player1.getLevel();
+					if (!levelText.loadFromRenderedText(level.str().c_str(), textColor, renderer, font))
 					{
 						cout << "Failed to render score text texture!\n";
 					}
