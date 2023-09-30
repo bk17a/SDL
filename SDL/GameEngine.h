@@ -63,6 +63,8 @@ public:
 
 	void run();
 
+	void spawnEnemyWave(int numEnemiesToSpawn);
+
 private:
 	int countedFrames = 0;
 	int idleAnimationFrame = 0;
@@ -75,6 +77,9 @@ private:
 	Uint32 prevFrameTime = 0;
 	Uint32 shootInterval = 700;
 	Uint32 lastShotTime = 0;
+
+	Uint32 lastSpawnTime = 0;
+	Uint32 spawnInterval = 1500; // 1.5 sec
 
 	// grass texture
 	TextureManager grass;

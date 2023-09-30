@@ -373,6 +373,23 @@ void GameEngine::update()
 				updateCamera();
 				updateBullets();
 				updateEnemiesKilled();
+
+				// Check if any enemies are still alive
+				bool anyEnemiesAlive = false;
+				for (auto& e : enemy1Vec)
+				{
+					if (e.isAlive())
+					{
+						anyEnemiesAlive = true;
+						break; // No need to continue checking if one enemy is alive
+					}
+				}
+
+				// If no enemies are alive, spawn a new wave
+				if (!anyEnemiesAlive)
+				{
+					spawnEnemyWave(5);
+				}
 			}
 		}
 	}
@@ -1123,7 +1140,6 @@ void GameEngine::run()
 					// Render level
 					level.str("");
 					level << "Level: " << player1.getLevel();
-					cout << "Debug - Current Player Level: " << player1.getLevel() << endl; // Debug output
 					if (!levelText.loadFromRenderedText(level.str().c_str(), textColor, renderer, font))
 					{
 						cout << "Failed to render level text texture!\n";
@@ -1140,5 +1156,42 @@ void GameEngine::run()
 				++countedFrames;
 			}
 		}
+	}
+}
+
+void GameEngine::spawnEnemyWave(const int numEnemiesToSpawn)
+{
+	// Get the current time
+	currentFrameTime = SDL_GetTicks();
+
+	// Check if it's time to spawn a new enemy and if the maximum number of enemies is not reached
+	if (currentFrameTime - lastSpawnTime >= spawnInterval && enemy1Vec.size() < MAX_ENEMIES)
+	{
+		// Spawn multiple enemies
+		for (int i = 0; i < numEnemiesToSpawn; ++i)
+		{
+			enemy1 = Enemy(renderer, &enemy1WalkTex);
+			enemy1Vec.emplace_back(enemy1);
+		}
+
+		// Update the last spawn time
+		lastSpawnTime = currentFrameTime;
+	}
+
+	if (!enemy1.isAlive())
+	{
+		for (auto& e : enemy1Vec)
+		{
+			e.spawn();
+		}
+	}
+
+	constexpr int walkingFrames = 6;
+	for (int i = 0; i < walkingFrames; ++i)
+	{
+		enemy1WalkRect[i].x = i * ENEMY1RUN_WIDTH;
+		enemy1WalkRect[i].y = 0;
+		enemy1WalkRect[i].w = ENEMY1RUN_WIDTH;
+		enemy1WalkRect[i].h = ENEMY1RUN_HEIGHT;
 	}
 }

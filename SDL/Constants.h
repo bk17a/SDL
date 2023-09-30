@@ -54,4 +54,6 @@ static constexpr int ENEMY_WALK_ANIMATION_FRAMES = 6 * 8;
 static constexpr int ENEMY1RUN_WIDTH = 190;
 static constexpr int ENEMY1RUN_HEIGHT = 92;
 
+static constexpr int MAX_ENEMIES = 5; // Set a maximum number of enemies to automatically spawn
+
 #endif
