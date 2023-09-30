@@ -373,23 +373,7 @@ void GameEngine::update()
 				updateCamera();
 				updateBullets();
 				updateEnemiesKilled();
-
-				// Check if any enemies are still alive
-				bool anyEnemiesAlive = false;
-				for (auto& e : enemy1Vec)
-				{
-					if (e.isAlive())
-					{
-						anyEnemiesAlive = true;
-						break; // No need to continue checking if one enemy is alive
-					}
-				}
-
-				// If no enemies are alive, spawn a new wave
-				if (!anyEnemiesAlive)
-				{
-					spawnEnemyWave(5);
-				}
+				updateEnemyWave();
 			}
 		}
 	}
@@ -1174,6 +1158,13 @@ void GameEngine::spawnEnemyWave(const int numEnemiesToSpawn)
 			enemy1Vec.emplace_back(enemy1);
 		}
 
+		// Spawn multiple enemies for enemies vector
+		for (int i = 0; i < numEnemiesToSpawn; ++i)
+		{
+			enemy = Enemy(renderer, &enemyTex);
+			enemies.emplace_back(enemy);
+		}
+
 		// Update the last spawn time
 		lastSpawnTime = currentFrameTime;
 	}
@@ -1186,6 +1177,14 @@ void GameEngine::spawnEnemyWave(const int numEnemiesToSpawn)
 		}
 	}
 
+	if (!enemy.isAlive())
+	{
+		for (auto& e : enemies)
+		{
+			e.spawn();
+		}
+	}
+
 	constexpr int walkingFrames = 6;
 	for (int i = 0; i < walkingFrames; ++i)
 	{
@@ -1193,5 +1192,34 @@ void GameEngine::spawnEnemyWave(const int numEnemiesToSpawn)
 		enemy1WalkRect[i].y = 0;
 		enemy1WalkRect[i].w = ENEMY1RUN_WIDTH;
 		enemy1WalkRect[i].h = ENEMY1RUN_HEIGHT;
+	}
+}
+
+void GameEngine::updateEnemyWave()
+{
+	// Check if any enemies are still alive
+	bool anyEnemiesAlive = false;
+	for (auto& e : enemy1Vec)
+	{
+		if (e.isAlive())
+		{
+			anyEnemiesAlive = true;
+			break; // No need to continue checking if one enemy is alive
+		}
+	}
+
+	for (auto& e : enemies)
+	{
+		if (e.isAlive())
+		{
+			anyEnemiesAlive = true;
+			break;
+		}
+	}
+
+	// If no enemies are alive, spawn a new wave
+	if (!anyEnemiesAlive)
+	{
+		spawnEnemyWave(5);
 	}
 }

@@ -64,6 +64,7 @@ public:
 	void run();
 
 	void spawnEnemyWave(int numEnemiesToSpawn);
+	void updateEnemyWave();
 
 private:
 	int countedFrames = 0;
